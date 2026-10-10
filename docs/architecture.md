@@ -31,6 +31,7 @@ draw         layout, projection, labels, legend -> scene       src/draw.js
 | `spec.js` | Validate a spec. Every problem names the field. |
 | `csv.js` | Read CSV or TSV, parse numbers the way spreadsheets print them. |
 | `regions.js`, `geo.js` | The region catalogue, loading areas from the bundled TopoJSON, name keys per level. |
+| `custom.js` | Read the boundaries of a `custom` region (GeoJSON or TopoJSON): rewind rings for d3, derive key types from the properties, choose an equal-area projection from the extent. |
 | `names.js`, `join.js` | Normalise names, find the key column, join rows to areas, report what did not join. |
 | `classify.js` | Quantile, equal interval, Fisher-Jenks and manual classes, with round edges that never move a value to another class. |
 | `color.js`, `palettes.js` | CIELAB, CIEDE2000, colour vision simulation (Machado 2009), the bundled palettes. |

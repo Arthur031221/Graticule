@@ -98,14 +98,14 @@ export const RULES = {
 const SHADED = new Set(["choropleth", "small-multiples"]);
 
 /** Projection the map will use. */
-export function projectionNameOf(spec) {
+export function projectionNameOf(spec, region = getRegion(spec.region)) {
   if (spec.projection !== "auto") return typeof spec.projection === "string" ? spec.projection : spec.projection.name;
-  const configured = getRegion(spec.region).projection;
+  const configured = region.projection;
   return typeof configured === "string" ? configured : configured.name;
 }
 
 function latitudeSpan(analysis) {
-  const box = getRegion(analysis.spec.region).box;
+  const box = analysis.region.box ?? analysis.region.bounds;
   if (box) return box[3] - box[1];
   const collection = {
     type: "FeatureCollection",
@@ -247,7 +247,7 @@ function checkRawCounts(a, add) {
 
 function checkProjection(a, add) {
   const { spec } = a;
-  const name = projectionNameOf(spec);
+  const name = projectionNameOf(spec, a.region);
   const entry = PROJECTIONS[name];
   if (!entry || entry.equalArea || latitudeSpan(a) <= THRESHOLDS.smallRegionSpan) return;
   if (name === "mercator" && latitudeSpan(a) > THRESHOLDS.mercatorLatitudeSpan) {

@@ -86,6 +86,17 @@ A locator map marks areas and adds a small globe:
 { "type": "locator", "region": "asia", "highlight": ["TWN"], "data": {} }
 ```
 
+## Your own boundaries
+
+For a place the bundled regions do not cover, give a GeoJSON or TopoJSON file with `--boundaries` instead of `--region`:
+
+```
+graticule join table.csv --boundaries states.geojson
+graticule init table.csv --boundaries states.geojson -o map.json
+```
+
+The spec gets `"region": "custom"` and a `boundaries` block, described in [config.md](config.md). Everything else works as for a bundled region: the join report, the rules, `--fix`, the four output formats and the nine label languages. In the playground, drop the file next to the table.
+
 ## 5. Language
 
 `--lang zh-TW` (or `"language": "zh-TW"` in the spec) changes the labels on the map and the language of the messages. The nine languages are en, zh-TW, zh-CN, ja, ko, es, fr, de and pt-BR. Names come from Natural Earth and, for Taiwan townships, from the Ministry of the Interior (English and Traditional Chinese only, other languages fall back to those).

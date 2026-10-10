@@ -30,7 +30,7 @@ export function summarize(result) {
         palette: a.classing.paletteName,
       }
     : null;
-  const projection = spec ? projectionNameOf(spec) : null;
+  const projection = spec && (a.region || spec.region !== "custom") ? projectionNameOf(spec, a.region) : null;
   return {
     graticule: VERSION,
     ok: !result.blocked,

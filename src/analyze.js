@@ -5,7 +5,7 @@ import { isNull, parseColumn, parseTable } from "./csv.js";
 import { breaksFor, classOf, equalEdges, equalEdgesAround, niceEdges, spearman } from "./classify.js";
 import { paletteColors, paletteType } from "./palettes.js";
 import { normalizeSpec } from "./spec.js";
-import { getRegion } from "./regions.js";
+import { BoundaryError, loadCustomAreas } from "./custom.js";
 
 const AGGREGATE = {
   sum: (v) => v.reduce((a, b) => a + b, 0),
@@ -65,7 +65,24 @@ export async function analyze(input, ctx) {
   const findings = [...specFindings];
   if (!spec || specFindings.some((f) => f.level === "error")) return { spec, findings, ok: false };
 
-  const { areas, borders, region } = await loadAreas(spec.region, ctx.assets);
+  let loaded;
+  try {
+    loaded =
+      spec.region === "custom"
+        ? await loadCustomAreas(spec.boundaries, ctx.readText)
+        : await loadAreas(spec.region, ctx.assets);
+  } catch (error) {
+    if (!(error instanceof BoundaryError)) throw error;
+    findings.push({ id: "spec", level: "error", params: { path: "boundaries", detail: error.message } });
+    return { spec, findings, ok: false };
+  }
+  const { areas, borders, region } = loaded;
+  if (loaded.skipped)
+    findings.push({
+      id: "boundaries-skipped",
+      level: "warn",
+      params: { count: loaded.skipped, file: loaded.file || "boundaries.geojson" },
+    });
   const aliases = await loadAliases(spec.region, region, ctx.assets);
   const index = buildIndex(areas, aliases);
   const analysis = {
@@ -320,7 +337,7 @@ function buildNumeric(analysis, rows, valueColumns) {
   const rhos = spec.data.normalize ? [] : analysis.series.map(rho).filter((r) => r !== null);
   analysis.population = {
     rho: rhos.length ? Math.max(...rhos) : null,
-    available: getRegion(spec.region).population === true,
+    available: analysis.region.population === true,
   };
   const all = analysis.series.flatMap((s) => s.numbers);
   const usable = spec.type === "symbols" ? all.filter((v) => v > 0) : all;

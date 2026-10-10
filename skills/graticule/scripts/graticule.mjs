@@ -507,18 +507,18 @@ function isWide(cp) {
 }
 function createMeasurer(metrics) {
   const advance = (cp, bold) => (bold ? metrics.bold : metrics.regular)[cp] ?? (bold ? metrics.bold : metrics.regular)[109] ?? 600;
-  function width(text, size, weight = "regular") {
+  function width(text2, size, weight = "regular") {
     let total = 0;
-    for (const char of String(text)) {
+    for (const char of String(text2)) {
       const cp = char.codePointAt(0);
       total += isWide(cp) ? 1e3 : advance(cp, weight === "bold");
     }
     return total / metrics.upm * size;
   }
-  function wrap(text, maxWidth, size, weight = "regular") {
+  function wrap(text2, maxWidth, size, weight = "regular") {
     const lines = [];
     let line = "";
-    const tokens = String(text).match(
+    const tokens = String(text2).match(
       /[\p{sc=Han}\p{sc=Hiragana}\p{sc=Katakana}\p{sc=Hangul}]|[^\s\p{sc=Han}\p{sc=Hiragana}\p{sc=Katakana}\p{sc=Hangul}]+|\s+/gu
     ) ?? [];
     for (const token of tokens) {
@@ -635,10 +635,10 @@ ${body}
 </svg>
 `;
 }
-function runs(text, scene, item) {
-  if (!scene.cjk) return esc(text);
+function runs(text2, scene, item) {
+  if (!scene.cjk) return esc(text2);
   const groups = [];
-  for (const char of text) {
+  for (const char of text2) {
     const cjk = isCjk(char);
     const face = cjk ? scene.coverage.pick(char.codePointAt(0), scene.cjk) : null;
     const last2 = groups[groups.length - 1];
@@ -143648,12 +143648,12 @@ var init_png_js = __esm({
               }
               break;
             case "tEXt":
-              var text = this.read(chunkSize);
-              var index = text.indexOf(0);
-              var key = String.fromCharCode.apply(String, text.slice(0, index));
+              var text2 = this.read(chunkSize);
+              var index = text2.indexOf(0);
+              var key = String.fromCharCode.apply(String, text2.slice(0, index));
               this.text[key] = String.fromCharCode.apply(
                 String,
-                text.slice(index + 1)
+                text2.slice(index + 1)
               );
               break;
             case "IEND":
@@ -144343,8 +144343,8 @@ function formatListLabel(n, listType) {
   }
   var letter = String.fromCharCode((n - 1) % 26 + 65);
   var times = Math.floor((n - 1) / 26 + 1);
-  var text = Array(times + 1).join(letter);
-  return `${text}.`;
+  var text2 = Array(times + 1).join(letter);
+  return `${text2}.`;
 }
 function mapTypeAndFlags(type, userOptions, pdfObject) {
   let flags = userOptions.Ff ?? 0;
@@ -144600,9 +144600,9 @@ function normalizeTable() {
   if (!rowStyle) rowStyle = () => ({});
   this._rowStyle = normalizedRowStyle.bind(this, defaultRowStyle, rowStyle);
 }
-function normalizeText(text) {
-  if (text != null) text = `${text}`;
-  return text;
+function normalizeText(text2) {
+  if (text2 != null) text2 = `${text2}`;
+  return text2;
 }
 function normalizeCell(cell, rowIndex, colIndex) {
   const colStyle = this._colStyle(colIndex);
@@ -147923,10 +147923,10 @@ udieresis     yacute         thorn          ydieresis`.split(/\s+/);
           }
         }
       }
-      encodeText(text) {
+      encodeText(text2) {
         const res = [];
-        for (let i2 = 0, len = text.length; i2 < len; i2++) {
-          let char = text.charCodeAt(i2);
+        for (let i2 = 0, len = text2.length; i2 < len; i2++) {
+          let char = text2.charCodeAt(i2);
           char = WIN_ANSI_MAP[char] || char;
           res.push(char.toString(16));
         }
@@ -148011,9 +148011,9 @@ udieresis     yacute         thorn          ydieresis`.split(/\s+/);
         };
         return this.dictionary.end();
       }
-      encode(text) {
-        const encoded = this.font.encodeText(text);
-        const glyphs = this.font.glyphsForString(`${text}`);
+      encode(text2) {
+        const encoded = this.font.encodeText(text2);
+        const glyphs = this.font.glyphsForString(`${text2}`);
         const advances = this.font.advancesForGlyphs(glyphs);
         const positions = [];
         for (let i2 = 0; i2 < glyphs.length; i2++) {
@@ -148063,8 +148063,8 @@ udieresis     yacute         thorn          ydieresis`.split(/\s+/);
           this.layoutCache = /* @__PURE__ */ Object.create(null);
         }
       }
-      layoutRun(text, features) {
-        const run = this.font.layout(text, features);
+      layoutRun(text2, features) {
+        const run = this.font.layout(text2, features);
         for (let i2 = 0; i2 < run.positions.length; i2++) {
           const position = run.positions[i2];
           for (let key in position) {
@@ -148074,31 +148074,31 @@ udieresis     yacute         thorn          ydieresis`.split(/\s+/);
         }
         return run;
       }
-      layoutCached(text) {
+      layoutCached(text2) {
         if (!this.layoutCache) {
-          return this.layoutRun(text);
+          return this.layoutRun(text2);
         }
         let cached;
-        if (cached = this.layoutCache[text]) {
+        if (cached = this.layoutCache[text2]) {
           return cached;
         }
-        const run = this.layoutRun(text);
-        this.layoutCache[text] = run;
+        const run = this.layoutRun(text2);
+        this.layoutCache[text2] = run;
         return run;
       }
-      layout(text, features, onlyWidth) {
+      layout(text2, features, onlyWidth) {
         if (features) {
-          return this.layoutRun(text, features);
+          return this.layoutRun(text2, features);
         }
         let glyphs = onlyWidth ? null : [];
         let positions = onlyWidth ? null : [];
         let advanceWidth = 0;
         let last2 = 0;
         let index = 0;
-        while (index <= text.length) {
+        while (index <= text2.length) {
           var needle;
-          if (index === text.length && last2 < index || (needle = text.charAt(index), [" ", "	"].includes(needle))) {
-            const run = this.layoutCached(text.slice(last2, ++index));
+          if (index === text2.length && last2 < index || (needle = text2.charAt(index), [" ", "	"].includes(needle))) {
+            const run = this.layoutCached(text2.slice(last2, ++index));
             if (!onlyWidth) {
               glyphs = glyphs.concat(run.glyphs);
               positions = positions.concat(run.positions);
@@ -148115,11 +148115,11 @@ udieresis     yacute         thorn          ydieresis`.split(/\s+/);
           advanceWidth
         };
       }
-      encode(text, features) {
+      encode(text2, features) {
         const {
           glyphs,
           positions
-        } = this.layout(text, features);
+        } = this.layout(text2, features);
         const res = [];
         for (let i2 = 0; i2 < glyphs.length; i2++) {
           const glyph = glyphs[i2];
@@ -148539,14 +148539,14 @@ end`);
         }
         return w + this.wordWidth(HYPHEN) <= this.spaceLeft;
       }
-      eachWord(text, fn) {
+      eachWord(text2, fn) {
         let bk;
-        const breaker = new $557adaaeb0c7885f$exports(text);
+        const breaker = new $557adaaeb0c7885f$exports(text2);
         let last2 = null;
         const wordWidths = /* @__PURE__ */ Object.create(null);
         while (bk = breaker.nextBreak()) {
           var shouldContinue;
-          let word = text.slice((last2 != null ? last2.position : void 0) || 0, bk.position);
+          let word = text2.slice((last2 != null ? last2.position : void 0) || 0, bk.position);
           let w = wordWidths[word] != null ? wordWidths[word] : wordWidths[word] = this.wordWidth(word);
           if (w > this.lineWidth + this.continuedX) {
             let lbk = last2;
@@ -148594,7 +148594,7 @@ end`);
           last2 = bk;
         }
       }
-      wrap(text, options) {
+      wrap(text2, options) {
         const {
           document
         } = this;
@@ -148629,7 +148629,7 @@ end`);
           return lc2++;
         };
         this.emit("sectionStart", options, this);
-        this.eachWord(text, (word, w, bk, last2) => {
+        this.eachWord(text2, (word, w, bk, last2) => {
           if (last2 == null || last2.required) {
             this.emit("firstLine", options, this);
             this.spaceLeft = this.lineWidth;
@@ -148766,11 +148766,11 @@ end`);
         this.y -= this.currentLineHeight(true) * lines + this._lineGap;
         return this;
       },
-      _text(text, x2, y, options, lineCallback) {
+      _text(text2, x2, y, options, lineCallback) {
         options = this._initOptions(x2, y, options);
-        text = text == null ? "" : `${text}`;
+        text2 = text2 == null ? "" : `${text2}`;
         if (options.wordSpacing) {
-          text = text.replace(/\s{2,}/g, " ");
+          text2 = text2.replace(/\s{2,}/g, " ");
         }
         const addStructure = () => {
           if (options.structParent) {
@@ -148792,9 +148792,9 @@ end`);
           }
           this._wrapper = options.continued ? wrapper : null;
           this._textOptions = options.continued ? options : null;
-          wrapper.wrap(text, options);
+          wrapper.wrap(text2, options);
         } else {
-          for (let line of text.split("\n")) {
+          for (let line of text2.split("\n")) {
             addStructure();
             lineCallback(line, options);
           }
@@ -148802,8 +148802,8 @@ end`);
         if (options.rotation !== 0) this.restore();
         return this;
       },
-      text(text, x2, y, options) {
-        return this._text(text, x2, y, options, this._line);
+      text(text2, x2, y, options) {
+        return this._text(text2, x2, y, options, this._line);
       },
       widthOfString(string, options = {}) {
         const horizontalScaling = options.horizontalScaling || 100;
@@ -148824,19 +148824,19 @@ end`);
         }
         if (options.width) {
           let wrapper = new LineWrapper(this, options);
-          wrapper.on("line", (text, options2) => {
+          wrapper.on("line", (text2, options2) => {
             this.y += lineHeight;
-            text = text.replace(/\n/g, "");
-            if (text.length) {
+            text2 = text2.replace(/\n/g, "");
+            if (text2.length) {
               let wordSpacing = options2.wordSpacing ?? 0;
               const characterSpacing = options2.characterSpacing ?? 0;
               if (options2.width && options2.align === "justify") {
-                const words = text.trim().split(/\s+/);
-                const textWidth = this.widthOfString(text.replace(/\s+/g, ""), options2);
+                const words = text2.trim().split(/\s+/);
+                const textWidth = this.widthOfString(text2.replace(/\s+/g, ""), options2);
                 const spaceWidth = this.widthOfString(" ") + characterSpacing;
                 wordSpacing = Math.max(0, (options2.lineWidth - textWidth) / Math.max(1, words.length - 1) - spaceWidth);
               }
-              contentWidth = Math.max(contentWidth, options2.textWidth + wordSpacing * (options2.wordCount - 1) + characterSpacing * (text.length - 1));
+              contentWidth = Math.max(contentWidth, options2.textWidth + wordSpacing * (options2.wordCount - 1) + characterSpacing * (text2.length - 1));
             }
           });
           wrapper.wrap(string, options);
@@ -148901,7 +148901,7 @@ end`);
           height: yMax - yMin
         };
       },
-      heightOfString(text, options) {
+      heightOfString(text2, options) {
         const {
           x: x2,
           y
@@ -148909,7 +148909,7 @@ end`);
         options = this._initOptions(options);
         options.height = Infinity;
         const lineGap = options.lineGap || this._lineGap || 0;
-        this._text(text, this.x, this.y, options, () => {
+        this._text(text2, this.x, this.y, options, () => {
           this.y += this.currentLineHeight(true) + lineGap;
         });
         const height = this.y - y;
@@ -148983,8 +148983,8 @@ end`);
                 break;
               case "numbered":
               case "lettered":
-                var text = formatListLabel(numbers[i2 - 1], listType);
-                this._fragment(text, this.x - indent, this.y, options);
+                var text2 = formatListLabel(numbers[i2 - 1], listType);
+                this._fragment(text2, this.x - indent, this.y, options);
                 break;
             }
             if (item && labelType && bodyType) {
@@ -149049,19 +149049,19 @@ end`);
         if (result.rotation < 0) result.rotation += 360;
         return result;
       },
-      _line(text, options = {}, wrapper) {
-        this._fragment(text, this.x, this.y, options);
+      _line(text2, options = {}, wrapper) {
+        this._fragment(text2, this.x, this.y, options);
         if (wrapper) {
           const lineGap = options.lineGap || this._lineGap || 0;
           this.y += this.currentLineHeight(true) + lineGap;
         } else {
-          this.x += this.widthOfString(text, options);
+          this.x += this.widthOfString(text2, options);
         }
       },
-      _fragment(text, x2, y, options) {
+      _fragment(text2, x2, y, options) {
         let dy, encoded, i2, positions, textWidth, words;
-        text = `${text}`.replace(/\n/g, "");
-        if (text.length === 0) {
+        text2 = `${text2}`.replace(/\n/g, "");
+        if (text2.length === 0) {
           return;
         }
         const align = options.align || "left";
@@ -149071,15 +149071,15 @@ end`);
         if (options.width) {
           switch (align) {
             case "right":
-              textWidth = this.widthOfString(text.replace(/\s+$/, ""), options);
+              textWidth = this.widthOfString(text2.replace(/\s+$/, ""), options);
               x2 += options.lineWidth - textWidth;
               break;
             case "center":
               x2 += options.lineWidth / 2 - options.textWidth / 2;
               break;
             case "justify":
-              words = text.trim().split(/\s+/);
-              textWidth = this.widthOfString(text.replace(/\s+/g, ""), options);
+              words = text2.trim().split(/\s+/);
+              textWidth = this.widthOfString(text2.replace(/\s+/g, ""), options);
               var spaceWidth = this.widthOfString(" ") + characterSpacing;
               wordSpacing = Math.max(0, (options.lineWidth - textWidth) / Math.max(1, words.length - 1) - spaceWidth);
               break;
@@ -149117,9 +149117,9 @@ end`);
           }
           dy = dy / 1e3 * this._fontSize;
         }
-        const measuredWidth = options.textWidth ?? this.widthOfString(text, options) - characterSpacing * (text.length - 1);
-        const measuredWordCount = options.wordCount ?? (text.trim() ? text.trim().split(/\s+/).length : 0);
-        const renderedWidth = measuredWidth + wordSpacing * (measuredWordCount - 1) + characterSpacing * (text.length - 1);
+        const measuredWidth = options.textWidth ?? this.widthOfString(text2, options) - characterSpacing * (text2.length - 1);
+        const measuredWordCount = options.wordCount ?? (text2.trim() ? text2.trim().split(/\s+/).length : 0);
+        const renderedWidth = measuredWidth + wordSpacing * (measuredWordCount - 1) + characterSpacing * (text2.length - 1);
         if (options.link != null) {
           const linkOptions = {};
           if (this._currentStructureElement && this._currentStructureElement.dictionary.data.S === "Link") {
@@ -149190,7 +149190,7 @@ end`);
           this.addContent(`${horizontalScaling} Tz`);
         }
         if (wordSpacing) {
-          words = text.trim().split(/\s+/);
+          words = text2.trim().split(/\s+/);
           wordSpacing += this.widthOfString(" ") + characterSpacing;
           wordSpacing *= 1e3 / this._fontSize;
           encoded = [];
@@ -149209,7 +149209,7 @@ end`);
             positions[positions.length - 1] = space;
           }
         } else {
-          [encoded, positions] = this._font.encode(text, options.features);
+          [encoded, positions] = this._font.encode(text2, options.features);
         }
         const scale = this._fontSize / 1e3;
         const commands = [];
@@ -149849,11 +149849,11 @@ end`);
         };
         return this.annotate(x2, y, w, h, annotationOptions);
       },
-      textAnnotation(x2, y, w, h, text, options) {
+      textAnnotation(x2, y, w, h, text2, options) {
         const annotationOptions = {
           ...options,
           Subtype: "FreeText",
-          Contents: new String(text),
+          Contents: new String(text2),
           DA: new String()
         };
         return this.annotate(x2, y, w, h, annotationOptions);
@@ -153548,7 +153548,8 @@ var BOUNDARY_CREDIT = {
   "jp-prefectures": "Boundaries: Natural Earth (public domain)",
   "kr-provinces": "Boundaries: Natural Earth (public domain)"
 };
-function boundaryCredit(id) {
+function boundaryCredit(id, custom) {
+  if (custom) return custom.credit ?? "";
   const region = getRegion(id);
   return BOUNDARY_CREDIT[region.parent ?? id];
 }
@@ -153730,8 +153731,8 @@ function decodeBytes(bytes, label) {
   }
 }
 var NULLS = /* @__PURE__ */ new Set(["", "na", "n/a", "nan", "null", "none", "..", "-", "--", "\u2014", "#n/a"]);
-function parseTable(text) {
-  const source = text.replace(/^\uFEFF/, "");
+function parseTable(text2) {
+  const source = text2.replace(/^\uFEFF/, "");
   const delimiter = sniffDelimiter(source);
   const records = [];
   let field = "";
@@ -153767,20 +153768,20 @@ function parseTable(text) {
   const rows = records.slice(1).map((cells) => Object.fromEntries(columns.map((c, i2) => [c, (cells[i2] ?? "").trim()])));
   return { columns, rows, delimiter, problems };
 }
-function sniffDelimiter(text) {
-  const header = text.split(/\r?\n/, 1)[0].replace(/"[^"]*"/g, "");
+function sniffDelimiter(text2) {
+  const header = text2.split(/\r?\n/, 1)[0].replace(/"[^"]*"/g, "");
   const counts = [",", "	", ";"].map((d) => [d, header.split(d).length - 1]);
   const best = counts.sort((a, b) => b[1] - a[1])[0];
   return best[1] > 0 ? best[0] : ",";
 }
-function isNull(text) {
+function isNull(text2) {
   return NULLS.has(
-    String(text ?? "").trim().toLowerCase()
+    String(text2 ?? "").trim().toLowerCase()
   );
 }
-function parseNumber(text, decimal) {
-  if (typeof text === "number") return Number.isFinite(text) ? text : null;
-  let t = String(text ?? "").trim();
+function parseNumber(text2, decimal) {
+  if (typeof text2 === "number") return Number.isFinite(text2) ? text2 : null;
+  let t = String(text2 ?? "").trim();
   if (isNull(t)) return null;
   t = t.replace(/−/g, "-").replace(/^[$€£¥]\s*/, "").replace(/\s*%$/, "");
   if (decimal === ",") {
@@ -153808,11 +153809,10 @@ function parseColumn(cells) {
 }
 
 // src/join.js
-var CODE_KINDS = /* @__PURE__ */ new Set(["iso3", "iso2", "isonum", "fips", "postal", "code", "iso", "jis"]);
 var PAD = { fips: 0, isonum: 3, jis: 2 };
 function normalizeCode(kind, value) {
-  const text = String(value).trim().toUpperCase();
-  return kind === "isonum" || kind === "jis" ? text.replace(/^0+(?=\d)/, "") : text;
+  const text2 = String(value).trim().toUpperCase();
+  return kind === "isonum" || kind === "jis" ? text2.replace(/^0+(?=\d)/, "") : text2;
 }
 function buildIndex(areas, aliases = {}) {
   const index = { kinds: {}, labels: [], byId: new Map(areas.map((a) => [a.id, a])) };
@@ -153849,7 +153849,7 @@ function kindsOf(index) {
 function lookup(index, kind, raw) {
   const map = index.kinds[kind];
   if (!map) return { entries: [], padded: false };
-  if (!CODE_KINDS.has(kind)) {
+  if (kind === "name") {
     const damaged = damagedNamePattern(raw);
     if (damaged) {
       const hits = [...map].filter(([key2]) => damaged.test(key2)).map(([, list2]) => list2);
@@ -154912,6 +154912,7 @@ var KEYS = {
     "source",
     "note",
     "region",
+    "boundaries",
     "type",
     "data",
     "classes",
@@ -154931,6 +154932,7 @@ var KEYS = {
     "attribution",
     "checks"
   ],
+  boundaries: ["file", "geojson", "key", "name", "population", "object", "credit", "title"],
   data: [
     "file",
     "csv",
@@ -154965,7 +154967,7 @@ function normalizeSpec(input) {
     return { spec: null, findings };
   }
   unknown("", input, KEYS.top);
-  const text = (value, path) => {
+  const text2 = (value, path) => {
     if (value === void 0 || value === null) return "";
     if (typeof value !== "string") bad(path, "must be a string");
     return typeof value === "string" ? value.trim() : "";
@@ -154978,7 +154980,24 @@ function normalizeSpec(input) {
     }
     return value;
   };
-  const region = oneOf(input.region, REGION_IDS, "region", "world");
+  const region = oneOf(input.region, [...REGION_IDS, "custom"], "region", "world");
+  const boundaries = input.boundaries;
+  if (region === "custom") {
+    if (!boundaries || typeof boundaries !== "object" || Array.isArray(boundaries))
+      bad("boundaries", 'is required with region "custom": give a file or geojson');
+    else {
+      unknown("boundaries.", boundaries, KEYS.boundaries);
+      const given = ["file", "geojson"].filter((k) => boundaries[k] !== void 0);
+      if (given.length !== 1) bad("boundaries", `give exactly one of file or geojson (found ${given.length})`);
+      if (boundaries.file !== void 0 && typeof boundaries.file !== "string")
+        bad("boundaries.file", "must be a path");
+      if (boundaries.geojson !== void 0 && (!boundaries.geojson || typeof boundaries.geojson !== "object"))
+        bad("boundaries.geojson", "must be a GeoJSON or TopoJSON object");
+      for (const field of ["key", "name", "population", "object", "credit", "title"])
+        if (boundaries[field] !== void 0 && typeof boundaries[field] !== "string")
+          bad(`boundaries.${field}`, "must be a string");
+    }
+  } else if (boundaries !== void 0) bad("boundaries", 'is only used with region "custom"');
   const type = oneOf(input.type, TYPES, "type", "choropleth");
   const data = input.data && typeof input.data === "object" ? input.data : {};
   if (!input.data || typeof input.data !== "object") {
@@ -155066,11 +155085,12 @@ function normalizeSpec(input) {
   const allow = input.checks?.allow ?? [];
   if (!Array.isArray(allow)) bad("checks.allow", "must be a list of rule ids");
   const spec = {
-    title: text(input.title, "title"),
-    subtitle: text(input.subtitle, "subtitle"),
-    source: text(input.source, "source"),
-    note: text(input.note, "note"),
+    title: text2(input.title, "title"),
+    subtitle: text2(input.subtitle, "subtitle"),
+    source: text2(input.source, "source"),
+    note: text2(input.note, "note"),
     region,
+    ...region === "custom" && boundaries && typeof boundaries === "object" ? { boundaries: { ...boundaries } } : {},
     type,
     data: { ...data, ...data.normalize ? { normalize: { ...data.normalize, per: data.normalize.per ?? 1 } } : {} },
     classes,
@@ -155097,6 +155117,196 @@ function normalizeSpec(input) {
   return { spec, findings };
 }
 
+// src/custom.js
+var import_topojson_client2 = __toESM(require_topojson_client(), 1);
+var EARTH_RADIUS_KM2 = 6371.0088;
+var NAME_PROPERTIES = ["name", "name_en", "name_1", "admin", "label", "title", "nom", "nombre"];
+var MAX_KIND_LENGTH = 80;
+var MAX_KINDS = 12;
+var BoundaryError = class extends Error {
+};
+async function loadCustomAreas(boundaries, readText) {
+  const file = boundaries.file ?? "";
+  const source = boundaries.geojson ?? await readJson(file, readText);
+  const { features, skipped: dropped } = featuresOf(source, boundaries.object);
+  const polygons = features.filter(
+    (f) => /^(Multi)?Polygon$/.test(f.geometry?.type ?? "") && hasCoordinates(f.geometry)
+  );
+  const skipped = dropped + features.length - polygons.length;
+  if (!polygons.length)
+    throw new BoundaryError("the boundaries have no polygons: each feature needs a Polygon or MultiPolygon geometry");
+  for (const f of polygons) checkCoordinates(f.geometry);
+  const rows = polygons.map((f) => ({ ...f.properties ?? {} }));
+  const idProperty = chooseId(boundaries, polygons, rows);
+  const nameProperty = chooseName(boundaries, rows);
+  const kinds = chooseKinds(boundaries, rows, nameProperty);
+  const populationProperty = boundaries.population;
+  if (populationProperty && !rows.some((r) => numeric(r[populationProperty]) !== null))
+    throw new BoundaryError(`boundaries.population: no feature has a number in the property "${populationProperty}"`);
+  const used = /* @__PURE__ */ new Set();
+  const areas = polygons.map((f, i2) => {
+    const geometry2 = rewind(f.geometry);
+    const props = rows[i2];
+    const label = String(props[nameProperty] ?? props[idProperty] ?? `Area ${i2 + 1}`).trim();
+    let id = String(idProperty === "" ? f.id ?? i2 + 1 : props[idProperty] ?? f.id ?? i2 + 1).trim();
+    if (used.has(id)) id = `${id}#${i2 + 1}`;
+    used.add(id);
+    const keys = { name: [...new Set(nameVariants(label))] };
+    for (const kind of kinds) {
+      const raw = String(props[kind]).trim();
+      keys[kind] = [.../* @__PURE__ */ new Set([raw, raw.replace(/^0+(?=\d)/, "")])];
+    }
+    const wrapped = { type: "Feature", properties: {}, geometry: geometry2 };
+    return {
+      id,
+      names: [label],
+      alt: [],
+      keys,
+      pop: populationProperty ? numeric(props[populationProperty]) ?? void 0 : void 0,
+      areaKm2: area_default(
+        /** @type {any} */
+        wrapped
+      ) * EARTH_RADIUS_KM2 ** 2,
+      geometry: geometry2,
+      props
+    };
+  });
+  const collection = {
+    type: "FeatureCollection",
+    features: areas.map((a) => ({ type: "Feature", properties: {}, geometry: a.geometry }))
+  };
+  const bounds = bounds_default(
+    /** @type {any} */
+    collection
+  );
+  const region = {
+    file: "",
+    object: "",
+    level: "custom",
+    projection: chooseProjection(collection, bounds),
+    bounds: [bounds[0][0], bounds[0][1], bounds[1][0], bounds[1][1]],
+    keys: ["name", ...kinds],
+    title: boundaries.title ?? "Custom boundaries",
+    population: Boolean(populationProperty),
+    markers: true,
+    credit: boundaries.credit ? `Boundaries: ${boundaries.credit}` : ""
+  };
+  return { areas, borders: null, region, skipped, file };
+}
+async function readJson(file, readText) {
+  let text2;
+  try {
+    const read = await readText(file);
+    text2 = typeof read === "string" ? read : read.text;
+  } catch (error) {
+    throw new BoundaryError(`cannot read the boundaries file ${file}: ${error.message}`);
+  }
+  try {
+    return JSON.parse(text2.replace(/^﻿/, ""));
+  } catch (error) {
+    throw new BoundaryError(`${file} is not valid JSON: ${error.message}`);
+  }
+}
+function featuresOf(source, objectName) {
+  if (!source || typeof source !== "object")
+    throw new BoundaryError("the boundaries must be a GeoJSON or TopoJSON object");
+  if (source.type === "Topology") {
+    const names = Object.keys(source.objects ?? {});
+    const name = objectName ?? (names.length === 1 ? names[0] : "");
+    if (!name || !source.objects?.[name])
+      throw new BoundaryError(
+        objectName ? `boundaries.object "${objectName}" is not in the TopoJSON. Objects: ${names.join(", ")}` : `the TopoJSON has ${names.length} objects, so boundaries.object must name one of: ${names.join(", ")}`
+      );
+    const out = (0, import_topojson_client2.feature)(source, source.objects[name]);
+    return { features: out.type === "FeatureCollection" ? out.features : [out], skipped: 0 };
+  }
+  if (source.type === "FeatureCollection" && Array.isArray(source.features))
+    return { features: source.features.filter((f) => f && f.type === "Feature"), skipped: 0 };
+  if (source.type === "Feature") return { features: [source], skipped: 0 };
+  throw new BoundaryError(
+    `the boundaries are a ${source.type ?? "value"} with no features: give a GeoJSON FeatureCollection or a TopoJSON topology`
+  );
+}
+var hasCoordinates = (geometry2) => Array.isArray(geometry2.coordinates) && geometry2.coordinates.length > 0;
+function checkCoordinates(geometry2) {
+  const polygons = geometry2.type === "Polygon" ? [geometry2.coordinates] : geometry2.coordinates;
+  for (const polygon of polygons)
+    for (const ring of polygon)
+      for (const [x2, y] of ring)
+        if (!(x2 >= -180 && x2 <= 180 && y >= -90 && y <= 90))
+          throw new BoundaryError(
+            `the coordinates are not longitude and latitude in degrees (found ${x2}, ${y}). Reproject the file first, for example: ogr2ogr -t_srs EPSG:4326 out.geojson in.geojson`
+          );
+}
+function rewind(geometry2) {
+  const flip = (polygon) => polygon.map((ring) => [...ring].reverse());
+  const fix = (polygon) => {
+    const area = area_default(
+      /** @type {any} */
+      { type: "Polygon", coordinates: polygon }
+    );
+    return area > 2 * Math.PI ? flip(polygon) : polygon;
+  };
+  return geometry2.type === "Polygon" ? { type: "Polygon", coordinates: fix(geometry2.coordinates) } : { type: "MultiPolygon", coordinates: geometry2.coordinates.map(fix) };
+}
+var text = (value) => (typeof value === "string" || typeof value === "number") && String(value).trim() !== "";
+function numeric(value) {
+  const n = typeof value === "number" ? value : Number(String(value ?? "").replace(/,/g, ""));
+  return String(value ?? "").trim() !== "" && Number.isFinite(n) ? n : null;
+}
+function uniqueProperties(rows) {
+  const names = [...new Set(rows.flatMap((r) => Object.keys(r)))];
+  return names.filter((name) => {
+    if (!rows.every((r) => text(r[name]) && String(r[name]).length <= MAX_KIND_LENGTH)) return false;
+    return new Set(rows.map((r) => String(r[name]).trim())).size === rows.length;
+  });
+}
+function chooseName(boundaries, rows) {
+  if (boundaries.name) {
+    if (!rows.some((r) => r[boundaries.name] !== void 0))
+      throw new BoundaryError(`boundaries.name: no feature has the property "${boundaries.name}"`);
+    return boundaries.name;
+  }
+  const names = [...new Set(rows.flatMap((r) => Object.keys(r)))];
+  const labelled = NAME_PROPERTIES.map((p) => names.find((n) => n.toLowerCase() === p)).find(Boolean);
+  if (labelled) return labelled;
+  return uniqueProperties(rows).find((p) => rows.some((r) => numeric(r[p]) === null)) ?? names.find((p) => rows.some((r) => numeric(r[p]) === null && text(r[p]))) ?? "";
+}
+function chooseId(boundaries, features, rows) {
+  if (boundaries.key) {
+    if (!rows.some((r) => r[boundaries.key] !== void 0))
+      throw new BoundaryError(`boundaries.key: no feature has the property "${boundaries.key}"`);
+    return boundaries.key;
+  }
+  if (features.every((f) => text(f.id))) return "";
+  return uniqueProperties(rows)[0] ?? "";
+}
+function chooseKinds(boundaries, rows, nameProperty) {
+  const unique = uniqueProperties(rows).filter(
+    (p) => p !== nameProperty && p !== boundaries.population && p !== "name"
+  );
+  const first2 = unique.includes(boundaries.key) ? [boundaries.key] : [];
+  return [.../* @__PURE__ */ new Set([...first2, ...unique])].slice(0, MAX_KINDS);
+}
+function chooseProjection(collection, bounds) {
+  const [[west, south], [east, north]] = bounds;
+  const lon = east >= west ? east - west : east - west + 360;
+  const lat = north - south;
+  const [cx2, cy2] = centroid_default(
+    /** @type {any} */
+    collection
+  );
+  if (lon >= 180 || lat >= 100) return "equal-earth";
+  if (lon > 40 && lat < 80 && Math.abs(cy2) < 65)
+    return {
+      name: "conic-equal-area",
+      parallels: [south + lat / 6, north - lat / 6],
+      rotate: [-cx2, 0],
+      center: [0, cy2]
+    };
+  return { name: "azimuthal-equal-area", rotate: [-cx2, -cy2] };
+}
+
 // src/analyze.js
 var AGGREGATE = {
   sum: (v) => v.reduce((a, b) => a + b, 0),
@@ -155120,8 +155330,8 @@ async function loadTable(data, readText) {
     };
   }
   const read = data.csv ?? await readText(data.file, data.encoding);
-  const { text, encoding, guessed } = typeof read === "string" ? { text: read, encoding: "", guessed: false } : read;
-  return { ...parseTable(text), guessedEncoding: guessed ? encoding : "" };
+  const { text: text2, encoding, guessed } = typeof read === "string" ? { text: read, encoding: "", guessed: false } : read;
+  return { ...parseTable(text2), guessedEncoding: guessed ? encoding : "" };
 }
 function applyFilter(rows, filter) {
   if (!filter) return rows;
@@ -155135,7 +155345,21 @@ async function analyze(input, ctx) {
   const { spec, findings: specFindings } = normalizeSpec(input);
   const findings = [...specFindings];
   if (!spec || specFindings.some((f) => f.level === "error")) return { spec, findings, ok: false };
-  const { areas, borders, region } = await loadAreas(spec.region, ctx.assets);
+  let loaded;
+  try {
+    loaded = spec.region === "custom" ? await loadCustomAreas(spec.boundaries, ctx.readText) : await loadAreas(spec.region, ctx.assets);
+  } catch (error) {
+    if (!(error instanceof BoundaryError)) throw error;
+    findings.push({ id: "spec", level: "error", params: { path: "boundaries", detail: error.message } });
+    return { spec, findings, ok: false };
+  }
+  const { areas, borders, region } = loaded;
+  if (loaded.skipped)
+    findings.push({
+      id: "boundaries-skipped",
+      level: "warn",
+      params: { count: loaded.skipped, file: loaded.file || "boundaries.geojson" }
+    });
   const aliases = await loadAliases(spec.region, region, ctx.assets);
   const index = buildIndex(areas, aliases);
   const analysis = {
@@ -155269,8 +155493,8 @@ function numbersFor(column, analysis, rows) {
   const cellsAll = rows.map((r) => r[column] ?? "");
   const nums = parseColumn(cellsAll).values;
   const nonEmpty = cellsAll.filter((c) => c.trim() !== "").length;
-  const numeric = nums.filter((n) => n !== null).length;
-  const mostlyText = nonEmpty > 0 && numeric / nonEmpty < 0.5;
+  const numeric2 = nums.filter((n) => n !== null).length;
+  const mostlyText = nonEmpty > 0 && numeric2 / nonEmpty < 0.5;
   if (mostlyText) {
     analysis.findings.push({
       id: "value-not-numeric",
@@ -155284,9 +155508,9 @@ function numbersFor(column, analysis, rows) {
   const duplicates = [];
   let missingDenominator = 0;
   const skipped = { count: 0, example: "" };
-  const skip = (text) => {
+  const skip = (text2) => {
     skipped.count++;
-    skipped.example ||= text;
+    skipped.example ||= text2;
   };
   for (const [id, rowIdx] of join3.rowsByArea) {
     if (rowIdx.length > 1) duplicates.push({ id, rows: rowIdx.length });
@@ -155359,7 +155583,7 @@ function buildNumeric(analysis, rows, valueColumns) {
   const rhos = spec.data.normalize ? [] : analysis.series.map(rho).filter((r) => r !== null);
   analysis.population = {
     rho: rhos.length ? Math.max(...rhos) : null,
-    available: getRegion(spec.region).population === true
+    available: analysis.region.population === true
   };
   const all = analysis.series.flatMap((s) => s.numbers);
   const usable = spec.type === "symbols" ? all.filter((v) => v > 0) : all;
@@ -155559,13 +155783,13 @@ var RULES = {
   }
 };
 var SHADED = /* @__PURE__ */ new Set(["choropleth", "small-multiples"]);
-function projectionNameOf(spec) {
+function projectionNameOf(spec, region = getRegion(spec.region)) {
   if (spec.projection !== "auto") return typeof spec.projection === "string" ? spec.projection : spec.projection.name;
-  const configured = getRegion(spec.region).projection;
+  const configured = region.projection;
   return typeof configured === "string" ? configured : configured.name;
 }
 function latitudeSpan(analysis) {
-  const box = getRegion(analysis.spec.region).box;
+  const box = analysis.region.box ?? analysis.region.bounds;
   if (box) return box[3] - box[1];
   const collection = {
     type: "FeatureCollection",
@@ -155683,7 +155907,7 @@ function checkRawCounts(a, add2) {
 }
 function checkProjection(a, add2) {
   const { spec } = a;
-  const name = projectionNameOf(spec);
+  const name = projectionNameOf(spec, a.region);
   const entry = PROJECTIONS[name];
   if (!entry || entry.equalArea || latitudeSpan(a) <= THRESHOLDS.smallRegionSpan) return;
   if (name === "mercator" && latitudeSpan(a) > THRESHOLDS.mercatorLatitudeSpan) {
@@ -155793,7 +156017,7 @@ function checkCategories(a, add2) {
 }
 
 // src/draw.js
-var import_topojson_client2 = __toESM(require_topojson_client(), 1);
+var import_topojson_client3 = __toESM(require_topojson_client(), 1);
 
 // node_modules/tinyqueue/index.js
 var TinyQueue = class {
@@ -156482,10 +156706,13 @@ function basics(a, ctx) {
   }
   const footLines = [];
   const stop = ["zh-Hant", "zh-Hans", "ja"].includes(spec.language) ? "\u3002" : ".";
-  const sentence = (text) => /[.!?\u3002\uff01\uff1f)]$/.test(text) ? text : text + stop;
+  const sentence = (text2) => /[.!?\u3002\uff01\uff1f)]$/.test(text2) ? text2 : text2 + stop;
   const sourceText = [spec.source ? t("footer.source", { source: spec.source }) : "", spec.note].filter(Boolean).map(sentence).join(" ");
   if (sourceText) footLines.push(...m.wrap(sourceText, inner, noteSize));
-  const credit = [spec.attribution === false ? "" : t("footer.made_with"), a.region ? boundaryCredit(spec.region) : ""].filter(Boolean).join("  |  ");
+  const credit = [
+    spec.attribution === false ? "" : t("footer.made_with"),
+    a.region ? boundaryCredit(spec.region, a.region.level === "custom" ? a.region : void 0) : ""
+  ].filter(Boolean).join("  |  ");
   if (credit) footLines.push(...m.wrap(credit, inner, noteSize));
   return { spec, theme, W, scale, M: M2, inner, titleSize, noteSize, head, headBottom: y, footLines, t, m };
 }
@@ -156692,7 +156919,7 @@ function drawShaded(a, ctx, b) {
   for (const { area, feature: feature2, d, path } of geo.shapes) {
     const value = series.byArea.get(area.id);
     const fill = colorOf(area.id) ?? theme.noData;
-    const text = value === null || value === void 0 ? null : typeof value === "number" ? fmt(value) : value;
+    const text2 = value === null || value === void 0 ? null : typeof value === "number" ? fmt(value) : value;
     const name = nameIn(area, spec.language);
     if (d)
       areaItems.push({
@@ -156701,21 +156928,21 @@ function drawShaded(a, ctx, b) {
         fill,
         stroke: theme.stroke,
         sw: Math.max(0.35, 0.6 * b.scale),
-        title: tooltipOf(area, spec.language, text, ctx.t),
+        title: tooltipOf(area, spec.language, text2, ctx.t),
         attrs: {
           "data-id": area.id,
           "data-name": name,
           "data-class": String(series.assign.get(area.id) ?? -1),
-          ...text !== null ? { "data-value": text } : {}
+          ...text2 !== null ? { "data-value": text2 } : {}
         }
       });
-    table.push({ id: area.id, name, value: text, fill });
-    const needRings = wantsLabels || getRegion(spec.region).markers && text !== null;
+    table.push({ id: area.id, name, value: text2, fill });
+    const needRings = wantsLabels || a.region.markers && text2 !== null;
     if (!needRings) continue;
     const rings = ringsOf(path, feature2);
     const anchor = labelAnchor(rings);
     if (!anchor) continue;
-    if (getRegion(spec.region).markers && text !== null && anchor.area < 14 * b.scale ** 2) {
+    if (a.region.markers && text2 !== null && anchor.area < 14 * b.scale ** 2) {
       markers.push({
         type: "circle",
         cx: anchor.x,
@@ -156725,12 +156952,12 @@ function drawShaded(a, ctx, b) {
         stroke: theme.ink,
         sw: 0.6 * b.scale,
         opacity: 0.95,
-        title: tooltipOf(area, spec.language, text, ctx.t),
+        title: tooltipOf(area, spec.language, text2, ctx.t),
         attrs: {
           "data-id": area.id,
           "data-name": name,
           "data-class": String(series.assign.get(area.id) ?? -1),
-          "data-value": text
+          "data-value": text2
         }
       });
       continue;
@@ -156743,7 +156970,7 @@ function drawShaded(a, ctx, b) {
   const frame = [b.M, mapTop, b.W - b.M, mapTop + geo.height];
   const sizes = [14, 13, 12, 11, 10, 9].map((s) => Math.max(8.5, s * b.scale));
   const placed = wantsLabels ? placeLabels(labelCandidates, {
-    width: (text, size) => b.m.width(text, size),
+    width: (text2, size) => b.m.width(text2, size),
     frame,
     sizes,
     loose: spec.labels.show === "all"
@@ -156822,7 +157049,7 @@ function drawMultiples(a, ctx, b) {
   const fmt = valueFormatter(spec.language);
   const items = [...legend.items];
   const table = [];
-  const tiny = getRegion(spec.region).markers ? probe.shapes.map(({ area, feature: feature2, path }) => ({ area, anchor: labelAnchor(ringsOf(path, feature2)) })).filter(({ anchor }) => anchor && anchor.area < 14 * b.scale ** 2) : [];
+  const tiny = a.region.markers ? probe.shapes.map(({ area, feature: feature2, path }) => ({ area, anchor: labelAnchor(ringsOf(path, feature2)) })).filter(({ anchor }) => anchor && anchor.area < 14 * b.scale ** 2) : [];
   const marked = /* @__PURE__ */ new Set();
   a.series.forEach((series, i2) => {
     const col = i2 % cols;
@@ -156836,19 +157063,19 @@ function drawMultiples(a, ctx, b) {
     ];
     const shapes = probe.shapes.map(({ area, d }) => {
       const value = series.byArea.get(area.id);
-      const text = value === null || value === void 0 ? null : fmt(value);
+      const text2 = value === null || value === void 0 ? null : fmt(value);
       return {
         type: "path",
         d,
         fill: colorOf(area.id) ?? theme.noData,
         stroke: theme.stroke,
         sw: Math.max(0.3, 0.5 * b.scale),
-        title: tooltipOf(area, spec.language, text, ctx.t),
+        title: tooltipOf(area, spec.language, text2, ctx.t),
         attrs: {
           "data-id": area.id,
           "data-name": nameIn(area, spec.language),
           "data-class": String(series.assign.get(area.id) ?? -1),
-          ...text !== null ? { "data-value": text } : {}
+          ...text2 !== null ? { "data-value": text2 } : {}
         }
       };
     });
@@ -157028,7 +157255,7 @@ function drawLocator(a, ctx, b) {
   const frame = [b.M, mapTop, b.W - b.M, mapTop + geo.height];
   const sizes = [15, 14, 13, 12, 11, 10].map((s) => s * b.scale);
   const placed = placeLabels(candidates, {
-    width: (text, size2) => b.m.width(text, size2, "bold"),
+    width: (text2, size2) => b.m.width(text2, size2, "bold"),
     frame,
     sizes
   });
@@ -157113,7 +157340,7 @@ function globeInset(a, ctx, b, lit, frame) {
   const center = centroid_default({ type: "FeatureCollection", features });
   const projection2 = orthographic_default().rotate([-center[0], -center[1]]).translate([cx2, cy2]).scale(radius).clipAngle(90);
   const path = path_default(projection2).digits(1);
-  const world = (0, import_topojson_client2.feature)(ctx.world110, ctx.world110.objects.countries);
+  const world = (0, import_topojson_client3.feature)(ctx.world110, ctx.world110.objects.countries);
   const litIso = new Set(lit.map((area) => area.keys.iso3?.[0]).filter(Boolean));
   const land = world.features.filter((f) => f.properties.id !== "ATA").map((f) => ({
     type: "path",
@@ -157313,10 +157540,10 @@ function interactions(svg, tip) {
   var keyboard = areas.length <= 400;
   areas.forEach(function(el) {
     var title = el.querySelector("title");
-    var text = title ? title.textContent : el.getAttribute("data-name");
+    var text2 = title ? title.textContent : el.getAttribute("data-name");
     if (title) el.removeChild(title);
-    el.setAttribute("data-tip", text);
-    el.setAttribute("aria-label", text);
+    el.setAttribute("data-tip", text2);
+    el.setAttribute("aria-label", text2);
     el.setAttribute("role", "graphics-symbol");
   });
   var current = null;
@@ -158117,7 +158344,7 @@ function summarize(result) {
     colors: a.classing.colors,
     palette: a.classing.paletteName
   } : null;
-  const projection2 = spec ? projectionNameOf(spec) : null;
+  const projection2 = spec && (a.region || spec.region !== "custom") ? projectionNameOf(spec, a.region) : null;
   return {
     graticule: VERSION,
     ok: !result.blocked,
@@ -158180,8 +158407,8 @@ var USAGE = `graticule ${VERSION}: maps that pass a checklist, from a small JSON
 Usage
   graticule render <spec.json> [-o base] [-f svg,png,pdf,html] [--fix] [--lang xx] [--dpi 300] [--json]
   graticule check  <spec.json> [--fix] [--write] [--lang xx] [--json]
-  graticule join   <table.csv> --region <id> [--key column] [--key-type kind] [--encoding name] [--json]
-  graticule init   <table.csv> --region <id> [--value column] [--encoding name] [-o spec.json]
+  graticule join   <table.csv> --region <id> | --boundaries <file.geojson> [--key column] [--key-type kind] [--encoding name] [--json]
+  graticule init   <table.csv> --region <id> | --boundaries <file.geojson> [--value column] [--encoding name] [-o spec.json]
   graticule regions | projections | palettes | rules [--lang xx]
 
 Options
@@ -158220,14 +158447,14 @@ function parseArgs(argv) {
 var UsageError = class extends Error {
 };
 async function readSpec(path) {
-  let text;
+  let text2;
   try {
-    text = await readFile2(path, "utf8");
+    text2 = await readFile2(path, "utf8");
   } catch (error) {
     throw new UsageError(`cannot read ${path}: ${error.message}`);
   }
   try {
-    return JSON.parse(text);
+    return JSON.parse(text2);
   } catch (error) {
     throw new UsageError(`${path} is not valid JSON: ${error.message}`);
   }
@@ -158273,12 +158500,12 @@ function decode(bytes, encoding, name) {
   }
 }
 async function readTable(path, encoding) {
-  const { text, encoding: used, guessed } = decode(await readFile2(path), encoding, path);
+  const { text: text2, encoding: used, guessed } = decode(await readFile2(path), encoding, path);
   if (guessed)
     console.error(
       `${path} is not valid UTF-8, so it was read as ${used}. If names look wrong, pass --encoding (big5, shift_jis, euc-kr, gbk) or save the file as UTF-8.`
     );
-  return parseTable(text);
+  return parseTable(text2);
 }
 async function build(specPath, flags, assets) {
   const spec = await readSpec(specPath);
@@ -158335,16 +158562,30 @@ async function commandRender(args, assets, check) {
   }
   return result.blocked ? 2 : 0;
 }
-async function commandJoin(args, assets) {
-  const [tablePath] = args.positional;
+async function openRegion(args, assets, tablePath) {
+  if (args.flags.boundaries) {
+    const file = String(args.flags.boundaries);
+    const readText = async (path) => decode(await readFile2(path), void 0, path).text;
+    let loaded;
+    try {
+      loaded = await loadCustomAreas({ file }, readText);
+    } catch (error) {
+      if (error instanceof BoundaryError) throw new UsageError(error.message);
+      throw error;
+    }
+    return { regionId: "custom", region: loaded.region, index: buildIndex(loaded.areas, {}), boundaries: { file } };
+  }
   const regionId = args.flags.region ?? "world";
-  if (!tablePath) throw new UsageError("give the table: graticule join <table.csv> --region world");
   const region = REGIONS[regionId];
   if (!region) throw new UsageError(`unknown region "${regionId}". Run: graticule regions`);
-  const table = await readTable(tablePath, args.flags.encoding && String(args.flags.encoding));
   const { areas } = await loadAreas(regionId, assets);
-  const aliases = await loadAliases(regionId, region, assets);
-  const index = buildIndex(areas, aliases);
+  return { regionId, region, index: buildIndex(areas, await loadAliases(regionId, region, assets)) };
+}
+async function commandJoin(args, assets) {
+  const [tablePath] = args.positional;
+  if (!tablePath) throw new UsageError("give the table: graticule join <table.csv> --region world");
+  const { regionId, region, index } = await openRegion(args, assets);
+  const table = await readTable(tablePath, args.flags.encoding && String(args.flags.encoding));
   const ranked = rankKeyColumns(table.columns, table.rows, index, region.keys, {
     kind: args.flags["key-type"] && String(args.flags["key-type"])
   });
@@ -158380,14 +158621,9 @@ async function commandJoin(args, assets) {
 }
 async function commandInit(args, assets) {
   const [tablePath] = args.positional;
-  const regionId = args.flags.region ?? "world";
   if (!tablePath) throw new UsageError("give the table: graticule init <table.csv> --region world");
-  const region = REGIONS[regionId];
-  if (!region) throw new UsageError(`unknown region "${regionId}". Run: graticule regions`);
+  const { regionId, region, index, boundaries } = await openRegion(args, assets);
   const table = await readTable(tablePath, args.flags.encoding && String(args.flags.encoding));
-  const { areas } = await loadAreas(regionId, assets);
-  const aliases = await loadAliases(regionId, region, assets);
-  const index = buildIndex(areas, aliases);
   const ranked = rankKeyColumns(table.columns, table.rows, index, region.keys, {
     exclude: args.flags.value ? [String(args.flags.value)] : []
   });
@@ -158396,10 +158632,10 @@ async function commandInit(args, assets) {
     throw new UsageError(
       `no column of ${tablePath} looks like ${region.keys.join(", ")} of ${regionId}. Columns: ${table.columns.join(", ")}`
     );
-  const numeric = table.columns.filter(
+  const numeric2 = table.columns.filter(
     (c) => c !== key.column && table.rows.some((r) => Number.isFinite(Number(String(r[c]).replace(/,/g, ""))) && String(r[c]).trim() !== "")
   );
-  const value = args.flags.value ?? numeric[0];
+  const value = args.flags.value ?? numeric2[0];
   if (!value) throw new UsageError("no numeric column found. Pass --value <column>");
   const specDir = args.flags.out ? dirname2(resolve2(String(args.flags.out))) : process.cwd();
   const file = relative(specDir, resolve2(tablePath)).split(sep).join("/");
@@ -158408,6 +158644,7 @@ async function commandInit(args, assets) {
     subtitle: "",
     source: "",
     region: regionId,
+    ...boundaries ? { boundaries: { file: relative(specDir, resolve2(boundaries.file)).split(sep).join("/") } } : {},
     type: "choropleth",
     data: {
       file,
@@ -158419,9 +158656,9 @@ async function commandInit(args, assets) {
     },
     classes: { method: "quantile", count: 5 }
   };
-  const text = JSON.stringify(spec, null, 2) + "\n";
-  if (args.flags.out) await writeFile(String(args.flags.out), text);
-  else process.stdout.write(text);
+  const text2 = JSON.stringify(spec, null, 2) + "\n";
+  if (args.flags.out) await writeFile(String(args.flags.out), text2);
+  else process.stdout.write(text2);
   console.error("Fill in title, source and data.kind (count, rate, share, index or other) before rendering.");
   return 0;
 }

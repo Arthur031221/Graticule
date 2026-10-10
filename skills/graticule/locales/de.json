@@ -173,6 +173,11 @@
       "message": "{file} ist kein gültiges UTF-8 und wurde deshalb als {encoding} gelesen. Wenn Namen falsch aussehen, setzen Sie data.encoding (zum Beispiel big5, shift_jis, euc-kr oder gbk) oder speichern Sie die Datei als UTF-8.",
       "reason": "Tabellenkalkulationen unter Windows speichern CSV oft in der Systemcodepage. Mit der falschen gelesen, werden aus einem Namen andere Zeichen, und seine Zeile passt zu keinem Gebiet."
     },
+    "boundaries-skipped": {
+      "message": "{count} Objekte aus {file} werden nicht gezeichnet, weil sie kein Polygon haben (ein Punkt, eine Linie oder keine Geometrie).",
+      "message_one": "{count} Objekt aus {file} wird nicht gezeichnet, weil es kein Polygon hat (ein Punkt, eine Linie oder keine Geometrie).",
+      "reason": "Nur Polygone lassen sich einfärben. Ein Objekt ohne Polygon kann keinen Wert zeigen, daher kann seine Zeile nicht auf der Karte erscheinen."
+    },
     "join-blank": {
       "message": "{count} Zeilen haben einen leeren Namen in der Schlüsselspalte und werden nicht gezeichnet.",
       "message_one": "{count} Zeile hat einen leeren Namen in der Schlüsselspalte und wird nicht gezeichnet.",
@@ -220,6 +225,9 @@
       "loaded_one": "{rows} Zeile, {cols} Spalten",
       "encodingNote": "Diese Datei ist nicht UTF-8 und wurde deshalb als {encoding} gelesen. Wenn Namen falsch aussehen, wählen Sie die richtige Kodierung.",
       "encoding": "Dateikodierung",
+      "boundaries": "{count} Gebiete aus {file} gelesen. Fügen Sie eine Tabelle hinzu, die sie benennt.",
+      "boundaries_one": "{count} Gebiet aus {file} gelesen. Fügen Sie eine Tabelle hinzu, die es benennt.",
+      "dropHint": "Eine CSV ist die Tabelle. Eine GeoJSON- oder TopoJSON-Datei fügt eigene Grenzen hinzu.",
       "error": "Konnte nicht gelesen werden: {detail}",
       "empty": "Fügen Sie eine Tabelle hinzu, dann erscheint hier die Karte."
     },
@@ -334,7 +342,8 @@
       "tw-counties": "Taiwan, Landkreise und Städte",
       "tw-towns": "Taiwan, Gemeinden und Bezirke",
       "jp-prefectures": "Japan, Präfekturen",
-      "kr-provinces": "Südkorea, Provinzen"
+      "kr-provinces": "Südkorea, Provinzen",
+      "custom": "Eigene Grenzen (GeoJSON)"
     },
     "examples": {
       "covid-raw": "COVID-Todesfälle, schlecht gezeichnet",

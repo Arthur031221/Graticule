@@ -3,6 +3,7 @@ import { basename, dirname, extname, join, relative, resolve, sep } from "node:p
 import { buildMap } from "./build.js";
 import { RULES, THRESHOLDS } from "./checks.js";
 import { decodeBytes, parseTable } from "./csv.js";
+import { BoundaryError, loadCustomAreas } from "./custom.js";
 import { exportMap, FORMATS } from "./export.js";
 import { createTranslator } from "./i18n.js";
 import { loadAreas } from "./geo.js";
@@ -20,8 +21,8 @@ const USAGE = `graticule ${VERSION}: maps that pass a checklist, from a small JS
 Usage
   graticule render <spec.json> [-o base] [-f svg,png,pdf,html] [--fix] [--lang xx] [--dpi 300] [--json]
   graticule check  <spec.json> [--fix] [--write] [--lang xx] [--json]
-  graticule join   <table.csv> --region <id> [--key column] [--key-type kind] [--encoding name] [--json]
-  graticule init   <table.csv> --region <id> [--value column] [--encoding name] [-o spec.json]
+  graticule join   <table.csv> --region <id> | --boundaries <file.geojson> [--key column] [--key-type kind] [--encoding name] [--json]
+  graticule init   <table.csv> --region <id> | --boundaries <file.geojson> [--value column] [--encoding name] [-o spec.json]
   graticule regions | projections | palettes | rules [--lang xx]
 
 Options
@@ -202,16 +203,35 @@ async function commandRender(args, assets, check) {
   return result.blocked ? 2 : 0;
 }
 
-async function commandJoin(args, assets) {
-  const [tablePath] = args.positional;
+/**
+ * The region a join or init command works on: a bundled one by --region, or the
+ * boundaries of --boundaries <file.geojson>. Returns the lookup index with it.
+ */
+async function openRegion(args, assets, tablePath) {
+  if (args.flags.boundaries) {
+    const file = String(args.flags.boundaries);
+    const readText = async (path) => decode(await readFile(path), undefined, path).text;
+    let loaded;
+    try {
+      loaded = await loadCustomAreas({ file }, readText);
+    } catch (error) {
+      if (error instanceof BoundaryError) throw new UsageError(error.message);
+      throw error;
+    }
+    return { regionId: "custom", region: loaded.region, index: buildIndex(loaded.areas, {}), boundaries: { file } };
+  }
   const regionId = args.flags.region ?? "world";
-  if (!tablePath) throw new UsageError("give the table: graticule join <table.csv> --region world");
   const region = REGIONS[regionId];
   if (!region) throw new UsageError(`unknown region "${regionId}". Run: graticule regions`);
-  const table = await readTable(tablePath, args.flags.encoding && String(args.flags.encoding));
   const { areas } = await loadAreas(regionId, assets);
-  const aliases = await loadAliases(regionId, region, assets);
-  const index = buildIndex(areas, aliases);
+  return { regionId, region, index: buildIndex(areas, await loadAliases(regionId, region, assets)) };
+}
+
+async function commandJoin(args, assets) {
+  const [tablePath] = args.positional;
+  if (!tablePath) throw new UsageError("give the table: graticule join <table.csv> --region world");
+  const { regionId, region, index } = await openRegion(args, assets);
+  const table = await readTable(tablePath, args.flags.encoding && String(args.flags.encoding));
   const ranked = rankKeyColumns(table.columns, table.rows, index, region.keys, {
     kind: args.flags["key-type"] && String(args.flags["key-type"]),
   });
@@ -253,14 +273,9 @@ async function commandJoin(args, assets) {
 
 async function commandInit(args, assets) {
   const [tablePath] = args.positional;
-  const regionId = args.flags.region ?? "world";
   if (!tablePath) throw new UsageError("give the table: graticule init <table.csv> --region world");
-  const region = REGIONS[regionId];
-  if (!region) throw new UsageError(`unknown region "${regionId}". Run: graticule regions`);
+  const { regionId, region, index, boundaries } = await openRegion(args, assets);
   const table = await readTable(tablePath, args.flags.encoding && String(args.flags.encoding));
-  const { areas } = await loadAreas(regionId, assets);
-  const aliases = await loadAliases(regionId, region, assets);
-  const index = buildIndex(areas, aliases);
   const ranked = rankKeyColumns(table.columns, table.rows, index, region.keys, {
     exclude: args.flags.value ? [String(args.flags.value)] : [],
   });
@@ -284,6 +299,7 @@ async function commandInit(args, assets) {
     subtitle: "",
     source: "",
     region: regionId,
+    ...(boundaries ? { boundaries: { file: relative(specDir, resolve(boundaries.file)).split(sep).join("/") } } : {}),
     type: "choropleth",
     data: {
       file,

@@ -160,6 +160,60 @@ test("a spec with data.encoding renders a Big5 file", async () => {
   assert.doesNotMatch(result.stdout, /table-encoding/);
 });
 
+test("join and init take --boundaries, and the spec init writes renders", async () => {
+  const fixtures = fileURLToPath(new URL("../fixtures/", import.meta.url));
+  const geojson = join(fixtures, "squares.geojson");
+  const table = join(fixtures, "squares.csv");
+  const joined = await graticule("join", table, "--boundaries", geojson);
+  assert.equal(joined.code, 0, joined.stderr);
+  assert.match(joined.stdout, /column "region" matches 4 areas of custom as name \(4 rows\)/);
+
+  const out = await mkdtemp(join(tmpdir(), "graticule-"));
+  await writeFile(join(out, "squares.geojson"), await readFile(geojson));
+  await writeFile(join(out, "squares.csv"), await readFile(table));
+  const init = await graticule(
+    "init",
+    join(out, "squares.csv"),
+    "--boundaries",
+    join(out, "squares.geojson"),
+    "-o",
+    join(out, "map.json"),
+  );
+  assert.equal(init.code, 0, init.stderr);
+  const spec = JSON.parse(await readFile(join(out, "map.json"), "utf8"));
+  assert.deepEqual(
+    [spec.region, spec.boundaries, spec.data.file, spec.data.key],
+    ["custom", { file: "squares.geojson" }, "squares.csv", "region"],
+  );
+  Object.assign(spec, { title: "Squares", source: "Made up" });
+  Object.assign(spec.data, { kind: "rate", label: "Score" });
+  await writeFile(join(out, "map.json"), JSON.stringify(spec));
+  const rendered = await graticule("render", join(out, "map.json"), "-f", "svg");
+  assert.equal(rendered.code, 0, rendered.stdout + rendered.stderr);
+  assert.match(await readFile(join(out, "map.svg"), "utf8"), /data-name="North West"/);
+
+  const bad = await graticule("join", table, "--boundaries", join(fixtures, "utm.geojson"));
+  assert.equal(bad.code, 1);
+  assert.match(bad.stderr, /not longitude and latitude/);
+});
+
+test("a spec may not read boundaries from outside its folder", async () => {
+  const fixtures = fileURLToPath(new URL("../fixtures/", import.meta.url));
+  const out = await mkdtemp(join(tmpdir(), "graticule-"));
+  await writeFile(join(out, "squares.csv"), await readFile(join(fixtures, "squares.csv")));
+  const spec = {
+    title: "Squares",
+    source: "Made up",
+    region: "custom",
+    boundaries: { file: join(fixtures, "squares.geojson") },
+    data: { file: "squares.csv", key: "region", value: "score", kind: "rate", label: "Score" },
+  };
+  await writeFile(join(out, "map.json"), JSON.stringify(spec));
+  const result = await graticule("check", join(out, "map.json"));
+  assert.equal(result.code, 2);
+  assert.match(result.stdout, /outside the folder of the spec/);
+});
+
 test("init writes the table's path relative to where the spec will be saved", async () => {
   const out = await mkdtemp(join(tmpdir(), "graticule-"));
   await writeFile(join(out, "data.csv"), await readFile(join(gallery, "life-expectancy/data.csv"), "utf8"));

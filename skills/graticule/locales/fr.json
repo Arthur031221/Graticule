@@ -173,6 +173,11 @@
       "message": "{file} n'est pas de l'UTF-8 valide, il a donc été lu comme {encoding}. Si les noms semblent faux, indiquez data.encoding (par exemple big5, shift_jis, euc-kr ou gbk) ou enregistrez le fichier en UTF-8.",
       "reason": "Les tableurs sous Windows enregistrent souvent le CSV avec la page de codes du système. Lu avec une autre, un nom devient d'autres caractères et sa ligne ne correspond à aucune zone."
     },
+    "boundaries-skipped": {
+      "message": "{count} entités de {file} ne sont pas dessinées car elles n'ont pas de polygone (un point, une ligne ou aucune géométrie).",
+      "message_one": "{count} entité de {file} n'est pas dessinée car elle n'a pas de polygone (un point, une ligne ou aucune géométrie).",
+      "reason": "Seuls les polygones peuvent être colorés. Une entité sans polygone ne peut pas montrer de valeur, donc sa ligne ne peut pas apparaître sur la carte."
+    },
     "join-blank": {
       "message": "{count} lignes ont un nom vide dans la colonne clé et ne sont pas dessinées.",
       "message_one": "{count} ligne a un nom vide dans la colonne clé et n'est pas dessinée.",
@@ -220,6 +225,9 @@
       "loaded_one": "{rows} ligne, {cols} colonnes",
       "encodingNote": "Ce fichier n'est pas en UTF-8, il a donc été lu comme {encoding}. Si les noms semblent faux, choisissez le bon encodage.",
       "encoding": "Encodage du fichier",
+      "boundaries": "{count} zones lues depuis {file}. Ajoutez un tableau qui les nomme.",
+      "boundaries_one": "{count} zone lue depuis {file}. Ajoutez un tableau qui la nomme.",
+      "dropHint": "Un CSV est le tableau. Un fichier GeoJSON ou TopoJSON ajoute vos propres limites.",
       "error": "Lecture impossible : {detail}",
       "empty": "Ajoutez un tableau et la carte apparaîtra ici."
     },
@@ -334,7 +342,8 @@
       "tw-counties": "Taïwan, comtés et villes",
       "tw-towns": "Taïwan, cantons et districts",
       "jp-prefectures": "Japon, préfectures",
-      "kr-provinces": "Corée du Sud, provinces"
+      "kr-provinces": "Corée du Sud, provinces",
+      "custom": "Vos limites (GeoJSON)"
     },
     "examples": {
       "covid-raw": "Décès du COVID, mal dessiné",

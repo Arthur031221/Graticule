@@ -20,6 +20,8 @@ Generated from the code by scripts/build-docs.mjs.
 
 Key types: `iso3`, `iso2` and `isonum` are ISO 3166-1 codes, `fips` are US FIPS codes (a county code is five digits and a missing leading zero is added back), `postal` is the US state abbreviation, `code` is the Taiwan Ministry of the Interior code, `iso` is ISO 3166-2 such as JP-13, `jis` is the Japanese prefecture number, `name` is any spelling in the nine label languages plus common aliases: World Bank, UN, IMF, WHO and everyday names for countries, and for the other regions the Associated Press state abbreviations (`Calif.`, `N.Y.`), Taiwan county names from before 2014 and bare city names (`桃園縣`, `Taipei`), the Korean provinces renamed in 2023 and 2024 and romanised Japanese suffixes (`Osaka-fu`, `Fukuoka-ken`). A name that fits two areas, such as `Chiayi`, is reported, never guessed.
 
+Not in the table: `custom` draws boundaries from your own GeoJSON or TopoJSON file, see [config.md](config.md). Its projection is chosen from the extent of the file, and its key types are the properties of the file.
+
 ## Details that matter
 
 - **world** and the continents use Natural Earth 1:50m countries. Antarctica is left out. Countries too small to see at the map's scale are drawn as dots, so a value is never lost. Dependencies share their parent's polygon only when Natural Earth does: French Guiana, Martinique, Guadeloupe, Mayotte and Reunion are part of France and cannot be mapped separately. Gibraltar and Tokelau have no polygon.

@@ -59,6 +59,7 @@ Every change is listed in the report as a `fix-applied` finding and the spec tha
 | `no-values` | error | No area has a value. |
 | `highlight-unmatched` | warn | A locator map could not find an area in `highlight`. |
 | `table-encoding` | warn | The table file is not valid UTF-8 and was read as Windows-1252. Set `data.encoding` or `--encoding` if the names look wrong. |
+| `boundaries-skipped` | warn | Some features of the custom boundaries have no polygon (a point, a line or no geometry) and are not drawn. |
 | `symbols-negative` | warn | Proportional symbols skip values at or below zero. |
 | `symbols-min-size` | info | Circles smaller than the minimum size were drawn at the minimum. |
 | `glyphs-missing` | warn | The embedded fonts have no glyph for some characters of a title or label. |

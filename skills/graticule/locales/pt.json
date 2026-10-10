@@ -173,6 +173,11 @@
       "message": "{file} não é UTF-8 válido, por isso foi lido como {encoding}. Se os nomes parecerem errados, defina data.encoding (por exemplo big5, shift_jis, euc-kr ou gbk) ou salve o arquivo como UTF-8.",
       "reason": "Planilhas no Windows costumam salvar o CSV na página de código do sistema. Lido com outra, um nome vira outros caracteres e sua linha não corresponde a nenhuma área."
     },
+    "boundaries-skipped": {
+      "message": "{count} feições de {file} não são desenhadas porque não têm polígono (são um ponto, uma linha ou não têm geometria).",
+      "message_one": "{count} feição de {file} não é desenhada porque não tem polígono (é um ponto, uma linha ou não tem geometria).",
+      "reason": "Só polígonos podem ser coloridos. Uma feição sem polígono não consegue mostrar um valor, então sua linha não pode aparecer no mapa."
+    },
     "join-blank": {
       "message": "{count} linhas têm o nome vazio na coluna-chave e não são desenhadas.",
       "message_one": "{count} linha tem o nome vazio na coluna-chave e não é desenhada.",
@@ -220,6 +225,9 @@
       "loaded_one": "{rows} linha, {cols} colunas",
       "encodingNote": "Este arquivo não é UTF-8, por isso foi lido como {encoding}. Se os nomes parecerem errados, escolha a codificação correta.",
       "encoding": "Codificação do arquivo",
+      "boundaries": "{count} áreas lidas de {file}. Adicione uma tabela que as nomeie.",
+      "boundaries_one": "{count} área lida de {file}. Adicione uma tabela que a nomeie.",
+      "dropHint": "Um CSV é a tabela. Um arquivo GeoJSON ou TopoJSON adiciona seus próprios limites.",
       "error": "Não foi possível ler: {detail}",
       "empty": "Adicione uma tabela e o mapa aparece aqui."
     },
@@ -334,7 +342,8 @@
       "tw-counties": "Taiwan, condados e cidades",
       "tw-towns": "Taiwan, municípios e distritos",
       "jp-prefectures": "Japão, prefeituras",
-      "kr-provinces": "Coreia do Sul, províncias"
+      "kr-provinces": "Coreia do Sul, províncias",
+      "custom": "Seus limites (GeoJSON)"
     },
     "examples": {
       "covid-raw": "Mortes por COVID, mal desenhado",

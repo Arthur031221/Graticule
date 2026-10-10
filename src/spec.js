@@ -28,6 +28,7 @@ const KEYS = {
     "source",
     "note",
     "region",
+    "boundaries",
     "type",
     "data",
     "classes",
@@ -47,6 +48,7 @@ const KEYS = {
     "attribution",
     "checks",
   ],
+  boundaries: ["file", "geojson", "key", "name", "population", "object", "credit", "title"],
   data: [
     "file",
     "csv",
@@ -103,7 +105,24 @@ export function normalizeSpec(input) {
     return value;
   };
 
-  const region = oneOf(input.region, REGION_IDS, "region", "world");
+  const region = oneOf(input.region, [...REGION_IDS, "custom"], "region", "world");
+  const boundaries = input.boundaries;
+  if (region === "custom") {
+    if (!boundaries || typeof boundaries !== "object" || Array.isArray(boundaries))
+      bad("boundaries", 'is required with region "custom": give a file or geojson');
+    else {
+      unknown("boundaries.", boundaries, KEYS.boundaries);
+      const given = ["file", "geojson"].filter((k) => boundaries[k] !== undefined);
+      if (given.length !== 1) bad("boundaries", `give exactly one of file or geojson (found ${given.length})`);
+      if (boundaries.file !== undefined && typeof boundaries.file !== "string")
+        bad("boundaries.file", "must be a path");
+      if (boundaries.geojson !== undefined && (!boundaries.geojson || typeof boundaries.geojson !== "object"))
+        bad("boundaries.geojson", "must be a GeoJSON or TopoJSON object");
+      for (const field of ["key", "name", "population", "object", "credit", "title"])
+        if (boundaries[field] !== undefined && typeof boundaries[field] !== "string")
+          bad(`boundaries.${field}`, "must be a string");
+    }
+  } else if (boundaries !== undefined) bad("boundaries", 'is only used with region "custom"');
   const type = oneOf(input.type, TYPES, "type", "choropleth");
   const data = input.data && typeof input.data === "object" ? input.data : {};
   if (!input.data || typeof input.data !== "object") {
@@ -209,6 +228,7 @@ export function normalizeSpec(input) {
     source: text(input.source, "source"),
     note: text(input.note, "note"),
     region,
+    ...(region === "custom" && boundaries && typeof boundaries === "object" ? { boundaries: { ...boundaries } } : {}),
     type,
     data: { ...data, ...(data.normalize ? { normalize: { ...data.normalize, per: data.normalize.per ?? 1 } } : {}) },
     classes,

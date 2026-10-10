@@ -6,7 +6,7 @@ import { labelAnchor, placeLabels, ringsOf } from "./labels.js";
 import { categoryLegend, classLegend, symbolLegend } from "./legend.js";
 import { nameIn } from "./geo.js";
 import { numberFormatter } from "./i18n.js";
-import { boundaryCredit, getRegion } from "./regions.js";
+import { boundaryCredit } from "./regions.js";
 import { cjkFamily } from "./lang.js";
 import { isCjk } from "./text.js";
 import { minifyPath } from "./pathmin.js";
@@ -84,7 +84,10 @@ function basics(a, ctx) {
     .map(sentence)
     .join(" ");
   if (sourceText) footLines.push(...m.wrap(sourceText, inner, noteSize));
-  const credit = [spec.attribution === false ? "" : t("footer.made_with"), a.region ? boundaryCredit(spec.region) : ""]
+  const credit = [
+    spec.attribution === false ? "" : t("footer.made_with"),
+    a.region ? boundaryCredit(spec.region, a.region.level === "custom" ? a.region : undefined) : "",
+  ]
     .filter(Boolean)
     .join("  |  ");
   if (credit) footLines.push(...m.wrap(credit, inner, noteSize));
@@ -351,12 +354,12 @@ function drawShaded(a, ctx, b) {
         },
       });
     table.push({ id: area.id, name, value: text, fill });
-    const needRings = wantsLabels || (getRegion(spec.region).markers && text !== null);
+    const needRings = wantsLabels || (a.region.markers && text !== null);
     if (!needRings) continue;
     const rings = ringsOf(path, feature);
     const anchor = labelAnchor(rings);
     if (!anchor) continue;
-    if (getRegion(spec.region).markers && text !== null && anchor.area < 14 * b.scale ** 2) {
+    if (a.region.markers && text !== null && anchor.area < 14 * b.scale ** 2) {
       markers.push({
         type: "circle",
         cx: anchor.x,
@@ -477,7 +480,7 @@ function drawMultiples(a, ctx, b) {
   const items = [...legend.items];
   const table = [];
   // Areas too small to see get a dot in every panel, as on a single map, so a value is never lost.
-  const tiny = getRegion(spec.region).markers
+  const tiny = a.region.markers
     ? probe.shapes
         .map(({ area, feature, path }) => ({ area, anchor: labelAnchor(ringsOf(path, feature)) }))
         .filter(({ anchor }) => anchor && anchor.area < 14 * b.scale ** 2)

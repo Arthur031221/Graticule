@@ -93,8 +93,16 @@
                 ><span data-i18n="data.or">or</span> <u data-i18n="data.choose">Choose a file</u></span
               ></span
             >
-            <input type="file" id="file" accept=".csv,.tsv,.txt,text/csv,text/plain" hidden />
+            <input
+              type="file"
+              id="file"
+              accept=".csv,.tsv,.txt,.json,.geojson,.topojson,text/csv,text/plain,application/json,application/geo+json"
+              hidden
+            />
           </div>
+          <p class="muted small" data-i18n="data.dropHint">
+            A CSV is the table. A GeoJSON or TopoJSON file adds your own boundaries.
+          </p>
           <details class="paste">
             <summary data-i18n="data.paste">Paste a table</summary>
             <textarea

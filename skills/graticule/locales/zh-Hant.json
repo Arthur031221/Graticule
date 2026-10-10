@@ -157,6 +157,10 @@
       "message": "{file} 不是有效的 UTF-8，已改用 {encoding} 讀取。若名稱看起來不對，請設定 data.encoding（例如 big5、shift_jis、euc-kr 或 gbk），或把檔案另存為 UTF-8。",
       "reason": "Windows 上的試算表常以系統碼頁儲存 CSV。用錯編碼讀取時，名稱會變成別的字元，該列就對不到任何區域。"
     },
+    "boundaries-skipped": {
+      "message": "{file} 中有 {count} 個圖徵不是多邊形（是點、線或沒有幾何），所以不會繪製。",
+      "reason": "只有多邊形能上色。沒有多邊形的圖徵無法呈現數值，它對應的資料列也就不會出現在地圖上。"
+    },
     "join-blank": {
       "message": "有 {count} 列的地區名稱欄是空的，沒有畫出來。",
       "reason": "沒有名稱的資料列無法定位。空白通常是合計列或表尾的備註。"
@@ -201,6 +205,8 @@
       "loaded": "{rows} 列，{cols} 欄",
       "encodingNote": "這個檔案不是 UTF-8，已用 {encoding} 讀取。若名稱看起來不對，請選擇正確的編碼。",
       "encoding": "檔案編碼",
+      "boundaries": "已從 {file} 讀入 {count} 個區域。請加入一份以名稱或代碼列出這些區域的資料表。",
+      "dropHint": "CSV 是資料表；GeoJSON 或 TopoJSON 檔可加入你自己的邊界。",
       "error": "無法讀取：{detail}",
       "empty": "加入資料表，地圖就會出現在這裡。"
     },
@@ -313,7 +319,8 @@
       "tw-counties": "臺灣，縣市",
       "tw-towns": "臺灣，鄉鎮市區",
       "jp-prefectures": "日本，都道府縣",
-      "kr-provinces": "南韓，道與廣域市"
+      "kr-provinces": "南韓，道與廣域市",
+      "custom": "自備邊界（GeoJSON）"
     },
     "examples": {
       "covid-raw": "新冠死亡數（畫錯的版本）",

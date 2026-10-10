@@ -7,7 +7,6 @@ import { damagedNamePattern, formalVariants, normalizeName, suggest } from "./na
  * @typedef {{ kinds: Record<string, Map<string, Entry[]>>, labels: [string, string][], byId: Map<string, Area> }} Index
  */
 
-const CODE_KINDS = new Set(["iso3", "iso2", "isonum", "fips", "postal", "code", "iso", "jis"]);
 const PAD = { fips: 0, isonum: 3, jis: 2 };
 
 function normalizeCode(kind, value) {
@@ -76,7 +75,7 @@ export function kindsOf(index) {
 export function lookup(index, kind, raw) {
   const map = index.kinds[kind];
   if (!map) return { entries: [], padded: false };
-  if (!CODE_KINDS.has(kind)) {
+  if (kind === "name") {
     // A name with a replacement character lost a letter to a wrong text encoding. Folding it away would
     // let "Niger\uFFFD" match Niger, so such names are only matched by the pattern that keeps the gap.
     const damaged = damagedNamePattern(raw);

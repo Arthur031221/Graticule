@@ -1,5 +1,6 @@
 import { buildMap } from "../src/build.js";
 import { decodeBytes, parseNumber, parseTable } from "../src/csv.js";
+import { loadCustomAreas } from "../src/custom.js";
 import { exportMap } from "../src/export.js";
 import { createFontStore } from "../src/fonts.js";
 import { interactions } from "../src/html.js";
@@ -112,6 +113,7 @@ const state = {
   signature: "",
   refocus: "",
   bytes: null,
+  boundaries: null,
 };
 
 /** Counts the tables loaded, so a slow region lookup for an older table cannot change a newer one. */
@@ -175,7 +177,7 @@ function buildSelects() {
   );
   options(
     $("region"),
-    Object.keys(REGIONS).map((id) => [id, ui(`regions.${id}`)]),
+    [...Object.keys(REGIONS), ...(state.boundaries ? ["custom"] : [])].map((id) => [id, ui(`regions.${id}`)]),
     state.spec.region,
   );
   options(
@@ -372,6 +374,8 @@ function toSpec() {
     checks: { allow: [...state.allow] },
   };
   if (s.method !== "manual") delete spec.classes.breaks;
+  if (s.region === "custom" && state.boundaries) spec.boundaries = { geojson: state.boundaries.geojson };
+  else delete spec.boundaries;
   if (state.extra.palette) spec.palette = state.extra.palette;
   else if (s.palette) spec.palette = s.palette;
   else delete spec.palette;
@@ -455,6 +459,10 @@ function resetForNewData() {
   state.extra = {};
   state.base = null;
   state.spec = { ...fresh(), language: state.spec.language, theme: state.spec.theme };
+  if (state.boundaries) {
+    state.spec.region = "custom";
+    state.regionTouched = true;
+  }
   buildExamples();
   buildPalettes();
 }
@@ -473,6 +481,43 @@ async function loadBytes(bytes, label) {
   }
   await setTable(decoded.text);
   if (decoded.guessed) $("data-status").textContent += ` ${ui("data.encodingNote", { encoding: decoded.encoding })}`;
+}
+
+/** Your own boundaries: a GeoJSON or TopoJSON file becomes a region of its own, next to the bundled ones. */
+async function loadBoundaries(bytes, name) {
+  let loaded;
+  let geojson;
+  try {
+    geojson = JSON.parse(new TextDecoder().decode(bytes).replace(/^\uFEFF/, ""));
+    loaded = await loadCustomAreas({ geojson }, async () => {
+      throw new Error("no files in the browser");
+    });
+  } catch (error) {
+    return setStatus(ui("data.error", { detail: error.message }), true);
+  }
+  state.boundaries = { geojson, name, loaded };
+  if (state.example) {
+    // The table of an example never names your areas, so it goes.
+    resetForNewData();
+    state.csv = "";
+    state.table = null;
+    fillColumns();
+  } else {
+    state.spec.region = "custom";
+    state.regionTouched = true;
+  }
+  state.bytes = null;
+  $("field-encoding").hidden = true;
+  buildSelects();
+  const note = ui("data.boundaries", { count: loaded.areas.length, file: name });
+  if (state.csv) {
+    await setTable(state.csv);
+    toast(note);
+  } else {
+    syncControls();
+    schedule();
+    setStatus(note);
+  }
 }
 
 function setStatus(text, error = false) {
@@ -529,7 +574,7 @@ async function detectKey(table) {
   const columns = table.columns.slice(0, 8);
   const rows = table.rows.slice(0, 400);
   const topOf = async (id) => {
-    const { areas, region } = await loadAreas(id, assets);
+    const { areas, region } = id === "custom" ? state.boundaries.loaded : await loadAreas(id, assets);
     const aliases = await loadAliases(id, region, assets);
     return rankKeyColumns(columns, rows, buildIndex(areas, aliases), region.keys)[0];
   };
@@ -555,6 +600,7 @@ async function loadExample(id) {
   ]);
   tableRun++;
   state.bytes = null;
+  state.boundaries = null;
   $("field-encoding").hidden = true;
   state.example = id;
   state.allow = new Set();
@@ -931,8 +977,11 @@ function wire() {
   const readFile = async (f) => {
     if (!f) return;
     if (f.size > 25 * 1024 * 1024) return setStatus(ui("data.error", { detail: "25 MB" }), true);
+    const bytes = new Uint8Array(await f.arrayBuffer());
+    const text = new TextDecoder().decode(bytes.subarray(0, 4096)).trimStart();
+    if (/\.(geo|topo)?json$/i.test(f.name) || text.startsWith("{")) return loadBoundaries(bytes, f.name);
     resetForNewData();
-    await loadBytes(new Uint8Array(await f.arrayBuffer()));
+    await loadBytes(bytes);
   };
   drop.addEventListener("click", () => file.click());
   drop.addEventListener("keydown", (e) => (e.key === "Enter" || e.key === " ") && (e.preventDefault(), file.click()));

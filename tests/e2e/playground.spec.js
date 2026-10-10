@@ -294,3 +294,37 @@ test("on a phone the blocked list is one column and the form controls keep their
   const padding = await page.locator("#stage-note").evaluate((n) => getComputedStyle(n).paddingLeft);
   expect(padding).toBe("16px");
 });
+
+test("a GeoJSON file becomes a region of its own, before or after the table", async ({ page }) => {
+  await page.goto("/");
+  await page.locator("#file").setInputFiles("tests/fixtures/squares.geojson");
+  await expect(page.locator("#data-status")).toContainText("4 areas read from squares.geojson");
+  await expect(page.locator("#region")).toHaveValue("custom");
+  await page.locator("#file").setInputFiles("tests/fixtures/squares.csv");
+  await expect(page.locator("#region")).toHaveValue("custom");
+  await expect(page.locator("#join-summary")).toContainText("4 of 4 rows matched 4 areas");
+  await page.fill("#title", "Squares");
+  await page.fill("#source", "Made up");
+  await page.selectOption("#kind", "rate");
+  await page.fill("#unit", "Score");
+  await expect(svg(page)).toBeVisible();
+  await expect(svg(page)).toContainText("North West");
+  await page.selectOption("#region", "world");
+  await page.selectOption("#region", "custom");
+  await expect(page.locator("#join-summary")).toContainText("4 of 4 rows matched 4 areas");
+
+  await page.goto("/");
+  await page.locator("#file").setInputFiles("tests/fixtures/squares.csv");
+  await expect(page.locator("#data-status")).toContainText("rows");
+  await page.locator("#file").setInputFiles("tests/fixtures/squares.geojson");
+  await expect(page.locator("#region")).toHaveValue("custom");
+  await expect(page.locator("#join-summary")).toContainText("4 of 4 rows matched 4 areas");
+  await expect(page.locator("#value")).toHaveValue("score");
+});
+
+test("a boundary file in metres is refused with the fix", async ({ page }) => {
+  await page.goto("/");
+  await page.locator("#file").setInputFiles("tests/fixtures/utm.geojson");
+  await expect(page.locator("#data-status")).toContainText("not longitude and latitude");
+  await expect(page.locator("#data-status")).toHaveClass(/error/);
+});

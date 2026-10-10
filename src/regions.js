@@ -205,7 +205,9 @@ export const BOUNDARY_CREDIT = {
   "kr-provinces": "Boundaries: Natural Earth (public domain)",
 };
 
-export function boundaryCredit(id) {
+/** @param {string} id region id @param {{ credit?: string }} [custom] the region of custom boundaries, which names its own credit */
+export function boundaryCredit(id, custom) {
+  if (custom) return custom.credit ?? "";
   const region = getRegion(id);
   return BOUNDARY_CREDIT[region.parent ?? id];
 }

@@ -163,6 +163,11 @@
       "message": "{file} is not valid UTF-8, so it was read as {encoding}. If names look wrong, set data.encoding (for example big5, shift_jis, euc-kr or gbk) or save the file as UTF-8.",
       "reason": "Spreadsheets on Windows often save CSV in the system code page. Read with the wrong one, a name turns into other characters and its row matches no area."
     },
+    "boundaries-skipped": {
+      "message": "{count} features of {file} are not drawn because they have no polygon (a point, a line or no geometry).",
+      "message_one": "{count} feature of {file} is not drawn because it has no polygon (a point, a line or no geometry).",
+      "reason": "Only polygons can be shaded. A feature without one cannot show a value, so its row cannot appear on the map."
+    },
     "join-blank": {
       "message": "{count} rows have an empty name in the key column and are not drawn.",
       "message_one": "{count} row has an empty name in the key column and is not drawn.",
@@ -215,6 +220,9 @@
       "loaded_one": "{rows} row, {cols} columns",
       "encodingNote": "This file is not UTF-8, so it was read as {encoding}. If the names look wrong, pick the right encoding.",
       "encoding": "File encoding",
+      "boundaries": "{count} areas read from {file}. Add a table that names them.",
+      "boundaries_one": "{count} area read from {file}. Add a table that names it.",
+      "dropHint": "A CSV is the table. A GeoJSON or TopoJSON file adds your own boundaries.",
       "error": "Could not read that: {detail}",
       "empty": "Add a table and the map appears here."
     },
@@ -329,7 +337,8 @@
       "tw-counties": "Taiwan, counties",
       "tw-towns": "Taiwan, townships",
       "jp-prefectures": "Japan, prefectures",
-      "kr-provinces": "South Korea, provinces"
+      "kr-provinces": "South Korea, provinces",
+      "custom": "Your boundaries (GeoJSON)"
     },
     "examples": {
       "covid-raw": "COVID deaths, drawn badly",

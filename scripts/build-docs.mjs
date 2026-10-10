@@ -56,6 +56,7 @@ Every change is listed in the report as a \`fix-applied\` finding and the spec t
 | \`no-values\` | error | No area has a value. |
 | \`highlight-unmatched\` | warn | A locator map could not find an area in \`highlight\`. |
 | \`table-encoding\` | warn | The table file is not valid UTF-8 and was read as Windows-1252. Set \`data.encoding\` or \`--encoding\` if the names look wrong. |
+| \`boundaries-skipped\` | warn | Some features of the custom boundaries have no polygon (a point, a line or no geometry) and are not drawn. |
 | \`symbols-negative\` | warn | Proportional symbols skip values at or below zero. |
 | \`symbols-min-size\` | info | Circles smaller than the minimum size were drawn at the minimum. |
 | \`glyphs-missing\` | warn | The embedded fonts have no glyph for some characters of a title or label. |
@@ -87,6 +88,8 @@ Generated from the code by scripts/build-docs.mjs.
 ${regionRows}
 
 Key types: \`iso3\`, \`iso2\` and \`isonum\` are ISO 3166-1 codes, \`fips\` are US FIPS codes (a county code is five digits and a missing leading zero is added back), \`postal\` is the US state abbreviation, \`code\` is the Taiwan Ministry of the Interior code, \`iso\` is ISO 3166-2 such as JP-13, \`jis\` is the Japanese prefecture number, \`name\` is any spelling in the nine label languages plus common aliases: World Bank, UN, IMF, WHO and everyday names for countries, and for the other regions the Associated Press state abbreviations (\`Calif.\`, \`N.Y.\`), Taiwan county names from before 2014 and bare city names (\`桃園縣\`, \`Taipei\`), the Korean provinces renamed in 2023 and 2024 and romanised Japanese suffixes (\`Osaka-fu\`, \`Fukuoka-ken\`). A name that fits two areas, such as \`Chiayi\`, is reported, never guessed.
+
+Not in the table: \`custom\` draws boundaries from your own GeoJSON or TopoJSON file, see [config.md](config.md). Its projection is chosen from the extent of the file, and its key types are the properties of the file.
 
 ## Details that matter
 

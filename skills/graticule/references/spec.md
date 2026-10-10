@@ -10,7 +10,8 @@ A spec is one JSON object. Paths are relative to the spec file and must stay ins
 | `subtitle` | none | One line under the title: unit, place, period. |
 | `source` | none | Where the numbers come from. Required (`source-required`). |
 | `note` | none | A short note after the source line, for caveats. |
-| `region` | `world` | One of the regions in `references/regions.md`. |
+| `region` | `world` | One of the regions in `references/regions.md`, or `custom` to draw your own boundaries from a GeoJSON or TopoJSON file, see `boundaries`. |
+| `boundaries` | none | Required with `region: "custom"`, see below. |
 | `type` | `choropleth` | `choropleth`, `symbols`, `categorical`, `locator`, `small-multiples`. |
 | `data` | required | The table and which columns to use, see below. |
 | `classes` | quantile, 5 | How values are sorted into legend classes. |
@@ -28,6 +29,35 @@ A spec is one JSON object. Paths are relative to the spec file and must stay ins
 | `symbols` | none | `{ "color": "#c8412b", "maxRadius": 38 }`. The colour must be `#rrggbb`. |
 | `attribution` | `true` | `false` removes the "Made with Graticule" line. The boundary credit stays, because the licenses ask for it. |
 | `checks` | none | `{ "allow": ["rule-id"] }`. Accepts rules, with a note in the report. |
+
+## boundaries
+
+With `"region": "custom"` the map is drawn from your own polygons. Give exactly one of `file` (GeoJSON or TopoJSON, a path inside the spec's folder) or `geojson` (the object itself).
+
+| Field | Meaning |
+| --- | --- |
+| `file` | Path to a GeoJSON FeatureCollection or a TopoJSON topology. |
+| `geojson` | The same, inline. |
+| `object` | The TopoJSON object to read. Needed only when the topology has more than one. |
+| `name` | The property that holds the display name of an area. Found when omitted: `name`, `NAME`, `name_en`, `NAME_1`, `admin` or `label`, else the first text property that differs on every feature. |
+| `key` | The property to try first when the table is joined. |
+| `population` | A property with the population of each area. With it `data.normalize` can use `population` and `--fix` can divide raw counts. Without it, normalize by `area` or by a column of the table. |
+| `credit` | Who made the boundaries. Printed under the map as `Boundaries: ...`. |
+| `title` | The title used when the spec has none. |
+
+Every property that holds a different value on every feature is a key type of its own, so a table column can join on any of them (`data.keyType` names one). The display name feeds the `name` key type, which ignores case, accents and punctuation. A property such as `01` also matches `1`. Coordinates must be longitude and latitude in degrees (WGS84); a file in metres is refused with the `ogr2ogr` command that reprojects it. Features that are not polygons are skipped and counted in `boundaries-skipped`. The projection is chosen from the extent and is always equal-area: Equal Earth for a world-sized extent, an equal-area conic for a wide band, otherwise Lambert azimuthal. Set `projection` to use another. Keep the file small, because every vertex is drawn: simplify detailed files first (for example with mapshaper).
+
+```json
+{
+  "title": "Unemployment by state",
+  "source": "Statistisches Bundesamt, 2024",
+  "region": "custom",
+  "boundaries": { "file": "germany-states.geojson", "name": "GEN", "credit": "BKG (dl-de/by-2-0)" },
+  "data": { "file": "unemployment.csv", "key": "state", "value": "rate", "kind": "rate", "label": "Percent" }
+}
+```
+
+`graticule join table.csv --boundaries states.geojson` shows how the rows match, and `graticule init table.csv --boundaries states.geojson -o map.json` writes this spec.
 
 ## data
 
