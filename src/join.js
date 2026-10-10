@@ -1,3 +1,4 @@
+import { parseNumber } from "./csv.js";
 import { damagedNamePattern, formalVariants, normalizeName, suggest } from "./names.js";
 
 /**
@@ -102,7 +103,41 @@ export function detectKind(values, index, order) {
     const hits = distinct.filter((v) => lookup(index, kind, v).entries.length === 1).length;
     if (hits > best.hits) best = { kind, hits };
   }
-  return { kind: best.kind, rate: distinct.length ? Math.max(0, best.hits) / distinct.length : 0 };
+  return {
+    kind: best.kind,
+    rate: distinct.length ? Math.max(0, best.hits) / distinct.length : 0,
+    hits: Math.max(0, best.hits),
+  };
+}
+
+/** A column of plain numbers, as opposed to text or zero-padded codes such as "06037". */
+function isPlainNumbers(cells) {
+  const filled = cells.filter((c) => c !== "");
+  return filled.length > 0 && filled.every((c) => parseNumber(c) !== null && !/^0\d/.test(c));
+}
+
+/**
+ * Ranks the columns of a table by how well they name the areas of a region.
+ * Small whole numbers join codes by accident, so a plain number column ranks
+ * below any text column that joins at least half of its distinct values.
+ * @param {string[]} columns
+ * @param {Record<string, string>[]} rows
+ * @param {Index} index
+ * @param {string[]} order key kinds of the region
+ * @param {string[]} [exclude] columns that hold values, never keys
+ * @returns {{ column: string, kind: string, rate: number, hits: number, strong: boolean }[]}
+ */
+export function rankKeyColumns(columns, rows, index, order, exclude = []) {
+  const ranked = [];
+  for (const column of columns) {
+    if (exclude.includes(column)) continue;
+    const cells = rows.map((r) => (r[column] ?? "").trim());
+    if (new Set(cells.filter((c) => c !== "")).size < Math.min(3, cells.length)) continue;
+    const { kind, rate, hits } = detectKind(cells, index, order);
+    ranked.push({ column, kind, rate, hits, strong: !isPlainNumbers(cells) && rate >= 0.5 });
+  }
+  // Array.prototype.sort is stable, so columns that tie keep the order of the table.
+  return ranked.sort((p, q) => Number(q.strong) - Number(p.strong) || q.rate - p.rate || q.hits - p.hits);
 }
 
 /**

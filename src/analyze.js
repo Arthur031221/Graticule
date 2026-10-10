@@ -1,6 +1,6 @@
 import { geoBounds } from "d3-geo";
 import { loadAreas } from "./geo.js";
-import { buildIndex, detectKind, joinKeys, kindsOf } from "./join.js";
+import { buildIndex, detectKind, joinKeys, kindsOf, rankKeyColumns } from "./join.js";
 import { isNull, parseColumn, parseTable } from "./csv.js";
 import { breaksFor, classOf, equalEdges, equalEdgesAround, niceEdges, spearman } from "./classify.js";
 import { paletteColors, paletteType } from "./palettes.js";
@@ -171,14 +171,8 @@ export async function analyze(input, ctx) {
 }
 
 function guessKeyColumn(columns, rows, valueColumns, index, region) {
-  let best = { column: "", rate: 0 };
-  for (const column of columns.filter((c) => !valueColumns.includes(c))) {
-    const values = rows.map((r) => (r[column] ?? "").trim());
-    if (new Set(values).size < Math.min(3, values.length)) continue;
-    const { rate } = detectKind(values, index, region.keys);
-    if (rate > best.rate) best = { column, rate };
-  }
-  return best.rate >= 0.5 ? best.column : "";
+  const best = rankKeyColumns(columns, rows, index, region.keys, valueColumns)[0];
+  return best && best.rate >= 0.5 ? best.column : "";
 }
 
 /**

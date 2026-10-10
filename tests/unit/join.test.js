@@ -1,7 +1,7 @@
 import assert from "node:assert/strict";
 import { test } from "node:test";
 import { loadAreas } from "../../src/geo.js";
-import { buildIndex, detectKind, joinKeys } from "../../src/join.js";
+import { buildIndex, detectKind, joinKeys, rankKeyColumns } from "../../src/join.js";
 import { damagedNamePattern, normalizeName, suggest } from "../../src/names.js";
 import { assets } from "./helpers.js";
 
@@ -99,4 +99,76 @@ test("suggest ignores very short or distant strings", () => {
     ]),
     ["Germany"],
   );
+});
+
+const table = (header, lines) => ({
+  columns: header,
+  rows: lines.map((line) => Object.fromEntries(header.map((c, i) => [c, String(line[i])]))),
+});
+
+test("a text column that half joins beats a number column that matches codes by accident", async () => {
+  const us = await indexFor("us-states");
+  const { columns, rows } = table(
+    ["state", "electoral_votes"],
+    [
+      ["Calif.", 54],
+      ["N.Y.", 28],
+      ["Texas", 40],
+      ["Fla.", 30],
+      ["Ohio", 17],
+      ["Maine", 4],
+    ],
+  );
+  const ranked = rankKeyColumns(columns, rows, us.index, us.order);
+  assert.equal(ranked[0].column, "state");
+  assert.equal(ranked[0].kind, "name");
+  assert.equal(ranked[1].column, "electoral_votes");
+});
+
+test("a value column is never offered as the key", async () => {
+  const us = await indexFor("us-states");
+  const { columns, rows } = table(
+    ["name", "votes"],
+    [
+      ["Texas", 40],
+      ["Ohio", 17],
+      ["Maine", 4],
+    ],
+  );
+  assert.deepEqual(
+    rankKeyColumns(columns, rows, us.index, us.order, ["name"]).map((r) => r.column),
+    ["votes"],
+  );
+});
+
+test("a plain number column is still the key when no text column joins", async () => {
+  const jp = await indexFor("jp-prefectures");
+  const { columns, rows } = table(
+    ["code", "population"],
+    [
+      [1, 5224614],
+      [13, 14047594],
+      [27, 8837685],
+      [47, 1467480],
+    ],
+  );
+  const best = rankKeyColumns(columns, rows, jp.index, jp.order)[0];
+  assert.equal(best.column, "code");
+  assert.equal(best.kind, "jis");
+});
+
+test("zero-padded codes count as codes, not as numbers", async () => {
+  const us = await indexFor("us-states");
+  const { columns, rows } = table(
+    ["note", "fips", "score"],
+    [
+      ["a", "06", 5],
+      ["b", "48", 6],
+      ["c", "36", 7],
+      ["d", "12", 8],
+    ],
+  );
+  const best = rankKeyColumns(columns, rows, us.index, us.order)[0];
+  assert.equal(best.column, "fips");
+  assert.equal(best.kind, "fips");
 });

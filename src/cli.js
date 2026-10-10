@@ -6,7 +6,7 @@ import { parseTable } from "./csv.js";
 import { exportMap, FORMATS } from "./export.js";
 import { createTranslator } from "./i18n.js";
 import { loadAreas } from "./geo.js";
-import { buildIndex, detectKind, joinKeys } from "./join.js";
+import { buildIndex, detectKind, joinKeys, rankKeyColumns } from "./join.js";
 import { normalizeLang } from "./lang.js";
 import { nodeAssets } from "./node-assets.js";
 import { listPalettes, paletteColors, separation } from "./palettes.js";
@@ -190,17 +190,14 @@ async function commandJoin(args, assets) {
   const { areas } = await loadAreas(regionId, assets);
   const aliases = region.level === "country" ? (await assets.json("data/aliases.json")).country : {};
   const index = buildIndex(areas, aliases);
-  const columns = args.flags.key ? [String(args.flags.key)] : table.columns;
-  const candidates = columns.map((column) => {
-    const cells = table.rows.map((r) => r[column] ?? "");
-    const detected = args.flags["key-type"]
-      ? { kind: String(args.flags["key-type"]) }
-      : detectKind(cells, index, region.keys);
-    return { column, ...joinKeys(cells, index, detected.kind) };
-  });
-  const rate = (c) => c.rowsByArea.size;
-  const best = candidates.sort((p, q) => rate(q) - rate(p))[0];
-  if (!best) throw new UsageError("the table has no columns");
+  const ranked = rankKeyColumns(table.columns, table.rows, index, region.keys);
+  const column = args.flags.key ? String(args.flags.key) : (ranked[0]?.column ?? table.columns[0]);
+  if (column === undefined) throw new UsageError("the table has no columns");
+  if (!table.columns.includes(column))
+    throw new UsageError(`no column "${column}" in ${tablePath}. Columns: ${table.columns.join(", ")}`);
+  const cells = table.rows.map((r) => r[column] ?? "");
+  const kind = String(args.flags["key-type"] ?? detectKind(cells, index, region.keys).kind);
+  const best = { column, ...joinKeys(cells, index, kind) };
   const out = {
     column: best.column,
     keyType: best.kind,
@@ -240,16 +237,13 @@ async function commandInit(args, assets) {
   const { areas } = await loadAreas(regionId, assets);
   const aliases = region.level === "country" ? (await assets.json("data/aliases.json")).country : {};
   const index = buildIndex(areas, aliases);
-  const ranked = table.columns
-    .map((column) => ({
-      column,
-      ...detectKind(
-        table.rows.map((r) => r[column] ?? ""),
-        index,
-        region.keys,
-      ),
-    }))
-    .sort((p, q) => q.rate - p.rate);
+  const ranked = rankKeyColumns(
+    table.columns,
+    table.rows,
+    index,
+    region.keys,
+    args.flags.value ? [String(args.flags.value)] : [],
+  );
   const key = ranked[0]?.rate >= 0.5 ? ranked[0] : null;
   if (!key)
     throw new UsageError(

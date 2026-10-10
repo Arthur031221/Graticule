@@ -4,7 +4,7 @@ import { exportMap } from "../src/export.js";
 import { createFontStore } from "../src/fonts.js";
 import { interactions } from "../src/html.js";
 import { createTranslator } from "../src/i18n.js";
-import { buildIndex, detectKind } from "../src/join.js";
+import { buildIndex, rankKeyColumns } from "../src/join.js";
 import { loadAreas } from "../src/geo.js";
 import { LANGS, normalizeLang } from "../src/lang.js";
 import { listPalettes, paletteColors } from "../src/palettes.js";
@@ -447,7 +447,11 @@ function setStatus(text, error = false) {
   $("data-status").classList.toggle("error", error);
 }
 
+const REGION_ORDER = ["world", "us-states", "us-counties", "jp-prefectures", "kr-provinces", "tw-counties", "tw-towns"];
+let tableRun = 0;
+
 async function setTable(text, { keepSpec = false } = {}) {
+  const run = ++tableRun;
   let table;
   try {
     table = parseTable(text);
@@ -459,48 +463,57 @@ async function setTable(text, { keepSpec = false } = {}) {
   state.csv = text;
   state.table = table;
   if (!keepSpec) {
+    const found = await detectKey(table);
+    if (run !== tableRun) return;
+    if (found.region && found.region !== state.spec.region) {
+      state.spec.region = found.region;
+      toast(ui("status.detected", { region: ui(`regions.${found.region}`) }));
+    }
     const columns = table.columns;
+    const sample = table.rows.slice(0, 60);
     const numeric = columns.filter(
       (c) =>
-        table.rows.slice(0, 60).filter((r) => (r[c] ?? "") !== "").length &&
-        table.rows.slice(0, 60).every((r) => (r[c] ?? "") === "" || parseNumber(r[c]) !== null),
+        c !== found.column &&
+        sample.some((r) => (r[c] ?? "") !== "") &&
+        sample.every((r) => (r[c] ?? "") === "" || parseNumber(r[c]) !== null),
     );
     state.spec.key = "";
     state.spec.value =
-      state.spec.value && columns.includes(state.spec.value)
+      state.spec.value && state.spec.value !== found.column && columns.includes(state.spec.value)
         ? state.spec.value
-        : (numeric.find((c) => c !== state.spec.key) ?? columns[1] ?? columns[0]);
+        : (numeric[0] ?? columns.find((c) => c !== found.column) ?? columns[0]);
     state.spec.values = numeric.slice(0, 3);
   }
   setStatus(ui("data.loaded", { rows: table.rows.length, cols: table.columns.length }));
   fillColumns();
   syncControls();
   schedule();
-  if (!keepSpec && !state.regionTouched) detectRegion(table);
 }
 
-/** Picks the region whose keys match a column of the table best. */
-async function detectRegion(table) {
-  const order = ["world", "us-states", "us-counties", "jp-prefectures", "kr-provinces", "tw-counties", "tw-towns"];
-  let best = { id: "", rate: 0 };
-  for (const id of order) {
+/**
+ * Finds the column that names the areas and, until the reader picks a region, the region it belongs to.
+ * @returns {Promise<{ region: string, column: string }>}
+ */
+async function detectKey(table) {
+  const columns = table.columns.slice(0, 8);
+  const rows = table.rows.slice(0, 400);
+  const topOf = async (id) => {
     const { areas, region } = await loadAreas(id, assets);
     const aliases = region.level === "country" ? (await assets.json("data/aliases.json")).country : {};
-    const index = buildIndex(areas, aliases);
-    for (const column of table.columns.slice(0, 6)) {
-      const cells = table.rows.slice(0, 400).map((r) => (r[column] ?? "").trim());
-      if (new Set(cells).size < 3) continue;
-      const { rate } = detectKind(cells, index, region.keys);
-      if (rate > best.rate) best = { id, rate };
+    return rankKeyColumns(columns, rows, buildIndex(areas, aliases), region.keys)[0];
+  };
+  if (!state.regionTouched) {
+    let best = { region: "", column: "", rate: 0, strong: false };
+    for (const id of REGION_ORDER) {
+      const top = await topOf(id);
+      if (top && (Number(top.strong) - Number(best.strong) || top.rate - best.rate) > 0)
+        best = { region: id, column: top.column, rate: top.rate, strong: top.strong };
+      if (best.rate >= 0.9 && best.strong) break;
     }
-    if (best.rate >= 0.9) break;
+    if (best.strong || best.rate >= 0.6) return best;
   }
-  if (best.id && best.rate >= 0.6 && best.id !== state.spec.region) {
-    state.spec.region = best.id;
-    syncControls();
-    toast(ui("status.detected", { region: ui(`regions.${best.id}`) }));
-    schedule();
-  }
+  const top = await topOf(state.spec.region);
+  return { region: "", column: top && top.rate >= 0.5 ? top.column : "" };
 }
 
 async function loadExample(id) {

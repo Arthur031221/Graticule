@@ -44,6 +44,26 @@ test("a dropped CSV becomes a map and the region is detected", async ({ page }) 
   await expect(page.locator("#join-summary")).toContainText("6 of 6 rows matched 6 areas");
 });
 
+test("a table whose first column is a numeric code keeps the codes as the key and the next column as the value", async ({
+  page,
+}) => {
+  await page.goto("/");
+  const csv = ["fips,rate", "06037,5.1", "48201,4.2", "17031,6.3", "04013,3.9", "12086,4.4", "36061,5.5"].join("\n");
+  await page.locator("#file").setInputFiles({ name: "counties.csv", mimeType: "text/csv", buffer: Buffer.from(csv) });
+  await expect(page.locator("#region")).toHaveValue("us-counties");
+  await expect(page.locator("#value")).toHaveValue("rate");
+  await expect(page.locator("#join-summary")).toContainText("6 of 6 rows matched 6 areas");
+});
+
+test("a column of names wins over a column of numbers that happen to be codes", async ({ page }) => {
+  await page.goto("/");
+  const csv = ["state,electoral_votes", "Calif.,54", "N.Y.,28", "Texas,40", "Fla.,30", "Ohio,17", "Maine,4"].join("\n");
+  await page.locator("#file").setInputFiles({ name: "votes.csv", mimeType: "text/csv", buffer: Buffer.from(csv) });
+  await expect(page.locator("#region")).toHaveValue("us-states");
+  await expect(page.locator("#value")).toHaveValue("electoral_votes");
+  await expect(page.locator("#join-summary")).toContainText("state");
+});
+
 test("switching the interface language translates the page and the checker", async ({ page }) => {
   await page.goto("/?example=covid-raw&lang=ja");
   await expect(page.locator("h2 >> nth=0")).toContainText("データ");

@@ -99,6 +99,20 @@ test("init writes a spec that checks cleanly once the text fields are filled", a
   assert.equal(spec.data.value, "life_expectancy");
 });
 
+test("init takes the column of names as the key, not a column of numbers that look like codes", async () => {
+  const out = await mkdtemp(join(tmpdir(), "graticule-"));
+  const csv = ["state,electoral_votes", "Calif.,54", "N.Y.,28", "Texas,40", "Fla.,30", "Ohio,17", "Maine,4"].join("\n");
+  await writeFile(join(out, "votes.csv"), csv);
+  for (const extra of [[], ["--value", "electoral_votes"]]) {
+    const result = await graticule("init", join(out, "votes.csv"), "--region", "us-states", ...extra);
+    assert.equal(result.code, 0, result.stderr);
+    const { data } = JSON.parse(result.stdout);
+    assert.deepEqual([data.key, data.keyType, data.value], ["state", "name", "electoral_votes"]);
+  }
+  const join_ = await graticule("join", join(out, "votes.csv"), "--region", "us-states");
+  assert.match(join_.stdout, /column "state" matches 3 areas/);
+});
+
 test("init writes the table's path relative to where the spec will be saved", async () => {
   const out = await mkdtemp(join(tmpdir(), "graticule-"));
   await writeFile(join(out, "data.csv"), await readFile(join(gallery, "life-expectancy/data.csv"), "utf8"));
