@@ -598,13 +598,14 @@ async function detectKey(table) {
 }
 
 async function loadExample(id) {
+  const run = ++fileRun;
   const dir = new URL(`examples/${id}/`, root);
   const [spec, csv] = await Promise.all([
     fetch(new URL("spec.json", dir)).then((r) => r.json()),
     fetch(new URL("data.csv", dir)).then((r) => r.text()),
   ]);
+  if (run !== fileRun) return;
   tableRun++;
-  fileRun++;
   state.bytes = null;
   state.boundaries = null;
   $("field-encoding").hidden = true;

@@ -3,6 +3,8 @@ import { feature as topoFeature } from "topojson-client";
 import { nameVariants } from "./names.js";
 
 const EARTH_RADIUS_KM = 6371.0088;
+/** The names GeoJSON files give longitude and latitude: CRS84, EPSG:4326 as a code, a URN with or without a version, or the OGC URL. */
+const WGS84 = /crs:?84|wgs ?84|epsg\D+(?:\d+(?:\.\d+)?\D+)?4326(?!\d)/i;
 const NAME_PROPERTIES = ["name", "name_en", "name_1", "admin", "label", "title", "nom", "nombre"];
 const MAX_KIND_LENGTH = 80;
 const MAX_KINDS = 12;
@@ -46,7 +48,7 @@ export async function loadCustomAreas(boundaries, readText) {
   const areas = polygons.map((f, i) => {
     const geometry = rewind(f.geometry);
     const props = rows[i];
-    const label = String(props[nameProperty] ?? props.id ?? `Area ${i + 1}`).trim();
+    const label = String(props[nameProperty] ?? props[idProperty] ?? props.id ?? `Area ${i + 1}`).trim();
     const wanted = String(idProperty === "" ? (f.id ?? i + 1) : (props[idProperty] ?? f.id ?? i + 1)).trim();
     let id = wanted;
     for (let n = 2; used.has(id); n++) id = `${wanted}#${n}`;
@@ -123,7 +125,7 @@ function featuresOf(source, objectName) {
     return { features: out.type === "FeatureCollection" ? out.features : [out], skipped: 0 };
   }
   const crs = source.crs?.properties?.name;
-  if (crs && !/crs84|epsg:{1,2}4326|wgs ?84/i.test(String(crs)))
+  if (crs && !WGS84.test(String(crs)))
     throw new BoundaryError(
       `the file declares the coordinate system ${crs}, not longitude and latitude (WGS84). Reproject it first, for example: ogr2ogr -t_srs EPSG:4326 out.geojson in.geojson`,
     );

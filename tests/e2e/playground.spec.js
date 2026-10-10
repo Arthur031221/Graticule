@@ -412,7 +412,8 @@ test("on a phone the map opens full screen at a size where labels can be read", 
   expect(large).toBeGreaterThan(small * 2);
   await expect(page.locator("#viewer-title")).toContainText("GDP");
   await page.locator('#viewer [data-id="DEU"]').first().focus();
-  await expect(page.locator("#viewer-tip")).toContainText("Germany");
+  await expect(page.locator("#viewer-tip")).toContainText(/Germany: \d/);
+  await expect(page.locator('#viewer [data-id="DEU"]').first()).toHaveAttribute("aria-label", /Germany: \d/);
   await page.keyboard.press("Escape");
   await expect(page.locator("#viewer")).toBeHidden();
   await page.locator("#expand").click();
@@ -429,4 +430,23 @@ test("the larger view is for small screens only, and not offered for a blocked m
   await page.fill("#source", "");
   await expect(page.locator("#stage-note")).toContainText("source-required");
   await expect(page.locator("#expand")).toBeHidden();
+});
+
+test("an example that finishes loading after a newer file was picked does not cancel the file", async ({ page }) => {
+  let release;
+  const gate = new Promise((resolve) => (release = resolve));
+  await page.goto("/?example=life-expectancy");
+  await expect(svg(page)).toBeVisible();
+  await page.route("**/examples/europe-gdp-per-capita/spec.json", async (route) => {
+    await gate;
+    await route.continue();
+  });
+  await page.getByRole("button", { name: "Europe GDP" }).click();
+  const csv = ["country,score", "France,5", "Japan,4", "Brazil,3", "Kenya,2"].join("\n");
+  await page.locator("#file").setInputFiles({ name: "late.csv", mimeType: "text/csv", buffer: Buffer.from(csv) });
+  await expect(page.locator("#value")).toHaveValue("score");
+  release();
+  await page.waitForTimeout(1200);
+  await expect(page.locator("#value")).toHaveValue("score");
+  await expect(page.locator("#join-summary")).toContainText("4 of 4 rows matched 4 areas");
 });

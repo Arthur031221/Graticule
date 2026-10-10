@@ -1,0 +1,16 @@
+name: Feature request
+description: A region, a rule, an output or a behavior you need.
+labels: [enhancement]
+body:
+  - type: textarea
+    id: problem
+    attributes:
+      label: What are you trying to do
+      description: The map you want to make and where Graticule stops you.
+    validations:
+      required: true
+  - type: textarea
+    id: idea
+    attributes:
+      label: What would you like to happen
+      description: If it is a new rule, say what it catches and the reason a reader would care.

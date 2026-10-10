@@ -360,3 +360,59 @@ test("a declared projected coordinate system is refused, WGS84 is accepted", asy
   const epsg = await loadCustomAreas({ geojson: withCrs("EPSG:4326") }, readFixture);
   assert.equal(epsg.areas.length, 1);
 });
+
+test("a numeric key names its area and joins by name when the feature has nothing else", async () => {
+  const sq = (x) => [
+    [x, 0],
+    [x + 1, 0],
+    [x + 1, 1],
+    [x, 1],
+    [x, 0],
+  ];
+  const geojson = collection(
+    { ...polygon("x", sq(0)), properties: { code: 101 } },
+    { ...polygon("x", sq(2)), properties: { code: 102 } },
+  );
+  const { areas } = await loadCustomAreas({ geojson, key: "code" }, readFixture);
+  assert.deepEqual(
+    areas.map((a) => a.names[0]),
+    ["101", "102"],
+  );
+  const result = await build(
+    spec(
+      { boundaries: { geojson, key: "code" } },
+      { csv: "k,score\n101,1\n102,2\n", file: undefined, key: "k", keyType: "name" },
+    ),
+  );
+  assert.equal(result.analysis.join.rowsMatched, 2);
+});
+
+test("every spelling of the WGS84 coordinate system is accepted, projected ones are not", async () => {
+  const sq = [
+    [0, 0],
+    [2, 0],
+    [2, 2],
+    [0, 2],
+    [0, 0],
+  ];
+  const withCrs = (name) => ({ ...collection(polygon("Square", sq)), crs: { type: "name", properties: { name } } });
+  for (const name of [
+    "EPSG:4326",
+    "urn:ogc:def:crs:EPSG::4326",
+    "urn:ogc:def:crs:EPSG:6.6:4326",
+    "http://www.opengis.net/def/crs/EPSG/0/4326",
+    "urn:ogc:def:crs:OGC:1.3:CRS84",
+    "urn:ogc:def:crs:OGC::CRS84",
+    "WGS 84",
+  ]) {
+    const { areas } = await loadCustomAreas({ geojson: withCrs(name) }, readFixture);
+    assert.equal(areas.length, 1, name);
+  }
+  for (const name of [
+    "EPSG:3857",
+    "urn:ogc:def:crs:EPSG::32633",
+    "EPSG:43260",
+    "http://www.opengis.net/def/crs/EPSG/0/2154",
+  ])
+    await assert.rejects(loadCustomAreas({ geojson: withCrs(name) }, readFixture), /not longitude and latitude/, name);
+});

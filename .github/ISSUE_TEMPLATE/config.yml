@@ -1,0 +1,5 @@
+blank_issues_enabled: true
+contact_links:
+  - name: Documentation
+    url: https://github.com/Arthur031221/Graticule/tree/main/docs
+    about: Usage, the spec reference, the rules and the data sources.

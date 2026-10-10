@@ -14,7 +14,7 @@ export function interactions(svg, tip) {
   var keyboard = areas.length <= 400;
   areas.forEach(function (el) {
     var title = el.querySelector("title");
-    var text = title ? title.textContent : el.getAttribute("data-name");
+    var text = title ? title.textContent : el.getAttribute("data-tip") || el.getAttribute("data-name");
     if (title) el.removeChild(title);
     el.setAttribute("data-tip", text);
     el.setAttribute("aria-label", text);

@@ -1,0 +1,26 @@
+name: Bug report
+description: A map is wrong, a rule fires when it should not, or a command fails.
+labels: [bug]
+body:
+  - type: textarea
+    id: what
+    attributes:
+      label: What happened
+      description: What you ran or clicked, what you expected and what you got. A wrong map is easiest to fix with the spec and a few rows of the table.
+    validations:
+      required: true
+  - type: textarea
+    id: spec
+    attributes:
+      label: Spec and command
+      description: The spec JSON and the command line, or the steps in the playground. Attach the `.check.json` that `render` writes if you have it.
+      render: shell
+  - type: input
+    id: version
+    attributes:
+      label: Version
+      description: Output of `graticule --version`, or the playground footer date.
+  - type: input
+    id: environment
+    attributes:
+      label: Node version, operating system and browser

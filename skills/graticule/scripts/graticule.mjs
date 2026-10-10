@@ -155125,6 +155125,7 @@ function normalizeSpec(input) {
 // src/custom.js
 var import_topojson_client2 = __toESM(require_topojson_client(), 1);
 var EARTH_RADIUS_KM2 = 6371.0088;
+var WGS84 = /crs:?84|wgs ?84|epsg\D+(?:\d+(?:\.\d+)?\D+)?4326(?!\d)/i;
 var NAME_PROPERTIES = ["name", "name_en", "name_1", "admin", "label", "title", "nom", "nombre"];
 var MAX_KIND_LENGTH = 80;
 var MAX_KINDS = 12;
@@ -155152,7 +155153,7 @@ async function loadCustomAreas(boundaries, readText) {
   const areas = polygons.map((f, i2) => {
     const geometry2 = rewind(f.geometry);
     const props = rows[i2];
-    const label = String(props[nameProperty] ?? props.id ?? `Area ${i2 + 1}`).trim();
+    const label = String(props[nameProperty] ?? props[idProperty] ?? props.id ?? `Area ${i2 + 1}`).trim();
     const wanted = String(idProperty === "" ? f.id ?? i2 + 1 : props[idProperty] ?? f.id ?? i2 + 1).trim();
     let id = wanted;
     for (let n = 2; used.has(id); n++) id = `${wanted}#${n}`;
@@ -155227,7 +155228,7 @@ function featuresOf(source, objectName) {
     return { features: out.type === "FeatureCollection" ? out.features : [out], skipped: 0 };
   }
   const crs = source.crs?.properties?.name;
-  if (crs && !/crs84|epsg:{1,2}4326|wgs ?84/i.test(String(crs)))
+  if (crs && !WGS84.test(String(crs)))
     throw new BoundaryError(
       `the file declares the coordinate system ${crs}, not longitude and latitude (WGS84). Reproject it first, for example: ogr2ogr -t_srs EPSG:4326 out.geojson in.geojson`
     );
@@ -157571,7 +157572,7 @@ function interactions(svg, tip) {
   var keyboard = areas.length <= 400;
   areas.forEach(function(el) {
     var title = el.querySelector("title");
-    var text2 = title ? title.textContent : el.getAttribute("data-name");
+    var text2 = title ? title.textContent : el.getAttribute("data-tip") || el.getAttribute("data-name");
     if (title) el.removeChild(title);
     el.setAttribute("data-tip", text2);
     el.setAttribute("aria-label", text2);
