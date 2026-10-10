@@ -1,5 +1,14 @@
 # Changelog
 
+## 0.2.0 (2026-10-10)
+
+- Your own boundaries. `region: "custom"` with a `boundaries` block draws any GeoJSON or TopoJSON file of polygons. Every property that differs per feature becomes a key type, so a table joins on whichever column matches. The projection is an equal-area one chosen from the extent. Files in metres are refused with the command that reprojects them. `graticule join` and `graticule init` take `--boundaries`, and the playground takes the file next to the table.
+- Tables that are not UTF-8. A Big5, Shift_JIS, EUC-KR, GBK or Windows-1252 file is read as Windows-1252 with a `table-encoding` warning. `--encoding` and `data.encoding` name the real encoding, and the playground shows an encoding picker. UTF-16 with a byte order mark is read as UTF-16.
+- Real-world spellings join: Associated Press state abbreviations, Taiwan county names from before 2014 and bare city names, Korean provinces renamed in 2023 and 2024, romanised Japanese suffixes. Names that fit two areas, such as Chiayi, are reported with both candidates.
+- Key columns. A text column that names the most areas wins over a column of numbers that happen to look like codes, value columns are never keys, and `--key-type` picks the column by the requested type.
+- Playground: the region picker works (it used to snap back), the export buttons show their names instead of message keys, the Fix button stays inside the card on a phone, the map is one tab stop with arrow keys, findings link to their field, singular messages read correctly in five languages, and an axe check runs in both themes.
+- Messages for the new features are translated in all nine languages.
+
 ## 0.1.0 (2026-10-10)
 
 First release.

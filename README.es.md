@@ -2,7 +2,7 @@
 
 # Graticule
 
-Una habilidad de cartografía para agentes de programación: 1 habilidad, 5 tipos de mapa, 13 regiones, 25 reglas, 9 idiomas. No dibuja un mapa defectuoso y te dice por qué.
+Una habilidad de cartografía para agentes de programación: 1 habilidad, 5 tipos de mapa, 13 regiones o tu propio GeoJSON, 25 reglas, 9 idiomas. No dibuja un mapa defectuoso y te dice por qué.
 
 > **Inicio rápido.** Ejecuta `npx skills add Arthur031221/Graticule` y pide a tu agente: "haz un mapa de las muertes por COVID por país con deaths.csv".
 
@@ -31,6 +31,7 @@ Una retícula (graticule) es la cuadrícula de líneas de latitud y longitud de 
 - **Recuentos en lugar de tasas.** Colorear los países por su número de muertes muestra dónde vive la gente. Graticule pide que se declare el tipo (`kind`), o detecta valores que se ordenan como la población, y divide.
 - **Mercator para el mundo.** Groenlandia tan grande como África. Las proyecciones de área equivalente son la opción por defecto. Mercator se rechaza por encima de los 20 grados de latitud.
 - **Filas que desaparecen.** "Korea, Rep." no coincide con "South Korea" y nadie se entera. Cada fila que no se une aparece en una lista con los nombres más parecidos. Un nombre que encaja en dos sitios nunca se adivina.
+- **Archivos que no son UTF-8.** Una tabla guardada por una hoja de cálculo en Windows suele estar en Big5, Shift_JIS o Windows-1252, y leída como UTF-8 no cruza con nada. Graticule avisa cuando un archivo no es UTF-8, lo lee como Windows-1252 y acepta `--encoding big5` o `data.encoding` para el resto.
 - **Paletas arcoíris.** Una luminosidad que sube y baja dibuja bordes que no están en los datos. La paleta debe aclararse u oscurecerse de forma constante, y sus colores deben seguir separados para los tres tipos de daltonismo que simulo.
 - **Etiquetas que se vuelven cuadros vacíos.** Las etiquetas en chino, japonés y coreano necesitan fuentes. Cada salida lleva un subconjunto de Noto Sans CJK con solo los glifos que usa.
 - **Sin fuente.** Un mapa sin línea de fuente se rechaza.
@@ -110,7 +111,7 @@ O clona el repositorio y ejecuta `node skills/graticule/scripts/graticule.mjs --
 <details>
 <summary><b>En el navegador</b></summary>
 
-Abre el [área de pruebas](https://arthur031221.github.io/Graticule/). Suelta un CSV, arregla lo que encuentre el verificador y descarga SVG, PNG, PDF o una página HTML interactiva. Todo se ejecuta en la página y no se sube nada. La interfaz está en nueve idiomas.
+Abre el [área de pruebas](https://arthur031221.github.io/Graticule/). Suelta un CSV, arregla lo que encuentre el verificador y descarga SVG, PNG, PDF o una página HTML interactiva. Todo se ejecuta en la página y no se sube nada. La interfaz está en nueve idiomas. Suelta un archivo GeoJSON o TopoJSON junto a la tabla para dibujar tus propios límites.
 
 </details>
 
@@ -139,7 +140,7 @@ Una especificación es un pequeño archivo JSON:
 
 ## Mapas y regiones
 
-Cinco tipos de mapa: áreas coloreadas (coroplético), círculos proporcionales, categorías, mapas de localización con un pequeño globo y pequeños múltiplos que comparten una leyenda. Trece regiones: el mundo, seis continentes, estados y condados de Estados Unidos (Alaska, Hawái y Puerto Rico como recuadros), condados y municipios de Taiwán, prefecturas de Japón y provincias de Corea del Sur. Todo va incluido, así que dibujar funciona sin conexión.
+Cinco tipos de mapa: áreas coloreadas (coroplético), círculos proporcionales, categorías, mapas de localización con un pequeño globo y pequeños múltiplos que comparten una leyenda. Trece regiones: el mundo, seis continentes, estados y condados de Estados Unidos (Alaska, Hawái y Puerto Rico como recuadros), condados y municipios de Taiwán, prefecturas de Japón y provincias de Corea del Sur. Todo va incluido, así que dibujar funciona sin conexión. Para cualquier otro lugar, da un archivo GeoJSON o TopoJSON: `graticule init table.csv --boundaries states.geojson`. Cada propiedad que difiere entre elementos se convierte en una clave, y la proyección es una de áreas iguales elegida según la extensión. Ver [docs/config.md](docs/config.md).
 
 | | | |
 | --- | --- | --- |
@@ -179,6 +180,7 @@ Las sesiones con agentes son una muestra pequeña: dos mensajes, dos agentes, do
 - Las fuentes cubren los caracteres comunes de cada idioma (por ejemplo, los 5.401 caracteres del nivel 1 de Big5 para el chino tradicional). Un carácter fuera de ese conjunto se informa como `glyphs-missing`. No se admiten escrituras que van de derecha a izquierda o necesitan composición.
 - En el mapa de Estados Unidos, Alaska se dibuja al 35 % de la escala de los 48 estados contiguos. Las áreas son comparables dentro de cada pieza.
 - Las etiquetas usan un colocador voraz. Los mapas densos dejan algunas fuera y el informe las cuenta.
+- Tus propios límites se dibujan tal cual, sin simplificar, así que un archivo con millones de vértices tarda en dibujarse. Las coordenadas deben ser longitud y latitud. Hace falta una propiedad de población para que `--fix` divida los recuentos brutos.
 
 ## Más
 

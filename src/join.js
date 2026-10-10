@@ -23,7 +23,7 @@ function normalizeCode(kind, value) {
  */
 export function buildIndex(areas, aliases = {}) {
   /** @type {Index} */
-  const index = { kinds: {}, labels: [], byId: new Map(areas.map((a) => [a.id, a])) };
+  const index = { kinds: Object.create(null), labels: [], byId: new Map(areas.map((a) => [a.id, a])) };
   const add = (kind, key, entry) => {
     const map = (index.kinds[kind] ??= new Map());
     const list = map.get(key) ?? [];
@@ -94,7 +94,8 @@ export function lookup(index, kind, raw) {
   const key = normalizeCode(kind, raw);
   const direct = map.get(key);
   if (direct) return { entries: direct, padded: false };
-  const width = PAD[kind] === 0 ? [...map.keys()][0]?.length : PAD[kind];
+  const pad = Object.hasOwn(PAD, kind) ? PAD[kind] : undefined;
+  const width = pad === 0 ? [...map.keys()][0]?.length : pad;
   if (width && /^\d+$/.test(key) && key.length < width) {
     const padded = map.get(key.padStart(width, "0"));
     if (padded) return { entries: padded, padded: true };

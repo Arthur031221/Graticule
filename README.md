@@ -2,7 +2,7 @@
 
 # Graticule
 
-A cartography skill for coding agents: 1 skill, 5 map types, 13 regions, 25 rules, 9 languages. It won't draw a bad map, and it tells you why.
+A cartography skill for coding agents: 1 skill, 5 map types, 13 regions or your own GeoJSON, 25 rules, 9 languages. It won't draw a bad map. It'll tell you why.
 
 > **Quick start.** `npx skills add Arthur031221/Graticule`, then ask your agent: "map COVID deaths by country from deaths.csv".
 
@@ -13,7 +13,7 @@ A cartography skill for coding agents: 1 skill, 5 map types, 13 regions, 25 rule
 <p align="center"><a href="https://arthur031221.github.io/Graticule/"><img src="assets/demo.gif" alt="A map with four mistakes is blocked, one click fixes it, then the labels change language" width="860"></a></p>
 
 **232 of 235** ISO 3166 country names join to the right polygon by name alone. None join to the wrong one. Matching on Natural Earth's English name finds 202.
-<sub>Names from datasets/country-codes (official_name_en), joined to Natural Earth 1:50m. Wrong joins counted against each name's ISO code. Five more public lists show the same pattern, see [docs/verification.md](docs/verification.md).</sub>
+<sub>Names from datasets/country-codes (official_name_en), joined to Natural Earth 1:50m. Wrong joins counted against each name's ISO code. Five more public lists show the same pattern. See [docs/verification.md](docs/verification.md).</sub>
 
 | A coding agent, no skill | The same agent with Graticule |
 | --- | --- |
@@ -22,22 +22,23 @@ A cartography skill for coding agents: 1 skill, 5 map types, 13 regions, 25 rule
 
 Same prompt and file, fresh sessions of the same agent (Sonnet 5.5). All four sessions without the skill shaded raw counts: two with that agent and two with Codex. Transcripts are in [eval/runs](eval/runs).
 
-I wrote down the rules an agent skips when drawing a map in a hurry, then built a renderer that won't run until they pass. No new map library.
+I wrote down the rules agents skip when drawing maps in a hurry, then built a renderer that won't run until they pass. No new map library.
 
 ## Why the name
 
-A graticule is the grid of latitude and longitude lines on a map. Readers use it to check that the map is where it says it is. This project does the same for maps drawn by agents. The same mistakes keep coming up.
+A graticule is the grid of latitude and longitude lines on a map. Readers use it to check that the map is where it says it is. This project does the same for maps drawn by agents. These mistakes keep coming up.
 
 - **Counts instead of rates.** Coloring countries by death counts shows where the people are. Graticule asks for the data kind, or spots values that rank like population, and divides.
-- **Mercator for the world.** Greenland as big as Africa. Equal-area projections are the default. Mercator is refused above 20 degrees of latitude.
-- **Rows that vanish.** "Korea, Rep." doesn't match "South Korea" and nobody hears about it. Every row that fails to join is listed with its closest names. A name that fits two places is never guessed.
+- **Mercator for the world.** Greenland as big as Africa. Equal-area projections are the default. Graticule refuses Mercator above 20 degrees of latitude.
+- **Rows that vanish.** "Korea, Rep." doesn't match "South Korea" and nobody hears about it. Every row that fails to join is listed with its closest names. If a name fits two places, Graticule won't guess.
+- **Files that are not UTF-8.** A table saved by a spreadsheet on Windows is often Big5, Shift_JIS or Windows-1252. Read as UTF-8, it joins nothing. Graticule flags files that aren't UTF-8, reads them as Windows-1252 and takes `--encoding big5` or `data.encoding` for the rest.
 - **Rainbow palettes.** Lightness that goes up and down draws borders that aren't in the data. The palette must get steadily lighter or darker. Its colors must stay apart for the three kinds of color vision deficiency I simulate.
 - **Labels that turn into empty boxes.** Chinese, Japanese and Korean labels need fonts. Each output carries a subset of Noto Sans CJK with only the glyphs it uses.
-- **No source.** A map without a source line is refused.
+- **No source.** Graticule refuses maps without a source line.
 
 ## What it checks
 
-25 rules, each with a plain reason beside the finding. Errors stop the map. `--fix` repairs errors that have a single mechanical repair. `--allow <id>` accepts a rule with a note in the report.
+25 rules, each with a plain reason beside the finding. Errors stop the map. `--fix` repairs errors with a single mechanical fix. `--allow <id>` accepts a rule with a note in the report.
 
 | Rule | What it catches |
 | --- | --- |
@@ -78,14 +79,14 @@ Exact conditions and thresholds are in [docs/rules.md](docs/rules.md).
 npx skills add Arthur031221/Graticule
 ```
 
-Run this in a project to write `.agents/skills/graticule`, which Codex reads, and link the skills folder of the other agents you pick. Then ask for a map in plain words.
+Run this in a project. It writes `.agents/skills/graticule`, which Codex reads, and links the skills folder of the other agents you pick. Then ask for a map in plain words.
 
 </details>
 
 <details>
 <summary><b>Cursor, Gemini CLI, OpenCode and other agents</b></summary>
 
-Run the same command and pick your agent when the `skills` program asks. I haven't run these agents myself. If your agent has a skills folder, copy `skills/graticule` into it. It's about 14 MB. Nothing else is needed.
+Run the same command and pick your agent when the `skills` program asks. I haven't run these agents myself. If your agent has a skills folder, copy `skills/graticule` into it. It's about 14 MB. That's all you need.
 
 </details>
 
@@ -110,7 +111,7 @@ Or clone and run `node skills/graticule/scripts/graticule.mjs --help`. Node 20 o
 <details>
 <summary><b>In the browser</b></summary>
 
-Open the [playground](https://arthur031221.github.io/Graticule/). Drop a CSV, fix what the checker finds, then download SVG, PNG, PDF or an interactive HTML page. Everything runs in the page. Nothing is uploaded. The interface is in nine languages.
+Open the [playground](https://arthur031221.github.io/Graticule/). Drop a CSV, fix what the checker finds, then download SVG, PNG, PDF or an interactive HTML page. Everything runs in the page. Nothing is uploaded. The interface is in nine languages. Drop a GeoJSON or TopoJSON file next to the table to draw your own boundaries.
 
 </details>
 
@@ -135,11 +136,11 @@ A spec is a small JSON file:
 }
 ```
 
-`render` writes `map.svg`, `map.png`, optionally `map.pdf` and `map.html`, and `map.check.json`. The report lists what matched, the class edges and every finding. [docs/usage.md](docs/usage.md) has the full walk-through. [docs/config.md](docs/config.md) lists the fields.
+`render` writes `map.svg`, `map.png`, optionally `map.pdf` and `map.html`, and `map.check.json`. The report lists what matched, the class edges and every finding. The full walk-through is in [docs/usage.md](docs/usage.md). [docs/config.md](docs/config.md) lists the fields.
 
 ## Maps and regions
 
-Five map types: shaded areas (choropleth), proportional circles, categories, locator maps with a small globe, and small multiples that share one legend. Thirteen regions: the world, six continents, US states and counties (Alaska, Hawaii and Puerto Rico as insets), Taiwan counties and townships, Japan prefectures and South Korean provinces. Everything is bundled, so rendering works offline.
+Five map types: shaded areas (choropleth), proportional circles, categories, locator maps with a small globe, and small multiples that share one legend. Thirteen regions: the world, six continents, US states and counties (Alaska, Hawaii and Puerto Rico as insets), Taiwan counties and townships, Japan prefectures and South Korean provinces. Everything is bundled, so rendering works offline. For any other place, supply a GeoJSON or TopoJSON file: `graticule init table.csv --boundaries states.geojson`. Every property that differs per feature becomes a key. The extent determines which equal-area projection to use. See [docs/config.md](docs/config.md).
 
 | | | |
 | --- | --- | --- |
@@ -156,7 +157,7 @@ English, Traditional and Simplified Chinese, Japanese, Korean, Spanish, French, 
 
 ## Checked against real systems
 
-Each check runs from a script in this repository. CI repeats most of them. [docs/verification.md](docs/verification.md) has the numbers and methods.
+Each check runs from a script in this repository. CI repeats most of them. The numbers and methods are in [docs/verification.md](docs/verification.md).
 
 | What | Compared with | Result |
 | --- | --- | --- |
@@ -179,6 +180,7 @@ The agent sessions are a small sample: two prompts, two agents, two runs each. R
 - Fonts cover each language's common characters (5,401 Big5 level 1 characters for Traditional Chinese, for example). Characters outside that set return `glyphs-missing`. Scripts that run right to left or need shaping aren't supported.
 - In the US map, Alaska is drawn at 35 percent of the lower 48 scale. Areas are comparable inside each piece.
 - Labels use a greedy placer. Dense maps leave some out, and the report counts them.
+- Your own boundaries are drawn as given, without simplification. Files with millions of vertices draw slowly. Coordinates must be longitude and latitude. `--fix` needs a population property in the file before it can divide raw counts.
 
 ## More
 

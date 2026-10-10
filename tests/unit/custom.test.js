@@ -191,3 +191,172 @@ test("the boundary credit appears in the footer when one is given", async () => 
   const texts = JSON.stringify(result.scene.items);
   assert.match(texts, /Boundaries: Example Survey \(CC0\)/);
 });
+
+const polygon = (name, ring, extra = {}, id) => ({
+  type: "Feature",
+  ...(id === undefined ? {} : { id }),
+  properties: { name, ...extra },
+  geometry: { type: "Polygon", coordinates: Array.isArray(ring[0][0]) ? ring : [ring] },
+});
+const collection = (...features) => ({ type: "FeatureCollection", features });
+const R = 6371.0088;
+const boxKm2 = (south, north, degrees) =>
+  R ** 2 * ((degrees * Math.PI) / 180) * (Math.sin((north * Math.PI) / 180) - Math.sin((south * Math.PI) / 180));
+
+test("a property called constructor, toString or __proto__ is only a property", async () => {
+  const geojson = JSON.parse(
+    '{"type":"FeatureCollection","features":[' +
+      '{"type":"Feature","properties":{"name":"A","constructor":"x1","toString":"y1","__proto__":"z1"},"geometry":{"type":"Polygon","coordinates":[[[0,0],[1,0],[1,1],[0,1],[0,0]]]}},' +
+      '{"type":"Feature","properties":{"name":"B","constructor":"x2","toString":"y2","__proto__":"z2"},"geometry":{"type":"Polygon","coordinates":[[[2,0],[3,0],[3,1],[2,1],[2,0]]]}}]}',
+  );
+  const result = await build(
+    spec(
+      { boundaries: { geojson } },
+      { csv: "k,score\nx1,1\nx2,2\n", file: undefined, key: "k", keyType: "constructor" },
+    ),
+  );
+  assert.deepEqual(errors(result), []);
+  assert.equal(result.analysis.join.rowsMatched, 2);
+});
+
+test("a feature id joins, and names a feature that has no properties", async () => {
+  const geojson = collection(
+    {
+      ...polygon(
+        "x",
+        [
+          [0, 0],
+          [1, 0],
+          [1, 1],
+          [0, 1],
+          [0, 0],
+        ],
+        {},
+        101,
+      ),
+      properties: null,
+    },
+    {
+      ...polygon(
+        "x",
+        [
+          [2, 0],
+          [3, 0],
+          [3, 1],
+          [2, 1],
+          [2, 0],
+        ],
+        {},
+        102,
+      ),
+      properties: null,
+    },
+  );
+  const result = await build(
+    spec({ boundaries: { geojson } }, { csv: "area,score\n101,1\n102,2\n", file: undefined, key: "area" }),
+  );
+  assert.deepEqual(errors(result), []);
+  assert.equal(result.analysis.join.rowsMatched, 2);
+  assert.deepEqual(
+    result.analysis.areas.map((a) => a.names[0]),
+    ["101", "102"],
+  );
+});
+
+test("duplicate ids get suffixes that are themselves unused", async () => {
+  const sq = (x) => [
+    [x, 0],
+    [x + 1, 0],
+    [x + 1, 1],
+    [x, 1],
+    [x, 0],
+  ];
+  const geojson = collection(
+    polygon("West", sq(0), { code: "A" }),
+    polygon("Middle", sq(2), { code: "A#2" }),
+    polygon("East", sq(4), { code: "A" }),
+  );
+  const { areas } = await loadCustomAreas({ geojson, key: "code" }, readFixture);
+  assert.equal(new Set(areas.map((a) => a.id)).size, 3);
+});
+
+test("a polygon wider than a hemisphere keeps its inside", async () => {
+  const band = [
+    [-170, -60],
+    [-90, -60],
+    [0, -60],
+    [90, -60],
+    [170, -60],
+    [170, 60],
+    [90, 60],
+    [0, 60],
+    [-90, 60],
+    [-170, 60],
+    [-170, -60],
+  ];
+  const { areas } = await loadCustomAreas({ geojson: collection(polygon("Band", band)) }, readFixture);
+  // Edges are great-circle arcs on the sphere, so the band covers 10.737 steradians, not a box of parallels.
+  const expected = 10.737 * R ** 2;
+  assert.ok(Math.abs(areas[0].areaKm2 / expected - 1) < 0.01, `${areas[0].areaKm2} vs ${expected}`);
+  const flipped = [...band].reverse();
+  const again = await loadCustomAreas({ geojson: collection(polygon("Band", flipped)) }, readFixture);
+  assert.ok(Math.abs(again.areas[0].areaKm2 / expected - 1) < 0.01);
+});
+
+test("holes are cut out whichever way the file winds the rings", async () => {
+  const outer = [
+    [0, 0],
+    [10, 0],
+    [10, 10],
+    [0, 10],
+    [0, 0],
+  ];
+  const hole = [
+    [4, 4],
+    [6, 4],
+    [6, 6],
+    [4, 6],
+    [4, 4],
+  ];
+  const rev = (ring) => [...ring].reverse();
+  const expected = boxKm2(0, 10, 10) - boxKm2(4, 6, 2);
+  const windings = {
+    "standard (exterior counter-clockwise, hole clockwise)": [outer, rev(hole)],
+    "d3 (exterior clockwise, hole counter-clockwise)": [rev(outer), hole],
+    "both counter-clockwise": [outer, hole],
+    "both clockwise": [rev(outer), rev(hole)],
+  };
+  for (const [label, rings] of Object.entries(windings)) {
+    const { areas } = await loadCustomAreas({ geojson: collection(polygon("Ring", rings)) }, readFixture);
+    assert.ok(Math.abs(areas[0].areaKm2 / expected - 1) < 0.01, `${label}: ${areas[0].areaKm2} vs ${expected}`);
+  }
+});
+
+test("a polygon across the antimeridian has the area of its box", async () => {
+  const ring = [
+    [170, 0],
+    [-170, 0],
+    [-170, 10],
+    [170, 10],
+    [170, 0],
+  ];
+  const { areas } = await loadCustomAreas({ geojson: collection(polygon("Fiji-ish", ring)) }, readFixture);
+  assert.ok(Math.abs(areas[0].areaKm2 / boxKm2(0, 10, 20) - 1) < 0.01, String(areas[0].areaKm2));
+});
+
+test("a declared projected coordinate system is refused, WGS84 is accepted", async () => {
+  const sq = [
+    [0, 0],
+    [2, 0],
+    [2, 2],
+    [0, 2],
+    [0, 0],
+  ];
+  const withCrs = (name) => ({ ...collection(polygon("Square", sq)), crs: { type: "name", properties: { name } } });
+  const refused = await build(spec({ boundaries: { geojson: withCrs("urn:ogc:def:crs:EPSG::3857") } }));
+  assert.match(refused.findings.find((f) => f.id === "spec").message, /EPSG::3857, not longitude and latitude/);
+  const wgs84 = await loadCustomAreas({ geojson: withCrs("urn:ogc:def:crs:OGC:1.3:CRS84") }, readFixture);
+  assert.equal(wgs84.areas.length, 1);
+  const epsg = await loadCustomAreas({ geojson: withCrs("EPSG:4326") }, readFixture);
+  assert.equal(epsg.areas.length, 1);
+});

@@ -2,7 +2,7 @@
 
 # Graticule
 
-Une compétence de cartographie pour les agents de programmation : 1 compétence, 5 types de cartes, 13 régions, 25 règles, 9 langues. Elle refuse de dessiner une mauvaise carte et vous dit pourquoi.
+Une compétence de cartographie pour les agents de programmation : 1 compétence, 5 types de cartes, 13 régions ou votre propre GeoJSON, 25 règles, 9 langues. Elle refuse de dessiner une mauvaise carte et vous dit pourquoi.
 
 > **Démarrage rapide.** Lancez `npx skills add Arthur031221/Graticule`, puis demandez à votre agent : « fais une carte des décès du COVID par pays à partir de deaths.csv ».
 
@@ -31,6 +31,7 @@ Un graticule est le quadrillage des lignes de latitude et de longitude d'une car
 - **Des effectifs au lieu de taux.** Colorier les pays selon leur nombre de décès montre où vivent les gens. Graticule demande de déclarer le type (`kind`), ou repère des valeurs qui se classent comme la population, et divise.
 - **Mercator pour le monde.** Le Groenland aussi grand que l'Afrique. Les projections équivalentes sont le choix par défaut. Mercator est refusée au-delà de 20 degrés de latitude.
 - **Des lignes qui disparaissent.** « Korea, Rep. » ne correspond pas à « South Korea » et personne n'est prévenu. Chaque ligne qui ne se joint pas est listée avec ses noms les plus proches. Un nom qui convient à deux endroits n'est jamais deviné.
+- **Des fichiers qui ne sont pas en UTF-8.** Un tableau enregistré par un tableur sous Windows est souvent en Big5, Shift_JIS ou Windows-1252, et lu comme de l'UTF-8 il ne correspond à rien. Graticule signale qu'un fichier n'est pas en UTF-8, le lit comme du Windows-1252 et accepte `--encoding big5` ou `data.encoding` pour le reste.
 - **Des palettes arc-en-ciel.** Une luminosité qui monte et descend dessine des frontières absentes des données. La palette doit s'éclaircir ou s'assombrir régulièrement, et ses couleurs doivent rester distinctes pour les trois types de daltonisme que je simule.
 - **Des étiquettes qui deviennent des cases vides.** Les étiquettes en chinois, japonais et coréen ont besoin de polices. Chaque fichier de sortie embarque un sous-ensemble de Noto Sans CJK avec les seuls glyphes utilisés.
 - **Pas de source.** Une carte sans ligne de source est refusée.
@@ -110,7 +111,7 @@ Ou clonez le dépôt et lancez `node skills/graticule/scripts/graticule.mjs --he
 <details>
 <summary><b>Dans le navigateur</b></summary>
 
-Ouvrez le [bac à sable](https://arthur031221.github.io/Graticule/). Déposez un CSV, corrigez ce que trouve le vérificateur, puis téléchargez du SVG, du PNG, du PDF ou une page HTML interactive. Tout s'exécute dans la page et rien n'est envoyé. L'interface existe en neuf langues.
+Ouvrez le [bac à sable](https://arthur031221.github.io/Graticule/). Déposez un CSV, corrigez ce que trouve le vérificateur, puis téléchargez du SVG, du PNG, du PDF ou une page HTML interactive. Tout s'exécute dans la page et rien n'est envoyé. L'interface existe en neuf langues. Déposez un fichier GeoJSON ou TopoJSON à côté du tableau pour dessiner vos propres limites.
 
 </details>
 
@@ -139,7 +140,7 @@ Une spécification est un petit fichier JSON :
 
 ## Cartes et régions
 
-Cinq types de cartes : surfaces coloriées (choroplèthe), cercles proportionnels, catégories, cartes de situation avec un petit globe et petits multiples qui partagent une légende. Treize régions : le monde, six continents, les États et comtés des États-Unis (Alaska, Hawaï et Porto Rico en encarts), les comtés et cantons de Taïwan, les préfectures du Japon et les provinces de Corée du Sud. Tout est embarqué, donc le dessin fonctionne hors ligne.
+Cinq types de cartes : surfaces coloriées (choroplèthe), cercles proportionnels, catégories, cartes de situation avec un petit globe et petits multiples qui partagent une légende. Treize régions : le monde, six continents, les États et comtés des États-Unis (Alaska, Hawaï et Porto Rico en encarts), les comtés et cantons de Taïwan, les préfectures du Japon et les provinces de Corée du Sud. Tout est embarqué, donc le dessin fonctionne hors ligne. Pour tout autre lieu, donnez un fichier GeoJSON ou TopoJSON : `graticule init table.csv --boundaries states.geojson`. Chaque propriété qui diffère d'une entité à l'autre devient une clé, et la projection est une projection équivalente choisie selon l'étendue. Voir [docs/config.md](docs/config.md).
 
 | | | |
 | --- | --- | --- |
@@ -179,6 +180,7 @@ Les sessions avec des agents forment un petit échantillon : deux consignes, deu
 - Les polices couvrent les caractères courants de chaque langue (par exemple les 5 401 caractères du niveau 1 de Big5 pour le chinois traditionnel). Un caractère hors de cet ensemble est signalé par `glyphs-missing`. Les écritures de droite à gauche ou qui demandent une mise en forme complexe ne sont pas prises en charge.
 - Sur la carte des États-Unis, l'Alaska est dessinée à 35 % de l'échelle des 48 États contigus. Les surfaces sont comparables à l'intérieur de chaque morceau.
 - Les étiquettes utilisent un placement glouton. Les cartes denses en omettent certaines, et le rapport les compte.
+- Vos propres limites sont dessinées telles quelles, sans simplification : un fichier de plusieurs millions de sommets se dessine lentement. Les coordonnées doivent être en longitude et latitude. Il faut une propriété de population pour que `--fix` divise les effectifs bruts.
 
 ## Pour aller plus loin
 

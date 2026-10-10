@@ -2,7 +2,7 @@
 
 # Graticule
 
-Ein Kartografie-Skill für Coding-Agenten: 1 Skill, 5 Kartentypen, 13 Regionen, 25 Regeln, 9 Sprachen. Er zeichnet keine schlechte Karte und sagt dir, warum.
+Ein Kartografie-Skill für Coding-Agenten: 1 Skill, 5 Kartentypen, 13 Regionen oder eigenes GeoJSON, 25 Regeln, 9 Sprachen. Er zeichnet keine schlechte Karte und sagt dir, warum.
 
 > **Schnellstart.** Führe `npx skills add Arthur031221/Graticule` aus und bitte deinen Agenten: "Mach aus deaths.csv eine Karte der COVID-Todesfälle pro Land."
 
@@ -31,6 +31,7 @@ Ein Graticule ist das Gitter aus Breiten- und Längengraden auf einer Karte. Dam
 - **Absolute Zahlen statt Raten.** Länder nach ihren Todeszahlen einzufärben zeigt nur, wo die Menschen leben. Graticule verlangt eine Angabe zur Art (`kind`) oder bemerkt Werte, die wie die Einwohnerzahl geordnet sind, und teilt.
 - **Mercator für die Welt.** Grönland so groß wie Afrika. Flächentreue Projektionen sind der Standard. Mercator wird ab 20 Breitengraden Ausdehnung abgelehnt.
 - **Verschwindende Zeilen.** "Korea, Rep." passt nicht zu "South Korea" und niemand erfährt es. Jede Zeile, die sich nicht zuordnen lässt, wird mit den ähnlichsten Namen aufgelistet. Ein Name, der zu zwei Orten passt, wird nie geraten.
+- **Dateien, die nicht UTF-8 sind.** Eine von einer Tabellenkalkulation unter Windows gespeicherte Tabelle ist oft Big5, Shift_JIS oder Windows-1252, und als UTF-8 gelesen passt keine Zeile. Graticule sagt, wenn eine Datei nicht UTF-8 ist, liest sie als Windows-1252 und nimmt `--encoding big5` oder `data.encoding` für den Rest.
 - **Regenbogenpaletten.** Eine Helligkeit, die auf und ab geht, zeichnet Grenzen, die in den Daten nicht vorkommen. Die Palette muss gleichmäßig heller oder dunkler werden, und ihre Farben müssen für die drei Formen von Farbsehschwäche, die ich simuliere, auseinanderbleiben.
 - **Beschriftungen, die zu leeren Kästchen werden.** Chinesische, japanische und koreanische Beschriftungen brauchen Schriften. Jede Ausgabe enthält eine Teilmenge von Noto Sans CJK mit nur den benutzten Zeichen.
 - **Keine Quelle.** Eine Karte ohne Quellenzeile wird abgelehnt.
@@ -110,7 +111,7 @@ Oder klone das Repository und führe `node skills/graticule/scripts/graticule.mj
 <details>
 <summary><b>Im Browser</b></summary>
 
-Öffne den [Spielplatz](https://arthur031221.github.io/Graticule/). Lege eine CSV ab, behebe, was der Prüfer findet, und lade SVG, PNG, PDF oder eine interaktive HTML-Seite herunter. Alles läuft in der Seite, nichts wird hochgeladen. Die Oberfläche gibt es in neun Sprachen.
+Öffne den [Spielplatz](https://arthur031221.github.io/Graticule/). Lege eine CSV ab, behebe, was der Prüfer findet, und lade SVG, PNG, PDF oder eine interaktive HTML-Seite herunter. Alles läuft in der Seite, nichts wird hochgeladen. Die Oberfläche gibt es in neun Sprachen. Lege eine GeoJSON- oder TopoJSON-Datei neben die Tabelle, um eigene Grenzen zu zeichnen.
 
 </details>
 
@@ -139,7 +140,7 @@ Eine Spezifikation ist eine kleine JSON-Datei:
 
 ## Karten und Regionen
 
-Fünf Kartentypen: eingefärbte Flächen (Choroplethen), proportionale Kreise, Kategorien, Lagekarten mit kleinem Globus und Kleinserien, die sich eine Legende teilen. Dreizehn Regionen: die Welt, sechs Kontinente, US-Bundesstaaten und Countys (Alaska, Hawaii und Puerto Rico als Einschübe), Landkreise und Gemeinden Taiwans, Präfekturen Japans und Provinzen Südkoreas. Alles ist enthalten, das Zeichnen funktioniert also offline.
+Fünf Kartentypen: eingefärbte Flächen (Choroplethen), proportionale Kreise, Kategorien, Lagekarten mit kleinem Globus und Kleinserien, die sich eine Legende teilen. Dreizehn Regionen: die Welt, sechs Kontinente, US-Bundesstaaten und Countys (Alaska, Hawaii und Puerto Rico als Einschübe), Landkreise und Gemeinden Taiwans, Präfekturen Japans und Provinzen Südkoreas. Alles ist enthalten, das Zeichnen funktioniert also offline. Für jeden anderen Ort gibst du eine GeoJSON- oder TopoJSON-Datei an: `graticule init table.csv --boundaries states.geojson`. Jede Eigenschaft, die sich von Objekt zu Objekt unterscheidet, wird zu einem Schlüssel, und die Projektion ist eine flächentreue, die nach der Ausdehnung gewählt wird. Siehe [docs/config.md](docs/config.md).
 
 | | | |
 | --- | --- | --- |
@@ -179,6 +180,7 @@ Die Agenten-Sitzungen sind eine kleine Stichprobe: zwei Prompts, zwei Agenten, j
 - Die Schriften decken die gängigen Zeichen jeder Sprache ab (zum Beispiel die 5.401 Zeichen der Big5-Stufe 1 für Traditionelles Chinesisch). Ein Zeichen außerhalb davon wird als `glyphs-missing` gemeldet. Schriften, die von rechts nach links laufen oder Formung brauchen, werden nicht unterstützt.
 - In der US-Karte ist Alaska mit 35 Prozent des Maßstabs der 48 zusammenhängenden Staaten gezeichnet. Flächen sind innerhalb jedes Teils vergleichbar.
 - Die Beschriftungen nutzen einen gierigen Platzierer. Dichte Karten lassen einige weg, und der Bericht zählt sie.
+- Eigene Grenzen werden unverändert gezeichnet, ohne Vereinfachung: Eine Datei mit Millionen Stützpunkten zeichnet sich also langsam. Die Koordinaten müssen Längen- und Breitengrad sein. Damit `--fix` absolute Zahlen durch die Bevölkerung teilen kann, braucht die Datei eine Bevölkerungseigenschaft.
 
 ## Mehr
 

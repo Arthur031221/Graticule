@@ -118,6 +118,8 @@ const state = {
 
 /** Counts the tables loaded, so a slow region lookup for an older table cannot change a newer one. */
 let tableRun = 0;
+/** Counts the files picked, so a slow read of an older file cannot replace a newer one. */
+let fileRun = 0;
 
 /* Language ------------------------------------------------------------- */
 
@@ -324,6 +326,7 @@ function readControls() {
   const s = state.spec;
   const text = (id) => $(id).value;
   Object.assign(s, {
+    region: text("region"),
     title: text("title"),
     subtitle: text("subtitle"),
     source: text("source"),
@@ -506,8 +509,6 @@ async function loadBoundaries(bytes, name) {
     state.spec.region = "custom";
     state.regionTouched = true;
   }
-  state.bytes = null;
-  $("field-encoding").hidden = true;
   buildSelects();
   const note = ui("data.boundaries", { count: loaded.areas.length, file: name });
   if (state.csv) {
@@ -599,6 +600,7 @@ async function loadExample(id) {
     fetch(new URL("data.csv", dir)).then((r) => r.text()),
   ]);
   tableRun++;
+  fileRun++;
   state.bytes = null;
   state.boundaries = null;
   $("field-encoding").hidden = true;
@@ -977,7 +979,9 @@ function wire() {
   const readFile = async (f) => {
     if (!f) return;
     if (f.size > 25 * 1024 * 1024) return setStatus(ui("data.error", { detail: "25 MB" }), true);
+    const run = ++fileRun;
     const bytes = new Uint8Array(await f.arrayBuffer());
+    if (run !== fileRun) return;
     const text = new TextDecoder().decode(bytes.subarray(0, 4096)).trimStart();
     if (/\.(geo|topo)?json$/i.test(f.name) || text.startsWith("{")) return loadBoundaries(bytes, f.name);
     resetForNewData();

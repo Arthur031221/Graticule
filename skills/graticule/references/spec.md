@@ -45,7 +45,7 @@ With `"region": "custom"` the map is drawn from your own polygons. Give exactly 
 | `credit` | Who made the boundaries. Printed under the map as `Boundaries: ...`. |
 | `title` | The title used when the spec has none. |
 
-Every property that holds a different value on every feature is a key type of its own, so a table column can join on any of them (`data.keyType` names one). The display name feeds the `name` key type, which ignores case, accents and punctuation. A property such as `01` also matches `1`. Coordinates must be longitude and latitude in degrees (WGS84); a file in metres is refused with the `ogr2ogr` command that reprojects it. Features that are not polygons are skipped and counted in `boundaries-skipped`. The projection is chosen from the extent and is always equal-area: Equal Earth for a world-sized extent, an equal-area conic for a wide band, otherwise Lambert azimuthal. Set `projection` to use another. Keep the file small, because every vertex is drawn: simplify detailed files first (for example with mapshaper).
+Every property that holds a different value on every feature is a key type of its own, so a table column can join on any of them (`data.keyType` names one). The display name feeds the `name` key type, which ignores case, accents and punctuation. A property such as `01` also matches `1`. Coordinates must be longitude and latitude in degrees (WGS84). A file in metres is refused with the `ogr2ogr` command that reprojects it. Features that are not polygons are skipped and counted in `boundaries-skipped`. The projection is chosen from the extent and is always equal-area: Equal Earth for a world-sized extent, an equal-area conic for a wide band, otherwise Lambert azimuthal. Set `projection` to use another. Keep the file small, because every vertex is drawn: simplify detailed files first (for example with mapshaper).
 
 ```json
 {
@@ -67,7 +67,7 @@ Give exactly one of `file`, `csv` (the text itself) or `rows` (a list of objects
 | --- | --- |
 | `key` | Column that names the areas. Found automatically when omitted. |
 | `keyType` | `auto` (default) or one of the region's key types: iso3, iso2, isonum, name for countries, fips, postal, name for US states, fips for counties, code and name for Taiwan, iso, jis, name for Japan, iso and name for Korea. |
-| `encoding` | How `file` is read when it is not UTF-8, for example `big5`, `shift_jis`, `euc-kr`, `gbk` or `windows-1252`. Without it a file must be valid UTF-8 (a byte order mark is honoured, UTF-16 too); one that is not is read as Windows-1252 and the report carries `table-encoding`. |
+| `encoding` | How `file` is read when it is not UTF-8, for example `big5`, `shift_jis`, `euc-kr`, `gbk` or `windows-1252`. Without it a file must be valid UTF-8 (a byte order mark is honoured, UTF-16 too). One that is not is read as Windows-1252 and the report carries `table-encoding`. |
 | `value` | Column to map. A list of columns for small multiples. |
 | `kind` | `count`, `rate`, `share`, `index` or `other`. Counts are refused on choropleths. |
 | `label` | Legend title, normally the unit. |

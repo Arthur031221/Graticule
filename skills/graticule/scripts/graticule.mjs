@@ -153815,7 +153815,7 @@ function normalizeCode(kind, value) {
   return kind === "isonum" || kind === "jis" ? text2.replace(/^0+(?=\d)/, "") : text2;
 }
 function buildIndex(areas, aliases = {}) {
-  const index = { kinds: {}, labels: [], byId: new Map(areas.map((a) => [a.id, a])) };
+  const index = { kinds: /* @__PURE__ */ Object.create(null), labels: [], byId: new Map(areas.map((a) => [a.id, a])) };
   const add2 = (kind, key, entry) => {
     const map = index.kinds[kind] ??= /* @__PURE__ */ new Map();
     const list2 = map.get(key) ?? [];
@@ -153866,7 +153866,8 @@ function lookup(index, kind, raw) {
   const key = normalizeCode(kind, raw);
   const direct = map.get(key);
   if (direct) return { entries: direct, padded: false };
-  const width = PAD[kind] === 0 ? [...map.keys()][0]?.length : PAD[kind];
+  const pad2 = Object.hasOwn(PAD, kind) ? PAD[kind] : void 0;
+  const width = pad2 === 0 ? [...map.keys()][0]?.length : pad2;
   if (width && /^\d+$/.test(key) && key.length < width) {
     const padded = map.get(key.padStart(width, "0"));
     if (padded) return { entries: padded, padded: true };
@@ -155136,7 +155137,7 @@ async function loadCustomAreas(boundaries, readText) {
   if (!polygons.length)
     throw new BoundaryError("the boundaries have no polygons: each feature needs a Polygon or MultiPolygon geometry");
   for (const f of polygons) checkCoordinates(f.geometry);
-  const rows = polygons.map((f) => ({ ...f.properties ?? {} }));
+  const rows = polygons.map((f) => ({ ...text(f.id) ? { id: f.id } : {}, ...f.properties ?? {} }));
   const idProperty = chooseId(boundaries, polygons, rows);
   const nameProperty = chooseName(boundaries, rows);
   const kinds = chooseKinds(boundaries, rows, nameProperty);
@@ -155147,11 +155148,12 @@ async function loadCustomAreas(boundaries, readText) {
   const areas = polygons.map((f, i2) => {
     const geometry2 = rewind(f.geometry);
     const props = rows[i2];
-    const label = String(props[nameProperty] ?? props[idProperty] ?? `Area ${i2 + 1}`).trim();
-    let id = String(idProperty === "" ? f.id ?? i2 + 1 : props[idProperty] ?? f.id ?? i2 + 1).trim();
-    if (used.has(id)) id = `${id}#${i2 + 1}`;
+    const label = String(props[nameProperty] ?? props.id ?? `Area ${i2 + 1}`).trim();
+    const wanted = String(idProperty === "" ? f.id ?? i2 + 1 : props[idProperty] ?? f.id ?? i2 + 1).trim();
+    let id = wanted;
+    for (let n = 2; used.has(id); n++) id = `${wanted}#${n}`;
     used.add(id);
-    const keys = { name: [...new Set(nameVariants(label))] };
+    const keys = Object.assign(/* @__PURE__ */ Object.create(null), { name: [...new Set(nameVariants(label))] });
     for (const kind of kinds) {
       const raw = String(props[kind]).trim();
       keys[kind] = [.../* @__PURE__ */ new Set([raw, raw.replace(/^0+(?=\d)/, "")])];
@@ -155220,6 +155222,11 @@ function featuresOf(source, objectName) {
     const out = (0, import_topojson_client2.feature)(source, source.objects[name]);
     return { features: out.type === "FeatureCollection" ? out.features : [out], skipped: 0 };
   }
+  const crs = source.crs?.properties?.name;
+  if (crs && !/crs84|epsg:{1,2}4326|wgs ?84/i.test(String(crs)))
+    throw new BoundaryError(
+      `the file declares the coordinate system ${crs}, not longitude and latitude (WGS84). Reproject it first, for example: ogr2ogr -t_srs EPSG:4326 out.geojson in.geojson`
+    );
   if (source.type === "FeatureCollection" && Array.isArray(source.features))
     return { features: source.features.filter((f) => f && f.type === "Feature"), skipped: 0 };
   if (source.type === "Feature") return { features: [source], skipped: 0 };
@@ -155238,14 +155245,34 @@ function checkCoordinates(geometry2) {
             `the coordinates are not longitude and latitude in degrees (found ${x2}, ${y}). Reproject the file first, for example: ogr2ogr -t_srs EPSG:4326 out.geojson in.geojson`
           );
 }
+function planarArea(ring) {
+  let sum = 0;
+  let x2 = ring[0][0];
+  const first2 = x2;
+  for (let i2 = 1; i2 < ring.length; i2++) {
+    let step = ring[i2][0] - ring[i2 - 1][0];
+    if (step > 180) step -= 360;
+    else if (step < -180) step += 360;
+    sum += x2 * ring[i2][1] - (x2 + step) * ring[i2 - 1][1];
+    x2 += step;
+  }
+  return { area: sum / 2, aroundPole: Math.abs(x2 - first2) >= 180 };
+}
 function rewind(geometry2) {
-  const flip = (polygon) => polygon.map((ring) => [...ring].reverse());
   const fix = (polygon) => {
-    const area = area_default(
-      /** @type {any} */
-      { type: "Polygon", coordinates: polygon }
-    );
-    return area > 2 * Math.PI ? flip(polygon) : polygon;
+    const rings = polygon.map(planarArea);
+    if (rings.some((r) => r.aroundPole)) {
+      const covered = area_default(
+        /** @type {any} */
+        { type: "Polygon", coordinates: polygon }
+      );
+      return covered > 2 * Math.PI ? polygon.map((ring) => [...ring].reverse()) : polygon;
+    }
+    return polygon.map((ring, i2) => {
+      const counterClockwise = rings[i2].area > 0;
+      const exterior = i2 === 0;
+      return rings[i2].area !== 0 && counterClockwise === exterior ? [...ring].reverse() : ring;
+    });
   };
   return geometry2.type === "Polygon" ? { type: "Polygon", coordinates: fix(geometry2.coordinates) } : { type: "MultiPolygon", coordinates: geometry2.coordinates.map(fix) };
 }
@@ -158319,7 +158346,7 @@ function nodeAssets(root = findAssetRoot()) {
 }
 
 // src/version.js
-var VERSION = "0.1.0";
+var VERSION = "0.2.0";
 
 // src/report.js
 var MAX_LISTED = 12;

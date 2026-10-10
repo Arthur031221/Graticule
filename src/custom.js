@@ -33,7 +33,8 @@ export async function loadCustomAreas(boundaries, readText) {
     throw new BoundaryError("the boundaries have no polygons: each feature needs a Polygon or MultiPolygon geometry");
   for (const f of polygons) checkCoordinates(f.geometry);
 
-  const rows = polygons.map((f) => ({ ...(f.properties ?? {}) }));
+  // A feature id is a property too, unless the properties already have an "id".
+  const rows = polygons.map((f) => ({ ...(text(f.id) ? { id: f.id } : {}), ...(f.properties ?? {}) }));
   const idProperty = chooseId(boundaries, polygons, rows);
   const nameProperty = chooseName(boundaries, rows);
   const kinds = chooseKinds(boundaries, rows, nameProperty);
@@ -45,12 +46,14 @@ export async function loadCustomAreas(boundaries, readText) {
   const areas = polygons.map((f, i) => {
     const geometry = rewind(f.geometry);
     const props = rows[i];
-    const label = String(props[nameProperty] ?? props[idProperty] ?? `Area ${i + 1}`).trim();
-    let id = String(idProperty === "" ? (f.id ?? i + 1) : (props[idProperty] ?? f.id ?? i + 1)).trim();
-    if (used.has(id)) id = `${id}#${i + 1}`;
+    const label = String(props[nameProperty] ?? props.id ?? `Area ${i + 1}`).trim();
+    const wanted = String(idProperty === "" ? (f.id ?? i + 1) : (props[idProperty] ?? f.id ?? i + 1)).trim();
+    let id = wanted;
+    for (let n = 2; used.has(id); n++) id = `${wanted}#${n}`;
     used.add(id);
+    // No prototype: a property may be called "constructor" or "__proto__".
     /** @type {Record<string, string[]>} */
-    const keys = { name: [...new Set(nameVariants(label))] };
+    const keys = Object.assign(Object.create(null), { name: [...new Set(nameVariants(label))] });
     for (const kind of kinds) {
       const raw = String(props[kind]).trim();
       keys[kind] = [...new Set([raw, raw.replace(/^0+(?=\d)/, "")])];
@@ -119,6 +122,11 @@ function featuresOf(source, objectName) {
     const out = topoFeature(source, source.objects[name]);
     return { features: out.type === "FeatureCollection" ? out.features : [out], skipped: 0 };
   }
+  const crs = source.crs?.properties?.name;
+  if (crs && !/crs84|epsg:{1,2}4326|wgs ?84/i.test(String(crs)))
+    throw new BoundaryError(
+      `the file declares the coordinate system ${crs}, not longitude and latitude (WGS84). Reproject it first, for example: ogr2ogr -t_srs EPSG:4326 out.geojson in.geojson`,
+    );
   if (source.type === "FeatureCollection" && Array.isArray(source.features))
     return { features: source.features.filter((f) => f && f.type === "Feature"), skipped: 0 };
   if (source.type === "Feature") return { features: [source], skipped: 0 };
@@ -142,15 +150,44 @@ function checkCoordinates(geometry) {
 }
 
 /**
- * d3 reads a ring that winds clockwise as the inside of a polygon, the opposite of
- * the GeoJSON standard. A polygon that covers more than a hemisphere is therefore
- * a standard one; it gets its rings reversed.
+ * Signed area of a ring on the longitude and latitude plane, with the longitudes
+ * unwrapped across the antimeridian. A ring that does not close once unwrapped goes
+ * round a pole, which the plane cannot judge.
+ * @param {number[][]} ring
+ */
+function planarArea(ring) {
+  let sum = 0;
+  let x = ring[0][0];
+  const first = x;
+  for (let i = 1; i < ring.length; i++) {
+    let step = ring[i][0] - ring[i - 1][0];
+    if (step > 180) step -= 360;
+    else if (step < -180) step += 360;
+    sum += x * ring[i][1] - (x + step) * ring[i - 1][1];
+    x += step;
+  }
+  return { area: sum / 2, aroundPole: Math.abs(x - first) >= 180 };
+}
+
+/**
+ * d3 reads an exterior ring that winds clockwise and a hole that winds counter-clockwise,
+ * the reverse of the GeoJSON standard, and files in the wild use either. Every ring is
+ * turned to d3's way by its own winding. A polygon round a pole has no winding on the
+ * plane, so it is judged by the area it covers: more than a hemisphere means it was
+ * written the other way.
  */
 function rewind(geometry) {
-  const flip = (polygon) => polygon.map((ring) => [...ring].reverse());
   const fix = (polygon) => {
-    const area = geoArea(/** @type {any} */ ({ type: "Polygon", coordinates: polygon }));
-    return area > 2 * Math.PI ? flip(polygon) : polygon;
+    const rings = polygon.map(planarArea);
+    if (rings.some((r) => r.aroundPole)) {
+      const covered = geoArea(/** @type {any} */ ({ type: "Polygon", coordinates: polygon }));
+      return covered > 2 * Math.PI ? polygon.map((ring) => [...ring].reverse()) : polygon;
+    }
+    return polygon.map((ring, i) => {
+      const counterClockwise = rings[i].area > 0;
+      const exterior = i === 0;
+      return rings[i].area !== 0 && counterClockwise === exterior ? [...ring].reverse() : ring;
+    });
   };
   return geometry.type === "Polygon"
     ? { type: "Polygon", coordinates: fix(geometry.coordinates) }

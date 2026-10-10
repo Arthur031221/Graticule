@@ -310,8 +310,12 @@ test("a GeoJSON file becomes a region of its own, before or after the table", as
   await expect(svg(page)).toBeVisible();
   await expect(svg(page)).toContainText("North West");
   await page.selectOption("#region", "world");
+  await expect(page.locator("#region")).toHaveValue("world");
+  await expect(page.locator("#stage-note")).toContainText("names the areas");
   await page.selectOption("#region", "custom");
+  await expect(page.locator("#region")).toHaveValue("custom");
   await expect(page.locator("#join-summary")).toContainText("4 of 4 rows matched 4 areas");
+  await expect(svg(page)).toBeVisible();
 
   await page.goto("/");
   await page.locator("#file").setInputFiles("tests/fixtures/squares.csv");
@@ -327,4 +331,30 @@ test("a boundary file in metres is refused with the fix", async ({ page }) => {
   await page.locator("#file").setInputFiles("tests/fixtures/utm.geojson");
   await expect(page.locator("#data-status")).toContainText("not longitude and latitude");
   await expect(page.locator("#data-status")).toHaveClass(/error/);
+});
+
+test("the region picker changes the map and the choice stays", async ({ page }) => {
+  await page.goto("/?example=life-expectancy");
+  await expect(svg(page)).toBeVisible();
+  await expect(page.locator('#sheet [data-id="USA"]')).toHaveCount(1);
+  await page.selectOption("#region", "europe");
+  await expect(page.locator('#sheet [data-id="USA"]')).toHaveCount(0);
+  await expect(page.locator('#sheet [data-id="FRA"]')).toHaveCount(1);
+  await page.fill("#title", "Europe only");
+  await expect(svg(page)).toContainText("Europe only");
+  await expect(page.locator("#region")).toHaveValue("europe");
+  await page.selectOption("#region", "world");
+  await expect(page.locator('#sheet [data-id="USA"]')).toHaveCount(1);
+});
+
+test("boundaries added after a file that is not UTF-8 keep the encoding picker", async ({ page }) => {
+  await page.goto("/");
+  await page.locator("#file").setInputFiles("tests/fixtures/tw-counties-big5.csv");
+  await expect(page.locator("#field-encoding")).toBeVisible();
+  await page.locator("#file").setInputFiles("tests/fixtures/squares.geojson");
+  await expect(page.locator("#region")).toHaveValue("custom");
+  await expect(page.locator("#field-encoding")).toBeVisible();
+  await page.selectOption("#encoding", "big5");
+  await expect(page.locator("#region")).toHaveValue("custom");
+  await expect(page.locator("#data-status")).not.toContainText("not UTF-8");
 });
