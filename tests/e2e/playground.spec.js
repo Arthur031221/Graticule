@@ -451,3 +451,31 @@ test("an example that finishes loading after a newer file was picked does not ca
   await expect(page.locator("#value")).toHaveValue("score");
   await expect(page.locator("#join-summary")).toContainText("4 of 4 rows matched 4 areas");
 });
+
+test("small multiples start with the numeric columns ticked, and a locator leads to its highlight field", async ({
+  page,
+}) => {
+  await page.goto("/?example=us-county-unemployment");
+  await expect(svg(page)).toBeVisible();
+  await page.locator('#type input[value="small-multiples"]').check({ force: true });
+  await expect(page.locator("#values input:checked").first()).toBeAttached();
+  await expect(page.locator("#stage-note")).not.toContainText("data.value");
+  await expect(svg(page)).toBeVisible();
+  await page.locator('#type input[value="locator"]').check({ force: true });
+  await expect(page.locator("#stage-note")).toContainText("highlight");
+  await page.locator("#stage-note .goto").click();
+  await expect(page.locator("#highlight")).toBeFocused();
+});
+
+test("the buttons of a blocked card stay clickable over the greyed map left behind", async ({ page }) => {
+  await page.goto("/?example=covid-raw");
+  await page.locator("#stage-note .btn.primary").click();
+  await expect(svg(page)).toBeVisible();
+  await page.selectOption("#normalize", "none");
+  await page.selectOption("#kind", "count");
+  await expect(page.locator("#stage-note")).toContainText("raw-counts");
+  await expect(page.locator("#sheet")).toHaveClass(/stale/);
+  await page.locator("#stage-note .btn.primary").click();
+  await expect(page.locator("#stage-note")).not.toHaveClass(/show/);
+  await expect(svg(page)).toBeVisible();
+});

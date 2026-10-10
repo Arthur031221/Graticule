@@ -529,6 +529,17 @@ function setStatus(text, error = false) {
 }
 
 const REGION_ORDER = ["world", "us-states", "us-counties", "jp-prefectures", "kr-provinces", "tw-counties", "tw-towns"];
+/** Columns whose cells are numbers, leaving out `except` (the column that names the areas). */
+function numericColumns(table, except = "") {
+  const sample = table.rows.slice(0, 60);
+  return table.columns.filter(
+    (c) =>
+      c !== except &&
+      sample.some((r) => (r[c] ?? "") !== "") &&
+      sample.every((r) => (r[c] ?? "") === "" || parseNumber(r[c]) !== null),
+  );
+}
+
 /** @returns {Promise<boolean>} false when a newer table or file replaced this one before it was applied */
 async function setTable(text, { keepSpec = false } = {}) {
   const run = ++tableRun;
@@ -550,13 +561,7 @@ async function setTable(text, { keepSpec = false } = {}) {
       toast(ui("status.detected", { region: ui(`regions.${found.region}`) }));
     }
     const columns = table.columns;
-    const sample = table.rows.slice(0, 60);
-    const numeric = columns.filter(
-      (c) =>
-        c !== found.column &&
-        sample.some((r) => (r[c] ?? "") !== "") &&
-        sample.every((r) => (r[c] ?? "") === "" || parseNumber(r[c]) !== null),
-    );
+    const numeric = numericColumns(table, found.column);
     state.spec.key = "";
     state.spec.value =
       state.spec.value && state.spec.value !== found.column && columns.includes(state.spec.value)
@@ -750,8 +755,20 @@ const FIELD = {
   "no-values": "value",
 };
 
-const fieldFor = (id) => {
-  const node = FIELD[id] && $(FIELD[id]);
+/** The spec path a "spec" finding names, as the control that holds it. */
+const SPEC_FIELD = {
+  highlight: "highlight",
+  "data.value": "value",
+  "data.key": "key",
+  "data.kind": "kind",
+  "data.normalize": "normalize",
+  "classes.count": "count",
+  palette: "palettes",
+};
+
+const fieldFor = (f) => {
+  const id = f.id === "spec" ? SPEC_FIELD[/spec at ([\w.]+):/.exec(f.message)?.[1] ?? ""] : FIELD[f.id];
+  const node = id && $(id);
   if (!node) return null;
   const target =
     node.id === "palettes"
@@ -769,7 +786,7 @@ function focusField(target) {
 }
 
 const gotoButton = (f) => {
-  const target = fieldFor(f.id);
+  const target = fieldFor(f);
   return target
     ? el("button", { class: "goto", type: "button", onclick: () => focusField(target) }, ui("checks.goto"))
     : null;
@@ -1059,6 +1076,14 @@ function wire() {
     }
     if (e.target.name === "type") {
       state.spec.type = e.target.value;
+      // Small multiples need columns to draw: start with the numeric ones.
+      if (state.spec.type === "small-multiples" && !state.spec.values.length && state.table) {
+        state.spec.values = numericColumns(state.table, state.spec.key || state.last?.analysis?.join?.column).slice(
+          0,
+          3,
+        );
+        fillColumns();
+      }
       state.extra.palette = undefined;
       buildPalettes();
     }

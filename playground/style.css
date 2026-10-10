@@ -691,6 +691,9 @@ html[data-start="map"] .sheet-wrap:not(.settled) .stage-note {
 .sheet.fresh svg {
   animation: fade 0.3s ease both;
 }
+.sheet.stale {
+  pointer-events: none;
+}
 .sheet.stale svg {
   filter: grayscale(0.85) blur(1.5px);
   opacity: 0.35;
@@ -764,6 +767,9 @@ html[data-start="map"] .sheet-wrap:not(.settled) .stage-note {
   height: auto;
 }
 .stage-note {
+  /* Above the greyed map under it, whose filter makes it paint over anything not positioned. */
+  position: relative;
+  z-index: 1;
   display: none;
   place-items: center;
   padding: 24px;
