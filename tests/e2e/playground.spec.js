@@ -558,3 +558,25 @@ test("an empty file says to add a table instead of calling it unreadable", async
   await expect(page.locator("#data-status")).not.toContainText("Could not read");
   await expect(page.locator("#data-status")).toHaveClass(/error/);
 });
+
+test("a county in one column and its state in another join US counties, and the region is found", async ({ page }) => {
+  await page.goto("/");
+  const csv = [
+    "county,state,rate",
+    "Los Angeles,CA,4.1",
+    "Orange,CA,3.9",
+    "Cook,IL,3.8",
+    "Harris,TX,3.2",
+    "Dallas,TX,3.4",
+    "Maricopa,AZ,2.9",
+    "Orleans Parish,LA,5.0",
+    "Miami-Dade,FL,3.5",
+    "King,WA,2.2",
+    "Wayne,MI,6.1",
+  ].join("\n");
+  await page.locator("#file").setInputFiles({ name: "counties.csv", mimeType: "text/csv", buffer: Buffer.from(csv) });
+  await expect(page.locator("#region")).toHaveValue("us-counties");
+  await expect(page.locator("#join-summary")).toContainText("county + state → name");
+  await expect(page.locator("#join-summary")).toContainText("10 of 10 rows matched 10 areas");
+  await expect(page.locator("#value")).toHaveValue("rate");
+});

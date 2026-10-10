@@ -188,7 +188,7 @@ const namesOf = (items, render) =>
 
 function checkJoin(a, add) {
   const { join } = a;
-  const keyed = join.tableRows.filter((r) => (r[join.column] ?? "").trim() !== "").length;
+  const keyed = join.cells.filter((cell) => cell !== "").length;
   const share = keyed ? join.rowsMatched / keyed : 0;
   const examples = join.unmatched.slice(0, 3).map((u) => u.value);
   if (!join.rowsMatched || share < THRESHOLDS.unmatchedShare) {

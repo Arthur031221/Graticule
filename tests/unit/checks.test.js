@@ -542,3 +542,22 @@ test("a long list of unmatched names is cut after twenty and says how many are l
   assert.equal(finding.message.split("; ").length, 21);
   assert.equal(result.analysis.join.unmatched.length, 60);
 });
+
+test("data.key may list the columns that name an area together, and they are found without being listed", async () => {
+  const rows = [
+    { county: "Los Angeles", state: "CA", rate: 4.1 },
+    { county: "Cook", state: "IL", rate: 3.8 },
+    { county: "Harris", state: "TX", rate: 3.2 },
+    { county: "Maricopa", state: "AZ", rate: 2.9 },
+  ];
+  const data = { rows, value: "rate", kind: "rate", label: "Rate" };
+  const listed = await build(base({ region: "us-counties", data: { ...data, key: ["county", "state"] } }));
+  assert.deepEqual(errors(listed), []);
+  assert.equal(listed.analysis.join.rowsMatched, 4);
+  assert.equal(listed.analysis.join.column, "county + state");
+  const found = await build(base({ region: "us-counties", data }));
+  assert.deepEqual(errors(found), []);
+  assert.deepEqual(found.analysis.join.columns, ["county", "state"]);
+  const missing = await build(base({ region: "us-counties", data: { ...data, key: ["county", "nope"] } }));
+  assert.ok(missing.findings.some((f) => f.id === "spec" && f.message.includes('column "nope" not found')));
+});

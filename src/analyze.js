@@ -1,6 +1,15 @@
 import { geoBounds } from "d3-geo";
 import { loadAreas } from "./geo.js";
-import { buildIndex, detectKind, joinKeys, kindsOf, loadAliases, rankKeyColumns } from "./join.js";
+import {
+  buildIndex,
+  combinedKey,
+  detectKind,
+  joinKeys,
+  keyText,
+  kindsOf,
+  loadAliases,
+  rankKeyColumns,
+} from "./join.js";
 import { isNull, parseColumn, parseTable } from "./csv.js";
 import { breaksFor, classOf, equalEdges, equalEdgesAround, niceEdges, spearman } from "./classify.js";
 import { paletteColors, paletteType } from "./palettes.js";
@@ -149,18 +158,19 @@ export async function analyze(input, ctx) {
       });
     }
   }
-  if (spec.data.key && !columns.includes(spec.data.key)) {
-    findings.push({
-      id: "spec",
-      level: "error",
-      params: { path: "data.key", detail: `column "${spec.data.key}" not found. Columns: ${columns.join(", ")}` },
-    });
+  for (const column of [].concat(spec.data.key ?? [])) {
+    if (!columns.includes(column))
+      findings.push({
+        id: "spec",
+        level: "error",
+        params: { path: "data.key", detail: `column "${column}" not found. Columns: ${columns.join(", ")}` },
+      });
   }
   if (findings.some((f) => f.level === "error")) return { ...analysis, ok: false };
 
   const rows = applyFilter(table.rows, spec.data.filter);
-  const keyColumn = spec.data.key ?? guessKeyColumn(columns, rows, valueColumns, index, region);
-  if (!keyColumn) {
+  const keyColumns = [].concat(spec.data.key ?? guessKeyColumn(columns, rows, valueColumns, index, region));
+  if (!keyColumns[0]) {
     findings.push({
       id: "spec",
       level: "error",
@@ -171,7 +181,7 @@ export async function analyze(input, ctx) {
     });
     return { ...analysis, ok: false };
   }
-  const cells = rows.map((r) => (r[keyColumn] ?? "").trim());
+  const cells = rows.map((r) => keyText(r, keyColumns));
   const order = region.keys;
   const kind =
     spec.data.keyType && spec.data.keyType !== "auto" ? spec.data.keyType : detectKind(cells, index, order).kind;
@@ -189,7 +199,9 @@ export async function analyze(input, ctx) {
   const joined = joinKeys(cells, index, kind);
   analysis.join = {
     ...joined,
-    column: keyColumn,
+    column: keyColumns.join(" + "),
+    columns: keyColumns,
+    cells,
     rows: rows.length,
     rowsMatched: [...joined.rowsByArea.values()].reduce((n, r) => n + r.length, 0),
     tableRows: rows,
@@ -202,7 +214,8 @@ export async function analyze(input, ctx) {
 
 function guessKeyColumn(columns, rows, valueColumns, index, region) {
   const best = rankKeyColumns(columns, rows, index, region.keys, { exclude: valueColumns })[0];
-  return best && best.rate >= 0.5 ? best.column : "";
+  if (best && best.rate >= 0.5) return best.column;
+  return combinedKey(columns, rows, index, region.keys, valueColumns)?.columns ?? "";
 }
 
 /**

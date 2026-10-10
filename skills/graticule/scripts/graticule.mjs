@@ -154009,6 +154009,23 @@ function rankKeyColumns(columns, rows, index, order, { exclude = [], kind: wante
     (p, q) => Number(q.strong) - Number(p.strong) || (p.strong && q.strong ? q.hits - p.hits || q.rate - p.rate : q.rate - p.rate || q.hits - p.hits)
   );
 }
+var STATE_COLUMN = /^(state|st|state[_ ]?name|state[_ ]?abbr(?:eviation)?|usps|postal)$/i;
+var keyText = (row, columns) => columns.map((c) => (row[c] ?? "").trim()).filter(Boolean).join(", ");
+function combinedKey(columns, rows, index, order, exclude = []) {
+  let best = null;
+  for (const state of columns.filter((c) => STATE_COLUMN.test(c.trim()) && !exclude.includes(c)))
+    for (const column of columns) {
+      if (column === state || exclude.includes(column)) continue;
+      const pair = [column, state];
+      const { kind, rate, hits } = detectKind(
+        rows.map((r) => keyText(r, pair)),
+        index,
+        order
+      );
+      if (rate >= 0.5 && (!best || hits > best.hits)) best = { columns: pair, kind, rate, hits };
+    }
+  return best;
+}
 function joinKeys(values, index, kind) {
   const rowsByArea = /* @__PURE__ */ new Map();
   const unmatched = /* @__PURE__ */ new Map();
@@ -155199,8 +155216,10 @@ function normalizeSpec(input) {
     bad("columns", "must be a whole number from 1 to 4");
   if (input.attribution !== void 0 && typeof input.attribution !== "boolean")
     bad("attribution", "must be true or false");
-  for (const field of ["key", "keyType", "label", "file", "csv", "encoding"])
+  for (const field of ["keyType", "label", "file", "csv", "encoding"])
     if (data[field] !== void 0 && typeof data[field] !== "string") bad(`data.${field}`, "must be a string");
+  if (data.key !== void 0 && typeof data.key !== "string" && !(Array.isArray(data.key) && data.key.length >= 2 && data.key.every((c) => typeof c === "string")))
+    bad("data.key", "must be a column name, or a list of two or more columns that together name the area");
   if (data.rows !== void 0 && !Array.isArray(data.rows)) bad("data.rows", "must be a list of objects");
   if (data.value !== void 0 && typeof data.value !== "string" && !(Array.isArray(data.value) && data.value.every((v) => typeof v === "string")))
     bad("data.value", "must be a column name, or a list of names for small multiples");
@@ -155574,17 +155593,18 @@ async function analyze(input, ctx) {
       });
     }
   }
-  if (spec.data.key && !columns.includes(spec.data.key)) {
-    findings.push({
-      id: "spec",
-      level: "error",
-      params: { path: "data.key", detail: `column "${spec.data.key}" not found. Columns: ${columns.join(", ")}` }
-    });
+  for (const column of [].concat(spec.data.key ?? [])) {
+    if (!columns.includes(column))
+      findings.push({
+        id: "spec",
+        level: "error",
+        params: { path: "data.key", detail: `column "${column}" not found. Columns: ${columns.join(", ")}` }
+      });
   }
   if (findings.some((f) => f.level === "error")) return { ...analysis, ok: false };
   const rows = applyFilter(table.rows, spec.data.filter);
-  const keyColumn = spec.data.key ?? guessKeyColumn(columns, rows, valueColumns, index, region);
-  if (!keyColumn) {
+  const keyColumns = [].concat(spec.data.key ?? guessKeyColumn(columns, rows, valueColumns, index, region));
+  if (!keyColumns[0]) {
     findings.push({
       id: "spec",
       level: "error",
@@ -155595,7 +155615,7 @@ async function analyze(input, ctx) {
     });
     return { ...analysis, ok: false };
   }
-  const cells = rows.map((r) => (r[keyColumn] ?? "").trim());
+  const cells = rows.map((r) => keyText(r, keyColumns));
   const order = region.keys;
   const kind = spec.data.keyType && spec.data.keyType !== "auto" ? spec.data.keyType : detectKind(cells, index, order).kind;
   if (!kindsOf(index).includes(kind)) {
@@ -155612,7 +155632,9 @@ async function analyze(input, ctx) {
   const joined = joinKeys(cells, index, kind);
   analysis.join = {
     ...joined,
-    column: keyColumn,
+    column: keyColumns.join(" + "),
+    columns: keyColumns,
+    cells,
     rows: rows.length,
     rowsMatched: [...joined.rowsByArea.values()].reduce((n, r) => n + r.length, 0),
     tableRows: rows
@@ -155623,7 +155645,8 @@ async function analyze(input, ctx) {
 }
 function guessKeyColumn(columns, rows, valueColumns, index, region) {
   const best = rankKeyColumns(columns, rows, index, region.keys, { exclude: valueColumns })[0];
-  return best && best.rate >= 0.5 ? best.column : "";
+  if (best && best.rate >= 0.5) return best.column;
+  return combinedKey(columns, rows, index, region.keys, valueColumns)?.columns ?? "";
 }
 function areaValue(rowIdx, nums, dens, aggregate, per) {
   const usable = rowIdx.filter((i2) => nums[i2] !== null && (!dens || dens[i2] !== null && dens[i2] > 0));
@@ -156006,7 +156029,7 @@ var MAX_NAMES = 20;
 var namesOf = (items, render) => items.slice(0, MAX_NAMES).map(render).join("; ") + (items.length > MAX_NAMES ? `; ... (+${items.length - MAX_NAMES})` : "");
 function checkJoin(a, add2) {
   const { join: join3 } = a;
-  const keyed = join3.tableRows.filter((r) => (r[join3.column] ?? "").trim() !== "").length;
+  const keyed = join3.cells.filter((cell) => cell !== "").length;
   const share = keyed ? join3.rowsMatched / keyed : 0;
   const examples = join3.unmatched.slice(0, 3).map((u) => u.value);
   if (!join3.rowsMatched || share < THRESHOLDS.unmatchedShare) {
@@ -158571,7 +158594,7 @@ var USAGE = `graticule ${VERSION}: maps that pass a checklist, from a small JSON
 Usage
   graticule render <spec.json> [-o base] [-f svg,png,pdf,html] [--fix] [--lang xx] [--dpi 300] [--json]
   graticule check  <spec.json> [--fix] [--write] [--lang xx] [--json]
-  graticule join   <table.csv> --region <id> | --boundaries <file.geojson> [--key column] [--key-type kind] [--encoding name] [--json]
+  graticule join   <table.csv> --region <id> | --boundaries <file.geojson> [--key column[,column]] [--key-type kind] [--encoding name] [--json]
   graticule init   <table.csv> --region <id> | --boundaries <file.geojson> [--value column] [--encoding name] [-o spec.json]
   graticule regions | projections | palettes | rules [--lang xx]
 
@@ -158688,6 +158711,7 @@ async function readTable(path, encoding) {
       `${path} is not valid UTF-8, so it was read as ${used}. If names look wrong, pass --encoding (big5, shift_jis, euc-kr, gbk) or save the file as UTF-8.`
     );
   const table = parseTable(text2);
+  if (table.columns.length && !table.rows.length) throw new UsageError(`${path} has a header but no rows below it`);
   const { duplicateColumns, unterminatedQuote, raggedRows } = table.problems;
   if (unterminatedQuote)
     console.error(`${path}: a quoted field never closes, which swallows the rows after it. Check the quotes.`);
@@ -158794,13 +158818,15 @@ async function commandJoin(args, assets) {
   const ranked = rankKeyColumns(table.columns, table.rows, index, region.keys, {
     kind: args.flags["key-type"] && String(args.flags["key-type"])
   });
-  const column = args.flags.key ? String(args.flags.key) : ranked[0]?.column ?? table.columns[0];
-  if (column === void 0) throw new UsageError("the table has no columns");
-  if (!table.columns.includes(column))
-    throw new UsageError(`no column "${column}" in ${tablePath}. Columns: ${table.columns.join(", ")}`);
-  const cells = table.rows.map((r) => r[column] ?? "");
+  const combo = ranked[0]?.rate >= 0.5 ? null : combinedKey(table.columns, table.rows, index, region.keys);
+  const columns = args.flags.key ? String(args.flags.key).split(",").map((c) => c.trim()) : combo?.columns ?? [ranked[0]?.column ?? table.columns[0]];
+  if (columns[0] === void 0) throw new UsageError("the table has no columns");
+  for (const column of columns)
+    if (!table.columns.includes(column))
+      throw new UsageError(`no column "${column}" in ${tablePath}. Columns: ${table.columns.join(", ")}`);
+  const cells = table.rows.map((r) => keyText(r, columns));
   const kind = String(args.flags["key-type"] ?? detectKind(cells, index, region.keys).kind);
-  const best = { column, ...joinKeys(cells, index, kind) };
+  const best = { column: columns.join(" + "), ...joinKeys(cells, index, kind) };
   const out = {
     column: best.column,
     keyType: best.kind,
@@ -158829,16 +158855,16 @@ async function commandInit(args, assets) {
   if (!tablePath) throw new UsageError("give the table: graticule init <table.csv> --region world");
   const { regionId, region, index, boundaries } = await openRegion(args, assets);
   const table = await readTable(tablePath, args.flags.encoding && String(args.flags.encoding));
-  const ranked = rankKeyColumns(table.columns, table.rows, index, region.keys, {
-    exclude: args.flags.value ? [String(args.flags.value)] : []
-  });
-  const key = ranked[0]?.rate >= 0.5 ? ranked[0] : null;
+  const valueFlag = args.flags.value ? [String(args.flags.value)] : [];
+  const ranked = rankKeyColumns(table.columns, table.rows, index, region.keys, { exclude: valueFlag });
+  const combo = ranked[0]?.rate >= 0.5 ? null : combinedKey(table.columns, table.rows, index, region.keys, valueFlag);
+  const key = ranked[0]?.rate >= 0.5 ? { ...ranked[0], columns: [ranked[0].column] } : combo;
   if (!key)
     throw new UsageError(
-      `no column of ${tablePath} looks like ${region.keys.join(", ")} of ${regionId}. Columns: ${table.columns.join(", ")}`
+      `no column of ${tablePath} looks like ${region.keys.join(", ")} of ${regionId}. Columns: ${table.columns.join(", ")}. If an area is named over two columns, such as a county and its state, ${"`graticule join --key county,state`"} tries them together.`
     );
   const numeric2 = table.columns.filter(
-    (c) => c !== key.column && table.rows.some((r) => Number.isFinite(Number(String(r[c]).replace(/,/g, ""))) && String(r[c]).trim() !== "")
+    (c) => !key.columns.includes(c) && table.rows.some((r) => Number.isFinite(Number(String(r[c]).replace(/,/g, ""))) && String(r[c]).trim() !== "")
   );
   if (args.flags.value && !table.columns.includes(String(args.flags.value)))
     throw new UsageError(`no column "${args.flags.value}" in ${tablePath}. Columns: ${table.columns.join(", ")}`);
@@ -158846,7 +158872,7 @@ async function commandInit(args, assets) {
   const years = numeric2.filter((c) => looksLikeYear(c, cells(c)));
   const value = args.flags.value ?? numeric2.find((c) => !years.includes(c)) ?? numeric2[0];
   if (!value) throw new UsageError("no numeric column found. Pass --value <column>");
-  const named = cells(key.column).filter(Boolean);
+  const named = table.rows.map((r) => keyText(r, key.columns)).filter(Boolean);
   if (new Set(named).size < named.length)
     console.error(
       years.length ? `Several rows name the same area. Add "filter": { "${years[0]}": "${Math.max(...cells(years[0]).filter(Boolean).map(Number))}" } to data to map one ${years[0]}, or "aggregate" to combine them.` : 'Several rows name the same area. Add "aggregate" ("sum", "mean", "last") or "filter" to data so that each area has one value.'
@@ -158862,7 +158888,7 @@ async function commandInit(args, assets) {
     type: "choropleth",
     data: {
       file,
-      key: key.column,
+      key: key.columns.length > 1 ? key.columns : key.columns[0],
       keyType: key.kind,
       ...args.flags.encoding ? { encoding: String(args.flags.encoding) } : {},
       value,

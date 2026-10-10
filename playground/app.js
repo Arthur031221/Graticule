@@ -5,7 +5,7 @@ import { exportMap } from "../src/export.js";
 import { createFontStore } from "../src/fonts.js";
 import { interactions } from "../src/html.js";
 import { createTranslator } from "../src/i18n.js";
-import { buildIndex, loadAliases, rankKeyColumns } from "../src/join.js";
+import { STATE_COLUMN, buildIndex, combinedKey, keyText, loadAliases, rankKeyColumns } from "../src/join.js";
 import { loadAreas } from "../src/geo.js";
 import { LANGS, normalizeLang } from "../src/lang.js";
 import { listPalettes, paletteColors } from "../src/palettes.js";
@@ -550,11 +550,12 @@ const cellsOf = (table, column) => table.rows.map((r) => (r[column] ?? "").trim(
  * Columns whose cells are numbers, leaving out `except` (the column that names the areas) and the
  * columns that say when, unless nothing else is numeric.
  */
-function numericColumns(table, except = "") {
+function numericColumns(table, except = []) {
   const sample = table.rows.slice(0, 60);
+  const keys = [].concat(except);
   const numeric = table.columns.filter(
     (c) =>
-      c !== except &&
+      !keys.includes(c) &&
       sample.some((r) => (r[c] ?? "") !== "") &&
       sample.every((r) => (r[c] ?? "") === "" || parseNumber(r[c]) !== null),
   );
@@ -563,11 +564,11 @@ function numericColumns(table, except = "") {
 }
 
 /** A long table has a row per area and year: the year to map, the latest unless the reader picks another. */
-function periodOf(table, keyColumn) {
-  if (!keyColumn) return null;
-  const named = cellsOf(table, keyColumn).filter(Boolean);
+function periodOf(table, keyColumns) {
+  if (!keyColumns.length) return null;
+  const named = table.rows.map((r) => keyText(r, keyColumns)).filter(Boolean);
   if (new Set(named).size >= named.length) return null;
-  const column = table.columns.find((c) => c !== keyColumn && looksLikeYear(c, cellsOf(table, c)));
+  const column = table.columns.find((c) => !keyColumns.includes(c) && looksLikeYear(c, cellsOf(table, c)));
   if (!column) return null;
   const values = [...new Set(cellsOf(table, column).filter(Boolean))].sort().reverse();
   return { column, values, value: values[0] };
@@ -611,13 +612,13 @@ async function setTable(text, { keepSpec = false } = {}) {
       toast(ui("status.detected", { region: ui(`regions.${found.region}`) }));
     }
     const columns = table.columns;
-    const numeric = numericColumns(table, found.column);
-    state.period = periodOf(table, found.column);
+    const numeric = numericColumns(table, found.columns);
+    state.period = periodOf(table, found.columns);
     state.spec.key = "";
     state.spec.value =
-      state.spec.value && state.spec.value !== found.column && columns.includes(state.spec.value)
+      state.spec.value && !found.columns.includes(state.spec.value) && columns.includes(state.spec.value)
         ? state.spec.value
-        : (numeric[0] ?? columns.find((c) => c !== found.column) ?? columns[0]);
+        : (numeric[0] ?? columns.find((c) => !found.columns.includes(c)) ?? columns[0]);
     state.spec.values = numeric.slice(0, 3);
   }
   setStatus(ui("data.loaded", { rows: table.rows.length, count: table.rows.length, cols: table.columns.length }));
@@ -630,7 +631,7 @@ async function setTable(text, { keepSpec = false } = {}) {
 
 /**
  * Finds the column that names the areas and, until the reader picks a region, the region it belongs to.
- * @returns {Promise<{ region: string, column: string }>}
+ * @returns {Promise<{ region: string, columns: string[] }>}
  */
 async function detectKey(table) {
   const columns = table.columns.slice(0, 8);
@@ -638,21 +639,34 @@ async function detectKey(table) {
   const topOf = async (id) => {
     const { areas, region } = id === "custom" ? state.boundaries.loaded : await loadAreas(id, assets);
     const aliases = await loadAliases(id, region, assets);
-    return rankKeyColumns(columns, rows, buildIndex(areas, aliases), region.keys)[0];
+    const index = buildIndex(areas, aliases);
+    const top = rankKeyColumns(columns, rows, index, region.keys)[0];
+    if (top?.strong) return top;
+    // A county in one column and its state in another name an area together.
+    const pair = combinedKey(columns, rows, index, region.keys);
+    return pair ? { ...pair, column: pair.columns.join(" + "), strong: true } : top;
   };
   if (!state.regionTouched) {
-    let best = { region: "", column: "", rate: 0, strong: false, hits: 0 };
+    let best = { region: "", columns: [], rate: 0, strong: false, hits: 0 };
     for (const id of REGION_ORDER) {
       const top = await topOf(id);
-      if (top && (Number(top.strong) - Number(best.strong) || top.rate - best.rate) > 0)
-        best = { region: id, column: top.column, rate: top.rate, strong: top.strong, hits: top.hits };
-      if (best.rate >= 0.9 && best.strong) break;
+      // Equal fits go to the key that uses more columns: county and state say more than state alone.
+      const better =
+        top &&
+        (Number(top.strong) - Number(best.strong) ||
+          top.rate - best.rate ||
+          (top.columns?.length ?? 1) - best.columns.length) > 0;
+      if (better)
+        best = { region: id, columns: top.columns ?? [top.column], rate: top.rate, strong: top.strong, hits: top.hits };
+      // A column called state fits the states of the US, and a county and its state would fit better: keep looking.
+      const maybeCounties = id === "us-states" && best.columns.some((c) => STATE_COLUMN.test(c.trim()));
+      if (best.rate >= 0.9 && best.strong && !maybeCounties) break;
     }
     // A handful of plain numbers that happen to be codes (1 to 4, say) is not evidence of a region.
     if (best.strong || (best.rate >= 0.6 && best.hits >= 8)) return best;
   }
   const top = await topOf(state.spec.region);
-  return { region: "", column: top && top.rate >= 0.5 ? top.column : "" };
+  return { region: "", columns: top && top.rate >= 0.5 ? (top.columns ?? [top.column]) : [] };
 }
 
 async function loadExample(id) {
@@ -1134,10 +1148,10 @@ function wire() {
       state.spec.type = e.target.value;
       // Small multiples need columns to draw: start with the numeric ones.
       if (state.spec.type === "small-multiples" && !state.spec.values.length && state.table) {
-        state.spec.values = numericColumns(state.table, state.spec.key || state.last?.analysis?.join?.column).slice(
-          0,
-          3,
-        );
+        state.spec.values = numericColumns(
+          state.table,
+          state.spec.key || (state.last?.analysis?.join?.columns ?? []),
+        ).slice(0, 3);
         fillColumns();
       }
       state.extra.palette = undefined;

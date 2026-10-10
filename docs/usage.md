@@ -85,6 +85,8 @@ A locator map marks areas and adds a small globe:
 { "type": "locator", "region": "asia", "highlight": ["TWN"], "data": {} }
 ```
 
+When an area is named over two columns, the county in one and the state in the other, `graticule join counties.csv --region us-counties` finds the pair, and `--key county,state` names it. `init` then writes `"key": ["county", "state"]`.
+
 ## Your own boundaries
 
 For a place the bundled regions do not cover, give a GeoJSON or TopoJSON file with `--boundaries` instead of `--region`:

@@ -225,6 +225,10 @@ test("join and init warn about a table with a quote that never closes, repeated 
   assert.match(dup.stderr, /the column name value appears more than once/);
   const short = await graticule("init", join(out, "short.csv"), "--region", "world");
   assert.match(short.stderr, /1 row has a different number of cells than the header/);
+  await writeFile(join(out, "header.csv"), "country,value\n");
+  const header = await graticule("join", join(out, "header.csv"), "--region", "world");
+  assert.equal(header.code, 1);
+  assert.match(header.stderr, /header\.csv has a header but no rows below it/);
   const clean = await graticule("join", "life-expectancy/data.csv", "--region", "world");
   assert.equal(clean.stderr, "");
 });
@@ -293,6 +297,29 @@ test("init skips a year column when it picks the value, and says how to map one 
   const missing = await graticule("init", join(out, "long.csv"), "--region", "world", "--value", "nope");
   assert.equal(missing.code, 1);
   assert.match(missing.stderr, /no column "nope" in .*long\.csv\. Columns: country, year, value/);
+});
+
+test("join --key takes two columns and init writes them as a list", async () => {
+  const out = await mkdtemp(join(tmpdir(), "graticule-"));
+  await writeFile(
+    join(out, "counties.csv"),
+    "county,state,rate\nLos Angeles,CA,4.1\nCook,IL,3.8\nHarris,TX,3.2\nMaricopa,AZ,2.9\n",
+  );
+  const table = join(out, "counties.csv");
+  const auto = await graticule("join", table, "--region", "us-counties");
+  assert.match(auto.stdout, /column "county \+ state" matches 4 areas of us-counties as name \(4 rows\)/);
+  const named = await graticule("join", table, "--region", "us-counties", "--key", "county,state");
+  assert.match(named.stdout, /column "county \+ state" matches 4 areas/);
+  const alone = await graticule("join", table, "--region", "us-counties", "--key", "county");
+  assert.match(alone.stdout, /matches 0 areas/);
+  const init = await graticule("init", table, "--region", "us-counties", "-o", join(out, "map.json"));
+  assert.equal(init.code, 0, init.stderr);
+  const spec = JSON.parse(await readFile(join(out, "map.json"), "utf8"));
+  assert.deepEqual([spec.data.key, spec.data.keyType, spec.data.value], [["county", "state"], "name", "rate"]);
+  await writeFile(join(out, "bare.csv"), "county,rate\nLos Angeles,4.1\nCook,3.8\nHarris,3.2\n");
+  const none = await graticule("init", join(out, "bare.csv"), "--region", "us-counties");
+  assert.equal(none.code, 1);
+  assert.match(none.stderr, /If an area is named over two columns/);
 });
 
 test("init writes the table's path relative to where the spec will be saved", async () => {

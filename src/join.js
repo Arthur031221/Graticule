@@ -171,6 +171,45 @@ export function rankKeyColumns(columns, rows, index, order, { exclude = [], kind
   );
 }
 
+/** Columns that name the state next to a column that names the county. */
+export const STATE_COLUMN = /^(state|st|state[_ ]?name|state[_ ]?abbr(?:eviation)?|usps|postal)$/i;
+
+/**
+ * The text of the key columns of a row: "Los Angeles County, CA" for the columns county and state.
+ * @param {Record<string, string>} row
+ * @param {string[]} columns
+ */
+export const keyText = (row, columns) =>
+  columns
+    .map((c) => (row[c] ?? "").trim())
+    .filter(Boolean)
+    .join(", ");
+
+/**
+ * A key written over two columns, such as a county and its state, when no single column names the areas.
+ * @param {string[]} columns
+ * @param {Record<string, string>[]} rows
+ * @param {Index} index
+ * @param {string[]} order key kinds of the region
+ * @param {string[]} [exclude] columns that hold values
+ * @returns {{ columns: string[], kind: string, rate: number, hits: number } | null}
+ */
+export function combinedKey(columns, rows, index, order, exclude = []) {
+  let best = null;
+  for (const state of columns.filter((c) => STATE_COLUMN.test(c.trim()) && !exclude.includes(c)))
+    for (const column of columns) {
+      if (column === state || exclude.includes(column)) continue;
+      const pair = [column, state];
+      const { kind, rate, hits } = detectKind(
+        rows.map((r) => keyText(r, pair)),
+        index,
+        order,
+      );
+      if (rate >= 0.5 && (!best || hits > best.hits)) best = { columns: pair, kind, rate, hits };
+    }
+  return best;
+}
+
 /**
  * Joins the values of a key column to areas.
  * @param {string[]} values one cell per data row, in row order

@@ -1,7 +1,7 @@
 import assert from "node:assert/strict";
 import { test } from "node:test";
 import { loadAreas } from "../../src/geo.js";
-import { buildIndex, detectKind, joinKeys, loadAliases, rankKeyColumns } from "../../src/join.js";
+import { buildIndex, combinedKey, detectKind, joinKeys, keyText, loadAliases, rankKeyColumns } from "../../src/join.js";
 import { damagedNamePattern, editDistance, normalizeName, suggest } from "../../src/names.js";
 import { assets } from "./helpers.js";
 
@@ -346,4 +346,27 @@ test("hundreds of unmatched county names are reported in a moment", async () => 
   assert.equal(result.unmatched.length, 300);
   assert.ok(performance.now() - started < 5000, `${Math.round(performance.now() - started)} ms`);
   assert.equal(result.unmatched[299].suggestions.length, 0);
+});
+
+test("a county in one column and its state in another name the area together", async () => {
+  const us = await indexFor("us-counties");
+  const { columns, rows } = table(
+    ["county", "state", "rate"],
+    [
+      ["Los Angeles", "CA", 4.1],
+      ["Cook", "Illinois", 3.8],
+      ["Harris", "TX", 3.2],
+      ["Orleans Parish", "LA", 5.0],
+    ],
+  );
+  assert.equal(rankKeyColumns(columns, rows, us.index, us.order)[0].rate, 0);
+  const pair = combinedKey(columns, rows, us.index, us.order);
+  assert.deepEqual(pair.columns, ["county", "state"]);
+  assert.equal(pair.kind, "name");
+  assert.equal(pair.rate, 1);
+  assert.deepEqual(
+    rows.map((r) => keyText(r, pair.columns)),
+    ["Los Angeles, CA", "Cook, Illinois", "Harris, TX", "Orleans Parish, LA"],
+  );
+  assert.equal(combinedKey(["name", "value"], [{ name: "Cook", value: "1" }], us.index, us.order), null);
 });

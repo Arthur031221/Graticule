@@ -240,8 +240,14 @@ export function normalizeSpec(input) {
     bad("columns", "must be a whole number from 1 to 4");
   if (input.attribution !== undefined && typeof input.attribution !== "boolean")
     bad("attribution", "must be true or false");
-  for (const field of ["key", "keyType", "label", "file", "csv", "encoding"])
+  for (const field of ["keyType", "label", "file", "csv", "encoding"])
     if (data[field] !== undefined && typeof data[field] !== "string") bad(`data.${field}`, "must be a string");
+  if (
+    data.key !== undefined &&
+    typeof data.key !== "string" &&
+    !(Array.isArray(data.key) && data.key.length >= 2 && data.key.every((c) => typeof c === "string"))
+  )
+    bad("data.key", "must be a column name, or a list of two or more columns that together name the area");
   if (data.rows !== undefined && !Array.isArray(data.rows)) bad("data.rows", "must be a list of objects");
   if (
     data.value !== undefined &&
