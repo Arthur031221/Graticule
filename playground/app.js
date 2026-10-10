@@ -1,5 +1,5 @@
 import { buildMap } from "../src/build.js";
-import { decodeBytes, looksLikeYear, parseNumber, parseTable } from "../src/csv.js";
+import { decodeBytes, looksLikeYear, parseNumber, parseTable, sniffBinary } from "../src/csv.js";
 import { loadCustomAreas } from "../src/custom.js";
 import { exportMap } from "../src/export.js";
 import { createFontStore } from "../src/fonts.js";
@@ -659,7 +659,7 @@ async function detectKey(table) {
       if (better)
         best = { region: id, columns: top.columns ?? [top.column], rate: top.rate, strong: top.strong, hits: top.hits };
       // A column called state fits the states of the US, and a county and its state would fit better: keep looking.
-      const maybeCounties = id === "us-states" && best.columns.some((c) => STATE_COLUMN.test(c.trim()));
+      const maybeCounties = best.columns.some((c) => STATE_COLUMN.test(c.trim()));
       if (best.rate >= 0.9 && best.strong && !maybeCounties) break;
     }
     // A handful of plain numbers that happen to be codes (1 to 4, say) is not evidence of a region.
@@ -1103,6 +1103,9 @@ function wire() {
     if (run !== fileRun) return;
     const text = new TextDecoder().decode(bytes.subarray(0, 4096)).trimStart();
     if (/\.(geo|topo)?json$/i.test(f.name) || text.startsWith("{")) return loadBoundaries(bytes, f.name);
+    // Refuse a workbook or an image before anything of the current map is cleared.
+    const binary = sniffBinary(bytes);
+    if (binary) return setStatus(ui("data.error", { detail: `this is ${binary}, not a text table` }), true);
     resetForNewData();
     await loadBytes(bytes);
   };

@@ -277,10 +277,12 @@ async function commandJoin(args, assets) {
     kind: args.flags["key-type"] && String(args.flags["key-type"]),
   });
   const combo = ranked[0]?.rate >= 0.5 ? null : combinedKey(table.columns, table.rows, index, region.keys);
-  const columns = args.flags.key
-    ? String(args.flags.key)
-        .split(",")
-        .map((c) => c.trim())
+  const requested = args.flags.key ? String(args.flags.key) : "";
+  // A column may have a comma in its name: an exact match comes before a list of two columns.
+  const columns = requested
+    ? table.columns.includes(requested)
+      ? [requested]
+      : requested.split(",").map((c) => c.trim())
     : (combo?.columns ?? [ranked[0]?.column ?? table.columns[0]]);
   if (columns[0] === undefined) throw new UsageError("the table has no columns");
   for (const column of columns)
@@ -318,6 +320,17 @@ async function commandJoin(args, assets) {
   return 0;
 }
 
+/** The largest number among the cells, as the cell wrote it. Not Math.max(...cells), which fails on a long table. */
+function latestOf(cells) {
+  let latest = "";
+  let largest = -Infinity;
+  for (const cell of cells) {
+    const n = Number(cell);
+    if (cell !== "" && Number.isFinite(n) && n > largest) [latest, largest] = [cell, n];
+  }
+  return latest || "<year>";
+}
+
 async function commandInit(args, assets) {
   const [tablePath] = args.positional;
   if (!tablePath) throw new UsageError("give the table: graticule init <table.csv> --region world");
@@ -346,7 +359,7 @@ async function commandInit(args, assets) {
   if (new Set(named).size < named.length)
     console.error(
       years.length
-        ? `Several rows name the same area. Add "filter": { "${years[0]}": "${Math.max(...cells(years[0]).filter(Boolean).map(Number))}" } to data to map one ${years[0]}, or "aggregate" to combine them.`
+        ? `Several rows name the same area. Add "filter": { "${years[0]}": "${latestOf(cells(years[0]))}" } to data to map one ${years[0]}, or "aggregate" to combine them.`
         : 'Several rows name the same area. Add "aggregate" ("sum", "mean", "last") or "filter" to data so that each area has one value.',
     );
   // File names in a spec are relative to the spec, so the path is taken from where the spec will be saved.
@@ -445,7 +458,9 @@ export async function main(argv) {
         throw new UsageError(`unknown command "${command}". Run: graticule --help`);
     }
   } catch (error) {
-    if (error instanceof UsageError) console.error(`graticule: ${error.message}`);
+    // A file that is missing, unreadable or a folder is the person's to fix, not a bug of ours.
+    const fileError = typeof error.code === "string" && /^E[A-Z0-9]+$/.test(error.code);
+    if (error instanceof UsageError || fileError) console.error(`graticule: ${error.message}`);
     else {
       console.error(
         `graticule: unexpected error: ${error.message}\nThis is a bug. Please report it at https://github.com/Arthur031221/Graticule/issues with the command you ran (GRATICULE_DEBUG=1 prints the stack).`,

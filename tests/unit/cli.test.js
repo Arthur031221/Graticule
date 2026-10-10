@@ -322,6 +322,38 @@ test("join --key takes two columns and init writes them as a list", async () => 
   assert.match(none.stderr, /If an area is named over two columns/);
 });
 
+test("init copes with a long county time series, a missing year and a header with a comma", async () => {
+  const out = await mkdtemp(join(tmpdir(), "graticule-"));
+  const { loadAreas } = await import("../../src/geo.js");
+  const { assets } = await import("./helpers.js");
+  const { areas } = await loadAreas("us-counties", assets);
+  const rows = [];
+  for (const area of areas) for (let year = 1970; year <= 2019; year++) rows.push(`${area.id},${year},${year % 7}`);
+  await writeFile(join(out, "series.csv"), ["fips,year,value", ...rows].join("\n"));
+  const long = await graticule("init", join(out, "series.csv"), "--region", "us-counties");
+  assert.equal(long.code, 0, long.stderr);
+  assert.match(long.stderr, /"filter": \{ "year": "2019" \}/);
+
+  await writeFile(
+    join(out, "gaps.csv"),
+    "country,year,value\nFrance,2021,3\nFrance,2022,4\nJapan,2021,4\nJapan,NA,5\n",
+  );
+  const gaps = await graticule("init", join(out, "gaps.csv"), "--region", "world");
+  assert.match(gaps.stderr, /"year": "2022"/);
+  assert.doesNotMatch(gaps.stderr, /NaN/);
+
+  await writeFile(join(out, "comma.csv"), '"Country, name",value\nFrance,1\nJapan,2\nBrazil,3\n');
+  const comma = await graticule("join", join(out, "comma.csv"), "--region", "world", "--key", "Country, name");
+  assert.match(comma.stdout, /column "Country, name" matches 3 areas/);
+});
+
+test("a file that is missing is reported as a file error, not as a bug of Graticule", async () => {
+  const result = await graticule("join", "/does/not/exist.csv", "--region", "world");
+  assert.equal(result.code, 1);
+  assert.match(result.stderr, /ENOENT/);
+  assert.doesNotMatch(result.stderr, /This is a bug/);
+});
+
 test("init writes the table's path relative to where the spec will be saved", async () => {
   const out = await mkdtemp(join(tmpdir(), "graticule-"));
   await writeFile(join(out, "data.csv"), await readFile(join(gallery, "life-expectancy/data.csv"), "utf8"));

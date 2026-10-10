@@ -561,3 +561,21 @@ test("data.key may list the columns that name an area together, and they are fou
   const missing = await build(base({ region: "us-counties", data: { ...data, key: ["county", "nope"] } }));
   assert.ok(missing.findings.some((f) => f.id === "spec" && f.message.includes('column "nope" not found')));
 });
+
+test("a warning that is not one of the numbered rules can still be accepted", async () => {
+  const geojson = JSON.parse(await readFile(fixture("squares.geojson"), "utf8"));
+  const result = await build({
+    title: "Squares",
+    source: "Made up",
+    region: "custom",
+    type: "locator",
+    boundaries: { geojson },
+    highlight: ["North West", "Atlantis"],
+    data: {},
+    checks: { allow: ["highlight-unmatched"] },
+  });
+  assert.deepEqual(errors(result), []);
+  assert.ok(result.findings.some((f) => f.id === "highlight-unmatched" && f.allowed));
+  const typo = await build({ ...base(), checks: { allow: ["raw-count"] } });
+  assert.ok(typo.findings.some((f) => f.id === "spec" && f.message.includes('"raw-count" is not a rule')));
+});

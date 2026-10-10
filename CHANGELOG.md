@@ -1,5 +1,13 @@
 # Changelog
 
+## 0.3.4 (2026-10-11)
+
+- Accepting a warning that is not one of the numbered rules, such as unmatched highlight names, no longer blocks the map.
+- A table of California counties is no longer taken for Canada: a column called `state` does not end the search for a region before counties are tried.
+- `init` no longer fails on a county time series of 150,000 rows, and it names no year when the cells are missing. `--key` accepts a column with a comma in its name. A missing or unreadable file is reported as a file error, not as a bug.
+- Class edges that are close together are printed with enough decimals to read differently.
+- Dropping an Excel workbook on the playground leaves the current map and its settings alone.
+
 ## 0.3.3 (2026-10-11)
 
 - An area named over two columns joins: `data.key` may be a list such as `["county", "state"]`, joined as `Mohave, AZ`. A county column next to a column called `state` is found without being listed, by `join`, `init` (`--key county,state` names the pair), the spec and the playground, where it also decides the region over a bare state column.

@@ -79,3 +79,15 @@ test("a legend shows four significant digits, not the ten of an unrounded class 
   assert.deepEqual([10, 26.666666667, 43.33333333, 60].map(format), ["10.00", "26.67", "43.33", "60.00"]);
   assert.equal(numberFormatter("de", [0.5, 12.25])(12.25), "12,25");
 });
+
+test("class edges that are close together are never printed the same", () => {
+  const close = [1.00001, 1.00002, 1.00003];
+  const format = numberFormatter("en", close);
+  assert.equal(new Set(close.map(format)).size, 3);
+  const tiny = [1e-7, 2e-7, 3e-7];
+  assert.equal(new Set(tiny.map(numberFormatter("en", tiny))).size, 3);
+  assert.deepEqual(
+    [10, 26.666666667, 43.33333333, 60].map(numberFormatter("en", [10, 26.666666667, 43.33333333, 60])),
+    ["10.00", "26.67", "43.33", "60.00"],
+  );
+});

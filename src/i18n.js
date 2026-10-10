@@ -46,10 +46,17 @@ export function numberFormatter(lang, edges = []) {
       ),
     ),
   );
+  // Two class edges must never read the same: add decimals until every edge has its own text.
+  const distinct = (places) => {
+    const format = new Intl.NumberFormat(tag, { minimumFractionDigits: places, maximumFractionDigits: places });
+    return new Set(edges.map((e) => format.format(e))).size === new Set(edges).size;
+  };
+  let places = decimals;
+  while (!big && places < 12 && !distinct(places)) places++;
   if (big) {
     const compact = new Intl.NumberFormat(tag, { notation: "compact", maximumFractionDigits: 2 });
     return (value) => compact.format(value);
   }
-  const plain = new Intl.NumberFormat(tag, { minimumFractionDigits: decimals, maximumFractionDigits: decimals });
+  const plain = new Intl.NumberFormat(tag, { minimumFractionDigits: places, maximumFractionDigits: places });
   return (value) => plain.format(value);
 }

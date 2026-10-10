@@ -156737,11 +156737,17 @@ function numberFormatter(lang, edges = []) {
       )
     )
   );
+  const distinct = (places2) => {
+    const format = new Intl.NumberFormat(tag, { minimumFractionDigits: places2, maximumFractionDigits: places2 });
+    return new Set(edges.map((e) => format.format(e))).size === new Set(edges).size;
+  };
+  let places = decimals;
+  while (!big && places < 12 && !distinct(places)) places++;
   if (big) {
     const compact = new Intl.NumberFormat(tag, { notation: "compact", maximumFractionDigits: 2 });
     return (value) => compact.format(value);
   }
-  const plain = new Intl.NumberFormat(tag, { minimumFractionDigits: decimals, maximumFractionDigits: decimals });
+  const plain = new Intl.NumberFormat(tag, { minimumFractionDigits: places, maximumFractionDigits: places });
   return (value) => plain.format(value);
 }
 
@@ -157611,7 +157617,7 @@ async function buildMap(input, ctx) {
     resolveHighlight(analysis);
     findings = analysis.ok === false && !analysis.index ? analysis.findings : [...analysis.findings, ...checkAnalysis(analysis)];
     const allow = [...analysis.spec?.checks.allow ?? [], ...ctx.allow ?? []];
-    for (const id of new Set(allow.filter((id2) => !Object.hasOwn(RULES, id2))))
+    for (const id of new Set(allow.filter((id2) => !Object.hasOwn(english.rules, id2))))
       findings.push({
         id: "spec",
         level: "error",
@@ -158506,7 +158512,7 @@ function nodeAssets(root = findAssetRoot()) {
 }
 
 // src/version.js
-var VERSION = "0.3.3";
+var VERSION = "0.3.4";
 
 // src/report.js
 var MAX_LISTED = 12;
@@ -158819,7 +158825,8 @@ async function commandJoin(args, assets) {
     kind: args.flags["key-type"] && String(args.flags["key-type"])
   });
   const combo = ranked[0]?.rate >= 0.5 ? null : combinedKey(table.columns, table.rows, index, region.keys);
-  const columns = args.flags.key ? String(args.flags.key).split(",").map((c) => c.trim()) : combo?.columns ?? [ranked[0]?.column ?? table.columns[0]];
+  const requested = args.flags.key ? String(args.flags.key) : "";
+  const columns = requested ? table.columns.includes(requested) ? [requested] : requested.split(",").map((c) => c.trim()) : combo?.columns ?? [ranked[0]?.column ?? table.columns[0]];
   if (columns[0] === void 0) throw new UsageError("the table has no columns");
   for (const column of columns)
     if (!table.columns.includes(column))
@@ -158850,6 +158857,15 @@ async function commandJoin(args, assets) {
   }
   return 0;
 }
+function latestOf(cells) {
+  let latest = "";
+  let largest = -Infinity;
+  for (const cell of cells) {
+    const n = Number(cell);
+    if (cell !== "" && Number.isFinite(n) && n > largest) [latest, largest] = [cell, n];
+  }
+  return latest || "<year>";
+}
 async function commandInit(args, assets) {
   const [tablePath] = args.positional;
   if (!tablePath) throw new UsageError("give the table: graticule init <table.csv> --region world");
@@ -158875,7 +158891,7 @@ async function commandInit(args, assets) {
   const named = table.rows.map((r) => keyText(r, key.columns)).filter(Boolean);
   if (new Set(named).size < named.length)
     console.error(
-      years.length ? `Several rows name the same area. Add "filter": { "${years[0]}": "${Math.max(...cells(years[0]).filter(Boolean).map(Number))}" } to data to map one ${years[0]}, or "aggregate" to combine them.` : 'Several rows name the same area. Add "aggregate" ("sum", "mean", "last") or "filter" to data so that each area has one value.'
+      years.length ? `Several rows name the same area. Add "filter": { "${years[0]}": "${latestOf(cells(years[0]))}" } to data to map one ${years[0]}, or "aggregate" to combine them.` : 'Several rows name the same area. Add "aggregate" ("sum", "mean", "last") or "filter" to data so that each area has one value.'
     );
   const specDir = args.flags.out ? dirname2(resolve2(String(args.flags.out))) : process.cwd();
   const file = relative(specDir, resolve2(tablePath)).split(sep).join("/");
@@ -158968,7 +158984,8 @@ async function main(argv) {
         throw new UsageError(`unknown command "${command}". Run: graticule --help`);
     }
   } catch (error) {
-    if (error instanceof UsageError) console.error(`graticule: ${error.message}`);
+    const fileError = typeof error.code === "string" && /^E[A-Z0-9]+$/.test(error.code);
+    if (error instanceof UsageError || fileError) console.error(`graticule: ${error.message}`);
     else {
       console.error(
         `graticule: unexpected error: ${error.message}

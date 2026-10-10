@@ -41,7 +41,7 @@ export async function buildMap(input, ctx) {
       analysis.ok === false && !analysis.index ? analysis.findings : [...analysis.findings, ...checkAnalysis(analysis)];
     const allow = [...(analysis.spec?.checks.allow ?? []), ...(ctx.allow ?? [])];
     // A rule id with a typo would let the person think the rule is set aside while it still applies.
-    for (const id of new Set(allow.filter((id) => !Object.hasOwn(RULES, id))))
+    for (const id of new Set(allow.filter((id) => !Object.hasOwn(english.rules, id))))
       findings.push({
         id: "spec",
         level: "error",

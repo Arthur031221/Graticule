@@ -532,6 +532,8 @@ test("an Excel workbook is named, not read, and the page keeps its map", async (
   await expect(page.locator("#data-status")).toContainText("Excel workbook (.xlsx)");
   await expect(page.locator("#data-status")).toHaveClass(/error/);
   await expect(svg(page)).toBeVisible();
+  await expect(page.locator("#source")).toHaveValue(/World Bank/);
+  await expect(page.locator("#sheet")).not.toHaveClass(/stale/);
 });
 
 test("four plain numbers that look like codes do not pick a region, and typing while a table loads starts from empty fields", async ({
@@ -579,4 +581,14 @@ test("a county in one column and its state in another join US counties, and the 
   await expect(page.locator("#join-summary")).toContainText("county + state → name");
   await expect(page.locator("#join-summary")).toContainText("10 of 10 rows matched 10 areas");
   await expect(page.locator("#value")).toHaveValue("rate");
+});
+
+test("a table of California counties is not taken for Canada", async ({ page }) => {
+  await page.goto("/");
+  const csv = ["county,state,rate", "Los Angeles,CA,4.1", "Orange,CA,3.9", "San Diego,CA,3.5", "Kern,CA,5.2"].join(
+    "\n",
+  );
+  await page.locator("#file").setInputFiles({ name: "ca.csv", mimeType: "text/csv", buffer: Buffer.from(csv) });
+  await expect(page.locator("#region")).toHaveValue("us-counties");
+  await expect(page.locator("#join-summary")).toContainText("4 of 4 rows matched 4 areas");
 });
