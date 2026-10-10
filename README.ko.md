@@ -145,9 +145,9 @@ graticule render map.json --fix -f svg,png   # 오류마다 가장 작은 수정
 | | | |
 | --- | --- | --- |
 | [<img src="docs/gallery/us-county-unemployment.png" alt="미국 카운티별 실업률">](docs/gallery.md) | [<img src="docs/gallery/population-symbols.png" alt="비례 원으로 나타낸 인구">](docs/gallery.md) | [<img src="docs/gallery/fertility-small-multiples.png" alt="작은 다중 지도 네 장으로 본 출산율">](docs/gallery.md) |
-| [<img src="docs/gallery/taiwan-township-area.png" alt="번체 중국어로 된 대만 향진시구">](docs/gallery.md) | [<img src="docs/gallery/japan-regions.png" alt="지방별 일본 도도부현">](docs/gallery.md) | [<img src="docs/gallery/europe-gdp-per-capita.png" alt="유럽의 1인당 GDP">](docs/gallery.md) |
+| [<img src="docs/gallery/taiwan-township-area.png" alt="번체 중국어로 된 대만 향진시구">](docs/gallery.md) | [<img src="docs/gallery/japan-regions.png" alt="지방별 일본 도도부현">](docs/gallery.md) | [<img src="docs/gallery/brazil-state-density.png" alt="TopoJSON 파일로 그린 브라질 인구 밀도">](docs/gallery.md) |
 
-[docs/gallery.md](docs/gallery.md)에 열여섯 장이 모두 있습니다. 각각 요청한 프롬프트, 명세, 데이터, 검사 기록이 붙어 있습니다.
+[docs/gallery.md](docs/gallery.md)에 열일곱 장이 모두 있습니다. 각각 요청한 프롬프트, 명세, 데이터, 검사 기록이 붙어 있습니다.
 
 ## 아홉 가지 언어의 라벨
 

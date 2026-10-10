@@ -145,9 +145,9 @@ graticule render map.json --fix -f svg,png   # 对每个错误做最小的修复
 | | | |
 | --- | --- | --- |
 | [<img src="docs/gallery/us-county-unemployment.png" alt="美国各县失业率">](docs/gallery.md) | [<img src="docs/gallery/population-symbols.png" alt="用比例圆形呈现人口">](docs/gallery.md) | [<img src="docs/gallery/fertility-small-multiples.png" alt="四张小多图呈现的生育率">](docs/gallery.md) |
-| [<img src="docs/gallery/taiwan-township-area.png" alt="繁体中文的台湾乡镇市区地图">](docs/gallery.md) | [<img src="docs/gallery/japan-regions.png" alt="按地方划分的日本都道府县">](docs/gallery.md) | [<img src="docs/gallery/europe-gdp-per-capita.png" alt="欧洲人均 GDP">](docs/gallery.md) |
+| [<img src="docs/gallery/taiwan-township-area.png" alt="繁体中文的台湾乡镇市区地图">](docs/gallery.md) | [<img src="docs/gallery/japan-regions.png" alt="按地方划分的日本都道府县">](docs/gallery.md) | [<img src="docs/gallery/brazil-state-density.png" alt="用 TopoJSON 文件画出的巴西人口密度">](docs/gallery.md) |
 
-[docs/gallery.md](docs/gallery.md) 有全部 16 张，每张都附上提出需求的提示、配置文件、数据和检查记录。
+[docs/gallery.md](docs/gallery.md) 有全部 17 张，每张都附上提出需求的提示、配置文件、数据和检查记录。
 
 ## 九种语言的标签
 

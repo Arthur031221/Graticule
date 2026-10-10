@@ -1,0 +1,28 @@
+{
+  "title": "People per square kilometre in Brazil",
+  "subtitle": "Resident population at the 2022 census, by state",
+  "source": "IBGE Censo Demografico 2022. Boundaries from Natural Earth, simplified",
+  "note": "Data retrieved 2026-10-10. The area of each state is measured from the boundary file.",
+  "region": "custom",
+  "boundaries": {
+    "file": "states.topojson",
+    "name": "name",
+    "credit": "Natural Earth (public domain)"
+  },
+  "data": {
+    "file": "data.csv",
+    "key": "state",
+    "value": "population",
+    "kind": "count",
+    "normalize": {
+      "by": "area",
+      "per": 1
+    },
+    "label": "People"
+  },
+  "classes": {
+    "method": "jenks",
+    "count": 5
+  },
+  "palette": "ylorrd"
+}

@@ -15,6 +15,9 @@ import { loadAreas } from "../src/geo.js";
 import { normalizeLang } from "../src/lang.js";
 import { nodeAssets } from "../src/node-assets.js";
 import { summarize } from "../src/report.js";
+import { quantize } from "topojson-client";
+import { topology } from "topojson-server";
+import { presimplify, quantile, simplify } from "topojson-simplify";
 
 const root = join(fileURLToPath(new URL(".", import.meta.url)), "..");
 const assets = nodeAssets();
@@ -64,6 +67,25 @@ async function worldBank(indicator, date) {
 const round = (v, digits) => Math.round(v * 10 ** digits) / 10 ** digits;
 const wbSource = (code, year) => `World Bank, World Development Indicators, ${code}, ${year}`;
 const note = `Data retrieved ${RETRIEVED}.`;
+
+/** The states of one country from Natural Earth admin-1, simplified to a small TopoJSON file. */
+async function naturalEarthStates(iso3, keep) {
+  const url =
+    "https://raw.githubusercontent.com/nvkelso/natural-earth-vector/master/geojson/ne_10m_admin_1_states_provinces.geojson";
+  const all = await (await fetch(url, { signal: AbortSignal.timeout(180000) })).json();
+  const features = all.features
+    .filter((f) => f.properties.adm0_a3 === iso3)
+    .map((f) => ({
+      type: "Feature",
+      properties: { name: f.properties.name, postal: f.properties.postal },
+      geometry: f.geometry,
+    }));
+  const topo = presimplify(topology({ states: { type: "FeatureCollection", features } }));
+  const thin = simplify(topo, quantile(topo, keep));
+  // presimplify adds a weight to every point, which the file does not need.
+  const plain = { ...thin, arcs: thin.arcs.map((arc) => arc.map(([x, y]) => [x, y])) };
+  return JSON.stringify(quantize(plain, 1e4));
+}
 
 /** Gallery entries. `data()` returns { columns, rows }; `spec` is the finished map. */
 const GALLERY = [
@@ -467,6 +489,38 @@ const GALLERY = [
       palette: "tol-bright",
     },
   },
+  {
+    id: "brazil-state-density",
+    prompt: "Map how crowded each Brazilian state is. The boundaries are in states.topojson.",
+    files: { "states.topojson": () => naturalEarthStates("BRA", 0.2) },
+    data: async () => {
+      const url =
+        "https://servicodados.ibge.gov.br/api/v3/agregados/4714/periodos/2022/variaveis/93?localidades=N3[all]";
+      const body = await getJson(encodeURI(url).replace(/%5B/g, "[").replace(/%5D/g, "]"));
+      return {
+        columns: ["state", "population"],
+        rows: body[0].resultados[0].series.map((r) => ({ state: r.localidade.nome, population: r.serie["2022"] })),
+      };
+    },
+    spec: {
+      title: "People per square kilometre in Brazil",
+      subtitle: "Resident population at the 2022 census, by state",
+      source: "IBGE Censo Demografico 2022. Boundaries from Natural Earth, simplified",
+      note: `${note} The area of each state is measured from the boundary file.`,
+      region: "custom",
+      boundaries: { file: "states.topojson", name: "name", credit: "Natural Earth (public domain)" },
+      data: {
+        file: "data.csv",
+        key: "state",
+        value: "population",
+        kind: "count",
+        normalize: { by: "area", per: 1 },
+        label: "People",
+      },
+      classes: { method: "jenks", count: 5 },
+      palette: "ylorrd",
+    },
+  },
 ];
 
 await mkdir(join(root, "docs/gallery"), { recursive: true });
@@ -479,6 +533,9 @@ for (const entry of GALLERY) {
   if (!offline || !existsSync(csvPath)) {
     const { columns, rows } = await entry.data();
     await writeFile(csvPath, toCsv(columns, rows));
+  }
+  for (const [name, make] of Object.entries(entry.files ?? {})) {
+    if (!offline || !existsSync(join(dir, name))) await writeFile(join(dir, name), await make());
   }
   await writeFile(join(dir, "spec.json"), JSON.stringify(entry.spec, null, 2) + "\n");
   if (entry.rawSpec) await writeFile(join(dir, "spec.raw.json"), JSON.stringify(entry.rawSpec, null, 2) + "\n");

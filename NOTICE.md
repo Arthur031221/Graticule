@@ -26,4 +26,4 @@ Graticule is MIT licensed (see LICENSE). It bundles or derives from the work bel
 
 ## Data used by the examples and the checks
 
-- World Bank Open Data, CC BY 4.0. WHO COVID-19 dashboard data, CC BY 4.0. US Bureau of Labor Statistics data via plotly/datasets, public domain. datasets/country-codes, PDDL. Each map in the gallery names its source.
+- World Bank Open Data, CC BY 4.0. WHO COVID-19 dashboard data, CC BY 4.0. US Bureau of Labor Statistics data via plotly/datasets, public domain. IBGE (Brazilian Institute of Geography and Statistics) 2022 census data through its open data API. datasets/country-codes, PDDL. Each map in the gallery names its source.

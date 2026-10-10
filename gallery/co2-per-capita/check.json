@@ -1,5 +1,5 @@
 {
-  "graticule": "0.1.0",
+  "graticule": "0.2.0",
   "ok": true,
   "region": "world",
   "type": "choropleth",
@@ -67,7 +67,7 @@
       "id": "join-unmatched",
       "level": "warn",
       "allowed": false,
-      "message": "1 rows matched no area and are not drawn: GIB.",
+      "message": "1 row matched no area and is not drawn: GIB.",
       "reason": "Rows that vanish quietly make a map look complete when it is not. Fix the spelling or the key column.",
       "fixable": false
     },

@@ -172,5 +172,15 @@
     "type": "categorical",
     "language": "ko",
     "findings": []
+  },
+  {
+    "id": "brazil-state-density",
+    "title": "People per square kilometre in Brazil",
+    "prompt": "Map how crowded each Brazilian state is. The boundaries are in states.topojson.",
+    "promptEn": "Map how crowded each Brazilian state is. The boundaries are in states.topojson.",
+    "region": "custom",
+    "type": "choropleth",
+    "language": "en",
+    "findings": []
   }
 ]

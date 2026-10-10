@@ -1,6 +1,6 @@
 # Gallery
 
-16 maps built from public data. Each one is a spec and a table in `gallery/<name>`, so `graticule render gallery/<name>/spec.json` redraws it. The check log is the report the checker wrote. `npm run gallery` fetches the data again and rebuilds everything.
+17 maps built from public data. Each one is a spec and a table in `gallery/<name>`, so `graticule render gallery/<name>/spec.json` redraws it. The check log is the report the checker wrote. `npm run gallery` fetches the data again and rebuilds everything.
 
 ## Life expectancy at birth, 2019
 
@@ -129,3 +129,11 @@ Region `jp-prefectures`, type `categorical`. Labels in Japanese. The checker fou
 Prompt (asked in Korean): "Color the South Korean provinces as capital region, metropolitan cities and provinces."
 
 Region `kr-provinces`, type `categorical`. Labels in Korean. The checker found nothing to report. [Spec](../gallery/korea-capital-region/spec.json), [data](../gallery/korea-capital-region/data.csv), [check log](../gallery/korea-capital-region/check.json).
+
+## People per square kilometre in Brazil
+
+![brazil-state-density](gallery/brazil-state-density.png)
+
+Prompt: "Map how crowded each Brazilian state is. The boundaries are in states.topojson."
+
+Region `custom`, type `choropleth`. The checker found nothing to report. [Spec](../gallery/brazil-state-density/spec.json), [data](../gallery/brazil-state-density/data.csv), [check log](../gallery/brazil-state-density/check.json).

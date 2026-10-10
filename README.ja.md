@@ -145,9 +145,9 @@ graticule render map.json --fix -f svg,png   # エラーごとに最小限の修
 | | | |
 | --- | --- | --- |
 | [<img src="docs/gallery/us-county-unemployment.png" alt="アメリカの郡別失業率">](docs/gallery.md) | [<img src="docs/gallery/population-symbols.png" alt="比例円で表した人口">](docs/gallery.md) | [<img src="docs/gallery/fertility-small-multiples.png" alt="4 枚の小さな複数図で見る出生率">](docs/gallery.md) |
-| [<img src="docs/gallery/taiwan-township-area.png" alt="繁体字中国語の台湾の郷鎮市区">](docs/gallery.md) | [<img src="docs/gallery/japan-regions.png" alt="地方別の日本の都道府県">](docs/gallery.md) | [<img src="docs/gallery/europe-gdp-per-capita.png" alt="ヨーロッパの一人当たり GDP">](docs/gallery.md) |
+| [<img src="docs/gallery/taiwan-township-area.png" alt="繁体字中国語の台湾の郷鎮市区">](docs/gallery.md) | [<img src="docs/gallery/japan-regions.png" alt="地方別の日本の都道府県">](docs/gallery.md) | [<img src="docs/gallery/brazil-state-density.png" alt="TopoJSON ファイルから描いたブラジルの人口密度">](docs/gallery.md) |
 
-[docs/gallery.md](docs/gallery.md) に 16 枚すべてがあります。それぞれ、依頼したプロンプト、仕様、データ、チェックログつきです。
+[docs/gallery.md](docs/gallery.md) に 17 枚すべてがあります。それぞれ、依頼したプロンプト、仕様、データ、チェックログつきです。
 
 ## 9 つの言語のラベル
 

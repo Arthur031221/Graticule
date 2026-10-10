@@ -145,9 +145,9 @@ Cinq types de cartes : surfaces coloriées (choroplèthe), cercles proportionnel
 | | | |
 | --- | --- | --- |
 | [<img src="docs/gallery/us-county-unemployment.png" alt="Chômage par comté aux États-Unis">](docs/gallery.md) | [<img src="docs/gallery/population-symbols.png" alt="Population en cercles proportionnels">](docs/gallery.md) | [<img src="docs/gallery/fertility-small-multiples.png" alt="Taux de fécondité en quatre petits multiples">](docs/gallery.md) |
-| [<img src="docs/gallery/taiwan-township-area.png" alt="Cantons de Taïwan en chinois traditionnel">](docs/gallery.md) | [<img src="docs/gallery/japan-regions.png" alt="Préfectures du Japon par région">](docs/gallery.md) | [<img src="docs/gallery/europe-gdp-per-capita.png" alt="PIB par habitant en Europe">](docs/gallery.md) |
+| [<img src="docs/gallery/taiwan-township-area.png" alt="Cantons de Taïwan en chinois traditionnel">](docs/gallery.md) | [<img src="docs/gallery/japan-regions.png" alt="Préfectures du Japon par région">](docs/gallery.md) | [<img src="docs/gallery/brazil-state-density.png" alt="Densité de population du Brésil, dessinée depuis un fichier TopoJSON">](docs/gallery.md) |
 
-[docs/gallery.md](docs/gallery.md) contient les 16, chacune avec la consigne qui l'a demandée, sa spécification, ses données et son journal de vérification.
+[docs/gallery.md](docs/gallery.md) contient les 17, chacune avec la consigne qui l'a demandée, sa spécification, ses données et son journal de vérification.
 
 ## Des étiquettes en neuf langues
 

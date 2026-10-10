@@ -145,9 +145,9 @@ Five map types: shaded areas (choropleth), proportional circles, categories, loc
 | | | |
 | --- | --- | --- |
 | [<img src="docs/gallery/us-county-unemployment.png" alt="US county unemployment">](docs/gallery.md) | [<img src="docs/gallery/population-symbols.png" alt="Population as proportional circles">](docs/gallery.md) | [<img src="docs/gallery/fertility-small-multiples.png" alt="Fertility rates in four small multiples">](docs/gallery.md) |
-| [<img src="docs/gallery/taiwan-township-area.png" alt="Taiwan townships in Traditional Chinese">](docs/gallery.md) | [<img src="docs/gallery/japan-regions.png" alt="Japan prefectures by region">](docs/gallery.md) | [<img src="docs/gallery/europe-gdp-per-capita.png" alt="GDP per person in Europe">](docs/gallery.md) |
+| [<img src="docs/gallery/taiwan-township-area.png" alt="Taiwan townships in Traditional Chinese">](docs/gallery.md) | [<img src="docs/gallery/japan-regions.png" alt="Japan prefectures by region">](docs/gallery.md) | [<img src="docs/gallery/brazil-state-density.png" alt="Population density in Brazil, drawn from a TopoJSON file">](docs/gallery.md) |
 
-[docs/gallery.md](docs/gallery.md) has all 16, each with its prompt, spec, data and check log.
+[docs/gallery.md](docs/gallery.md) has all 17, each with its prompt, spec, data and check log.
 
 ## Labels in nine languages
 

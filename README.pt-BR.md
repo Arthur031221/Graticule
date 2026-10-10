@@ -145,9 +145,9 @@ Cinco tipos de mapa: áreas coloridas (coroplético), círculos proporcionais, c
 | | | |
 | --- | --- | --- |
 | [<img src="docs/gallery/us-county-unemployment.png" alt="Desemprego por condado nos Estados Unidos">](docs/gallery.md) | [<img src="docs/gallery/population-symbols.png" alt="População como círculos proporcionais">](docs/gallery.md) | [<img src="docs/gallery/fertility-small-multiples.png" alt="Taxas de fecundidade em quatro pequenos múltiplos">](docs/gallery.md) |
-| [<img src="docs/gallery/taiwan-township-area.png" alt="Municípios de Taiwan em chinês tradicional">](docs/gallery.md) | [<img src="docs/gallery/japan-regions.png" alt="Prefeituras do Japão por região">](docs/gallery.md) | [<img src="docs/gallery/europe-gdp-per-capita.png" alt="PIB por pessoa na Europa">](docs/gallery.md) |
+| [<img src="docs/gallery/taiwan-township-area.png" alt="Municípios de Taiwan em chinês tradicional">](docs/gallery.md) | [<img src="docs/gallery/japan-regions.png" alt="Prefeituras do Japão por região">](docs/gallery.md) | [<img src="docs/gallery/brazil-state-density.png" alt="Densidade populacional do Brasil, desenhada a partir de um arquivo TopoJSON">](docs/gallery.md) |
 
-[docs/gallery.md](docs/gallery.md) tem os 16, cada um com o pedido que o originou, sua especificação, seus dados e seu registro de verificação.
+[docs/gallery.md](docs/gallery.md) tem os 17, cada um com o pedido que o originou, sua especificação, seus dados e seu registro de verificação.
 
 ## Rótulos em nove idiomas
 

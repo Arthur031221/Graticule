@@ -1,0 +1,114 @@
+{
+  "graticule": "0.2.0",
+  "ok": true,
+  "region": "custom",
+  "type": "choropleth",
+  "projection": {
+    "name": "conic-equal-area",
+    "equalArea": true
+  },
+  "join": {
+    "column": "state",
+    "keyType": "name",
+    "rows": 27,
+    "matchedRows": 27,
+    "matchedAreas": 27,
+    "matchedBy": {
+      "code": 0,
+      "name": 27,
+      "alias": 0,
+      "padded": 0
+    },
+    "unmatched": [],
+    "ambiguous": []
+  },
+  "classes": {
+    "method": "jenks",
+    "edges": [
+      2.5,
+      40,
+      120,
+      200,
+      400,
+      490
+    ],
+    "counts": [
+      15,
+      9,
+      1,
+      1,
+      1
+    ],
+    "colors": [
+      "#ffffb2",
+      "#fecc5c",
+      "#fd8d3c",
+      "#f03b20",
+      "#bd0026"
+    ],
+    "palette": "ylorrd"
+  },
+  "labels": {
+    "placed": 19,
+    "hidden": 8,
+    "dots": 0
+  },
+  "findings": [
+    {
+      "id": "labels-hidden",
+      "level": "info",
+      "allowed": false,
+      "message": "8 labels were left out because they do not fit inside their area or would overlap another label.",
+      "reason": "Hidden labels are listed so that a quieter map is not mistaken for a complete one.",
+      "fixable": false
+    }
+  ],
+  "fixes": [],
+  "spec": {
+    "title": "People per square kilometre in Brazil",
+    "subtitle": "Resident population at the 2022 census, by state",
+    "source": "IBGE Censo Demografico 2022. Boundaries from Natural Earth, simplified",
+    "note": "Data retrieved 2026-10-10. The area of each state is measured from the boundary file.",
+    "region": "custom",
+    "boundaries": {
+      "file": "states.topojson",
+      "name": "name",
+      "credit": "Natural Earth (public domain)"
+    },
+    "type": "choropleth",
+    "data": {
+      "file": "data.csv",
+      "key": "state",
+      "value": "population",
+      "kind": "count",
+      "normalize": {
+        "by": "area",
+        "per": 1
+      },
+      "label": "People"
+    },
+    "classes": {
+      "method": "jenks",
+      "count": 5
+    },
+    "palette": "ylorrd",
+    "projection": "auto",
+    "language": "en",
+    "labels": {
+      "show": "auto"
+    },
+    "legend": {},
+    "size": {
+      "width": 1200
+    },
+    "theme": "light",
+    "grid": false,
+    "highlight": [],
+    "panels": [],
+    "attribution": true,
+    "symbols": {},
+    "checks": {
+      "allow": []
+    }
+  }
+}

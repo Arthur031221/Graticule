@@ -145,9 +145,9 @@ Fünf Kartentypen: eingefärbte Flächen (Choroplethen), proportionale Kreise, K
 | | | |
 | --- | --- | --- |
 | [<img src="docs/gallery/us-county-unemployment.png" alt="Arbeitslosigkeit nach County in den USA">](docs/gallery.md) | [<img src="docs/gallery/population-symbols.png" alt="Bevölkerung als proportionale Kreise">](docs/gallery.md) | [<img src="docs/gallery/fertility-small-multiples.png" alt="Geburtenraten in vier Kleinserien">](docs/gallery.md) |
-| [<img src="docs/gallery/taiwan-township-area.png" alt="Gemeinden Taiwans auf Traditionellem Chinesisch">](docs/gallery.md) | [<img src="docs/gallery/japan-regions.png" alt="Präfekturen Japans nach Region">](docs/gallery.md) | [<img src="docs/gallery/europe-gdp-per-capita.png" alt="BIP pro Kopf in Europa">](docs/gallery.md) |
+| [<img src="docs/gallery/taiwan-township-area.png" alt="Gemeinden Taiwans auf Traditionellem Chinesisch">](docs/gallery.md) | [<img src="docs/gallery/japan-regions.png" alt="Präfekturen Japans nach Region">](docs/gallery.md) | [<img src="docs/gallery/brazil-state-density.png" alt="Bevölkerungsdichte Brasiliens, aus einer TopoJSON-Datei gezeichnet">](docs/gallery.md) |
 
-[docs/gallery.md](docs/gallery.md) zeigt alle 16, jede mit dem Prompt, der sie angefordert hat, ihrer Spezifikation, ihren Daten und ihrem Prüfprotokoll.
+[docs/gallery.md](docs/gallery.md) zeigt alle 17, jede mit dem Prompt, der sie angefordert hat, ihrer Spezifikation, ihren Daten und ihrem Prüfprotokoll.
 
 ## Beschriftungen in neun Sprachen
 
