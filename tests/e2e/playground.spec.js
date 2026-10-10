@@ -83,6 +83,16 @@ test("PNG, PDF and HTML downloads are real files", async ({ page }) => {
   }
 });
 
+test("export buttons carry translated names, not message keys", async ({ page }) => {
+  await page.goto("/?example=life-expectancy");
+  await expect(page.locator('[data-export="png3x"]')).toContainText("PNG for print");
+  await expect(page.locator('[data-export="html"]')).toContainText("Interactive HTML");
+  await expect(page.locator("#exports")).not.toContainText("ui.export");
+  await page.selectOption("#ui-lang", "de");
+  await expect(page.locator('[data-export="html"]')).not.toContainText("Interactive HTML");
+  await expect(page.locator("#exports")).not.toContainText("ui.export");
+});
+
 test("accepting a rule lets a blocked map through and keeps it in the list", async ({ page }) => {
   await page.goto("/?example=life-expectancy");
   await expect(svg(page)).toBeVisible();

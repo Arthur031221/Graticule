@@ -120,6 +120,7 @@ async function setUiLanguage(code) {
     $("map-lang").value = code;
   }
   translatePage();
+  buildExports();
   buildSelects();
   buildPalettes();
   buildExamples();
@@ -881,7 +882,6 @@ function startLanguage() {
 }
 
 wire();
-buildExports();
 $("theme-toggle").setAttribute("aria-pressed", String(document.documentElement.dataset.theme === "dark"));
 await setUiLanguage(startLanguage());
 const wanted = new URLSearchParams(location.search).get("example");
