@@ -1,0 +1,12 @@
+{
+  "agent": "claude",
+  "condition": "skill",
+  "prompt": "Make a map of unemployment by county from unemployment.csv.",
+  "repetition": 1,
+  "seconds": 22,
+  "steps": 16,
+  "produced": [
+    "map.png"
+  ],
+  "note": "Only PNG outputs are kept here. Other files the agent wrote (HTML, SVG) were left out to keep the repository small."
+}

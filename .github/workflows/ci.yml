@@ -1,0 +1,110 @@
+name: CI
+
+on:
+  push:
+    branches: [main]
+  pull_request:
+
+permissions:
+  contents: read
+
+jobs:
+  unit:
+    name: Unit tests, Node ${{ matrix.node }}
+    runs-on: ubuntu-latest
+    strategy:
+      fail-fast: false
+      matrix:
+        node: [20, 22, 24]
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-node@v4
+        with:
+          node-version: ${{ matrix.node }}
+          cache: npm
+      - run: npm ci
+      - run: npm run format:check
+      - run: npm run typecheck
+      - run: npm test
+
+  generated:
+    name: Generated files are current
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-node@v4
+        with:
+          node-version: 22
+          cache: npm
+      - run: npm ci
+      - run: npm run build
+      - name: The program and the reference pages match their sources
+        run: git diff --exit-code -- skills/graticule/scripts skills/graticule/references
+
+  skill:
+    name: The skill folder runs on its own
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-node@v4
+        with:
+          node-version: 20
+      - name: Copy the skill somewhere with no node_modules and render a map
+        run: |
+          work="$(mktemp -d)"
+          cp -r skills/graticule "$work/graticule"
+          cp -r gallery/life-expectancy "$work/spec"
+          node "$work/graticule/scripts/graticule.mjs" render "$work/spec/spec.json" -f svg,png,pdf,html -o "$work/out/"
+          test -s "$work/out/spec.png" && test -s "$work/out/spec.pdf"
+          code=0
+          node "$work/graticule/scripts/graticule.mjs" check gallery/covid-deaths/spec.raw.json || code=$?
+          test "$code" -eq 2
+
+  verify:
+    name: Checks against PROJ, mapclassify and file parsers
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-node@v4
+        with:
+          node-version: 22
+          cache: npm
+      - uses: actions/setup-python@v5
+        with:
+          python-version: "3.12"
+          cache: pip
+          cache-dependency-path: verify/requirements.txt
+      - run: npm ci
+      - run: pip install -r verify/requirements.txt
+      - name: The reference fixtures were produced by the pinned libraries
+        continue-on-error: true
+        run: |
+          python scripts/make-fixtures.py
+          git diff --exit-code -- tests/fixtures
+      - run: node verify/dump-projections.mjs verify/projections.json
+      - run: python verify/proj_check.py verify/projections.json
+      - run: python verify/parse_outputs.py
+      - name: Name joins and the raw count detector, against live public data
+        # These download public tables, so a slow or changed source must not turn the build red.
+        continue-on-error: true
+        run: |
+          node verify/join-rates.mjs
+          node verify/raw-counts.mjs
+
+  browser:
+    name: Playground, Chromium and Firefox
+    runs-on: ubuntu-latest
+    strategy:
+      fail-fast: false
+      matrix:
+        browser: [chromium, firefox]
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-node@v4
+        with:
+          node-version: 22
+          cache: npm
+      - run: npm ci
+      - run: npx playwright install --with-deps ${{ matrix.browser }}
+      - run: node scripts/build.mjs --site
+      - run: npx playwright test --project=${{ matrix.browser }}

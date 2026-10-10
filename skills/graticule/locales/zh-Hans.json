@@ -1,0 +1,333 @@
+{
+  "legend": {
+    "no_data": "无数据",
+    "per_person": "每人",
+    "per_population": "每 {per} 人",
+    "per_area": "每 {per} 平方公里",
+    "per_km2": "每平方公里"
+  },
+  "footer": {
+    "source": "数据来源：{source}",
+    "made_with": "由 Graticule 制作"
+  },
+  "html": {
+    "data_table": "数据表",
+    "area": "地区",
+    "value": "数值"
+  },
+  "rules": {
+    "spec": {
+      "message": "配置文件的 {path} 有问题：{detail}。",
+      "reason": "配置文件读不懂，就无法画出地图。"
+    },
+    "spec-unknown-key": {
+      "message": "不认识字段 {path}，已忽略。这里可用的字段：{allowed}。",
+      "reason": "拼错的字段会被悄悄忽略，地图就不会按你的意思画。"
+    },
+    "source-required": {
+      "message": "这张地图没有数据来源。",
+      "reason": "没有标明数字从哪里来，读者就无法核实。请在配置文件中加上 \"source\"。"
+    },
+    "title-required": {
+      "message": "这张地图没有标题。",
+      "reason": "读者在看图例之前，应该先知道颜色代表什么。"
+    },
+    "legend-title": {
+      "message": "图例没有标题，{column} 的单位没有说明。",
+      "reason": "没有单位的数字可以有好几种读法。请设置 data.label，例如“每 10 万人死亡数”。"
+    },
+    "kind-undeclared": {
+      "message": "没有设置 data.kind，无法排除这是原始计数。",
+      "reason": "给原始计数着色，多半只是显示人口多的地方。请把 \"kind\" 标为 rate、share、index 或 count。"
+    },
+    "value-not-numeric": {
+      "message": "{column} 列大多不是数字（例如“{example}”）。",
+      "reason": "只有数字才能分进图例的分级。"
+    },
+    "no-values": {
+      "message": "没有任何地区有可画的数值。",
+      "reason": "地图会是空白的。"
+    },
+    "join-failed": {
+      "message": "{column} 列只有 {percent}% 的数据行能对应到 {region} 的地区（按 {kind} 匹配）。对不上的有：{examples}。",
+      "reason": "匹配失败的地图会把数值放到错的地方。请检查 data.key、data.keyType 和 region。"
+    },
+    "join-unmatched": {
+      "message": "有 {count} 行对不到任何地区，所以没有画出来：{list}。",
+      "reason": "悄悄消失的数据行会让地图看起来完整，其实不是。请修正拼写或键列。"
+    },
+    "join-ambiguous": {
+      "message": "这些名称符合不止一个地区，所以没有画出来：{list}。",
+      "reason": "乱猜是哪个地区，会把数值放到错的地方。"
+    },
+    "duplicate-keys": {
+      "message": "有 {count} 个地区不止一行数据（例如 {example} 有 {rows} 行）。",
+      "reason": "每个地区只能画一个数值，只留最后一行会藏起其他行。请设置 data.aggregate，或用 data.filter 选出一行，例如某一年。"
+    },
+    "raw-counts": {
+      "message_declared": "这些数值是原始计数（data.kind 是 count）。",
+      "message_correlated": "这些数值随人口一起升降（与各地区人口的 Spearman 相关系数为 {rho}），原始计数就是这样。",
+      "reason": "计数地图多半只是显示人在哪里。请除以人口或面积，让颜色表示比率。地区有人口数据时，--fix 会自动处理。"
+    },
+    "projection-mercator": {
+      "message": "在纬度跨度 {span} 度的范围使用墨卡托投影。",
+      "reason": "墨卡托投影离赤道越远面积越被拉大，格陵兰看起来和非洲一样大，而分级统计图是按面积来比较的。请改用等积投影。"
+    },
+    "projection-not-equal-area": {
+      "message": "{name} 不是等积投影。",
+      "reason": "面积会看起来比实际大或小，使比较略有偏差。Equal Earth、Albers 和兰伯特方位等积投影能保持面积正确。"
+    },
+    "max-classes": {
+      "message": "{count} 个分级超出读者能分辨的范围，上限是 {max}。",
+      "reason": "人通常只能把大约七种深浅和图例对上，再多就分不出来。"
+    },
+    "class-breaks-coverage": {
+      "message": "分级边界从 {low} 到 {high}，但数据范围是 {min} 到 {max}。",
+      "reason": "超出第一个和最后一个边界的数值没有颜色，图例就无法说明这张地图。请列出每个边界，最低值在前、最高值在后。"
+    },
+    "empty-class": {
+      "message": "第 {index} 级没有任何地区。",
+      "reason": "没有人使用的图例项，说明切分点和数据不匹配。"
+    },
+    "skewed-classes": {
+      "message": "{percent}% 的地区落在同一级。",
+      "reason": "对偏斜的数据用等距或手动切分，会让大半张地图同一个颜色。分位数或自然断点能把地区分散开。"
+    },
+    "palette-order": {
+      "message": "色板 {palette} 的明暗不是逐步变亮或变暗。",
+      "reason": "在连续色阶上，明暗顺序是“更多”的唯一线索。彩虹色板的明暗忽高忽低，会凭空造出分界。"
+    },
+    "cvd-separation": {
+      "message": "对部分色觉异常的读者，色板 {palette} 的颜色最接近时只差 CIEDE2000 {worst}。",
+      "reason": "约每 12 位男性就有 1 位分不清其中一些颜色。相邻分级至少要差 3，差 5 比较理想（类别则是 8）。"
+    },
+    "diverging-center": {
+      "message": "发散色板 {palette} 需要中心值。",
+      "reason": "没有像 0 这样有意义的中点，发散色阶会暗示数据中并不存在的分界。请设置 \"center\"。"
+    },
+    "too-many-categories": {
+      "message": "{count} 个类别超出图例能用的 {max} 种颜色。",
+      "reason": "超过八种颜色，读者就无法把地图和图例对上。请把小类别合并为“其他”。"
+    },
+    "normalize-missing": {
+      "message": "有 {count} 个地区没有内置的{by}可以除，显示为无数据。",
+      "reason": "没有分母就算不出比率。请用 normalize.by column 提供，或接受空缺并在备注中说明。"
+    },
+    "values-skipped": {
+      "message": "有 {count} 行对应到了区域，但因为单元格不是数字，或数值的分母缺失或为零而被跳过（例如 {example}）。",
+      "reason": "被跳过的行会改变该区域的数值，而地图上看不出来。请修正单元格，或接受这个缺口并在注记中说明。"
+    },
+    "no-data-share": {
+      "message": "{total} 个地区中有 {count} 个（{percent}%）没有数值。",
+      "reason": "大片灰色的地图可能误导人。请在备注中说明原因，或选择数据覆盖的区域。"
+    },
+    "label-overlap": {
+      "message": "有 {count} 个标签重叠。",
+      "reason": "重叠的标签读不出来。"
+    },
+    "highlight-unmatched": {
+      "message": "找不到这些要突出显示的地区：{list}。",
+      "reason": "没有突出任何地区的位置图什么也没呈现。"
+    },
+    "symbols-negative": {
+      "message": "比例圆形无法呈现 {count} 个小于或等于零的数值。",
+      "reason": "圆的面积代表数量，负值没有大小。"
+    },
+    "fix-applied": {
+      "message": "已为 {rule} 应用：{text}。",
+      "reason": "--fix 只做最小的修改来满足规则，并列在这里。"
+    },
+    "labels-hidden": {
+      "message": "有 {count} 个标签因为放不进地区或会与其他标签重叠而省略。",
+      "reason": "列出省略的标签，避免把较简洁的地图误认为完整。"
+    },
+    "small-areas-marked": {
+      "message": "有 {count} 个地区在这个比例尺下太小看不见，改用圆点表示。",
+      "reason": "否则小国和属地会从地图上消失。"
+    },
+    "outside-frame": {
+      "message": "有 {count} 个有数据的地区在地图范围之外：{list}。",
+      "reason": "它们没有画出来。请选更大的区域来显示。"
+    },
+    "table-ragged": {
+      "message": "有 {count} 行的单元格数量和表头不同。",
+      "reason": "太短或太长的行，单元格可能落在错的列下面。请检查文件的引号和分隔符。"
+    },
+    "join-blank": {
+      "message": "有 {count} 行的地区名称列是空的，没有画出来。",
+      "reason": "没有名称的数据行无法定位。空白通常是合计行或表尾的备注。"
+    },
+    "glyphs-missing": {
+      "message": "内嵌字体没有这些字符的字形：{list}。",
+      "reason": "它们会显示成空白方框。请换一种写法或换一种标签语言。"
+    },
+    "symbols-min-size": {
+      "message": "有 {count} 个圆形小于最小尺寸，已按最小尺寸绘制。",
+      "reason": "这些圆比它的数值略大。列出来是为了避免把大小读得太精确。"
+    }
+  },
+  "ui": {
+    "title": "Graticule",
+    "tagline": "通过检查清单的地图",
+    "skip": "跳到地图",
+    "nav": {
+      "gallery": "作品集",
+      "github": "GitHub",
+      "language": "语言",
+      "theme": "主题"
+    },
+    "theme": {
+      "light": "浅色",
+      "dark": "深色"
+    },
+    "step": {
+      "data": "数据",
+      "map": "地图",
+      "style": "样式",
+      "checks": "检查",
+      "export": "导出"
+    },
+    "data": {
+      "drop": "把 CSV 文件拖到这里",
+      "or": "或",
+      "choose": "选择文件",
+      "paste": "粘贴表格",
+      "pastePlaceholder": "country,value\nFrance,12.5\nJapan,8.1",
+      "examples": "或从示例开始",
+      "loaded": "{rows} 行，{cols} 列",
+      "error": "无法读取：{detail}",
+      "empty": "添加数据表，地图就会出现在这里。"
+    },
+    "map": {
+      "region": "区域",
+      "type": "地图类型",
+      "key": "标识地区的列",
+      "keyAuto": "自动检测",
+      "value": "要画的列",
+      "values": "要画的列（每列一张小图）",
+      "kind": "这些数字是什么",
+      "normalize": "除以",
+      "per": "每",
+      "unit": "图例显示的单位",
+      "highlight": "要突出显示的地区（名称或代码，用逗号分隔）"
+    },
+    "type": {
+      "choropleth": "区域着色",
+      "symbols": "圆形",
+      "categorical": "类别",
+      "locator": "位置图",
+      "small-multiples": "小多图"
+    },
+    "kind": {
+      "unset": "未说明",
+      "count": "计数",
+      "rate": "比率",
+      "share": "占比",
+      "index": "指数或分数",
+      "other": "其他"
+    },
+    "norm": {
+      "none": "不除",
+      "population": "人口",
+      "area": "面积（平方公里）",
+      "column": "另一列"
+    },
+    "style": {
+      "title": "标题",
+      "subtitle": "副标题",
+      "source": "数据来源",
+      "note": "备注",
+      "method": "分级方式",
+      "count": "分级数量",
+      "palette": "色板",
+      "labels": "标签",
+      "language": "标签语言",
+      "theme": "地图主题",
+      "center": "中心值（发散色板）"
+    },
+    "method": {
+      "quantile": "分位数",
+      "jenks": "自然断点",
+      "equal": "等距",
+      "manual": "手动切分"
+    },
+    "labels": {
+      "auto": "自动",
+      "none": "不显示",
+      "all": "尽量显示"
+    },
+    "checks": {
+      "ok": "没有发现问题。",
+      "blocked": "有 {count} 个问题让这张地图无法绘制。",
+      "warnings": "有 {count} 个警告需要阅读。",
+      "fixAll": "一键修复",
+      "fixed": "已修复：{list}",
+      "allow": "接受",
+      "allowed": "已接受",
+      "why": "原因",
+      "matched": "{rows} 行中有 {matched} 行对应到 {areas} 个地区",
+      "unmatched": "对不上：{list}",
+      "pending": "检查中..."
+    },
+    "level": {
+      "error": "错误",
+      "warn": "警告",
+      "info": "说明"
+    },
+    "export": {
+      "svg": "SVG",
+      "png": "PNG",
+      "png3x": "打印用 PNG",
+      "pdf": "PDF",
+      "html": "交互式 HTML",
+      "spec": "配置文件（JSON）",
+      "report": "检查报告（JSON）",
+      "working": "准备中...",
+      "hint": "所有文件都在你的浏览器里生成。"
+    },
+    "stage": {
+      "blocked": "修复左边的错误，就能看到地图。",
+      "loading": "绘制中...",
+      "failed": "无法画出这张地图：{detail}"
+    },
+    "footer": {
+      "note": "开源，MIT 许可。所有运算都在你的浏览器中进行，不会上传任何数据。"
+    },
+    "regions": {
+      "world": "世界",
+      "europe": "欧洲",
+      "asia": "亚洲",
+      "africa": "非洲",
+      "north-america": "北美洲",
+      "south-america": "南美洲",
+      "oceania": "大洋洲",
+      "us-states": "美国，州",
+      "us-counties": "美国，县",
+      "tw-counties": "台湾，县市",
+      "tw-towns": "台湾，乡镇市区",
+      "jp-prefectures": "日本，都道府县",
+      "kr-provinces": "韩国，道与广域市"
+    },
+    "examples": {
+      "covid-raw": "新冠死亡数（画错的版本）",
+      "life-expectancy": "预期寿命",
+      "us-county-unemployment": "美国各县",
+      "europe-gdp-per-capita": "欧洲 GDP",
+      "population-symbols": "人口圆形图",
+      "taiwan-township-area": "台湾乡镇市区",
+      "japan-regions": "日本地方"
+    },
+    "spec": {
+      "title": "配置文件（JSON）"
+    },
+    "status": {
+      "detected": "看起来是{region}。",
+      "applied": "已应用：{list}。"
+    }
+  },
+  "terms": {
+    "population": "人口",
+    "area": "面积",
+    "column": "分母"
+  }
+}

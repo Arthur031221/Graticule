@@ -1,0 +1,15 @@
+{
+  "title": "Population, 2022",
+  "subtitle": "Circle area is proportional to the number of people",
+  "source": "World Bank, World Development Indicators, SP.POP.TOTL, 2022",
+  "note": "Data retrieved 2026-10-10.",
+  "region": "world",
+  "type": "symbols",
+  "data": {
+    "file": "data.csv",
+    "key": "iso3",
+    "value": "population",
+    "kind": "count",
+    "label": "People"
+  }
+}

@@ -1,0 +1,8 @@
+[
+  { "id": "covid-deaths", "prompt": "Map COVID deaths by country from deaths.csv.", "files": ["deaths.csv"] },
+  {
+    "id": "county-unemployment",
+    "prompt": "Make a map of unemployment by county from unemployment.csv.",
+    "files": ["unemployment.csv"]
+  }
+]

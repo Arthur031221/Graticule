@@ -1,0 +1,76 @@
+{
+  "name": "graticule-maps",
+  "version": "0.1.0",
+  "description": "A cartography skill for coding agents: right projection, normalized data, colorblind-safe legend, labels in nine languages, exported offline.",
+  "type": "module",
+  "license": "MIT",
+  "author": "Arthur031221",
+  "homepage": "https://github.com/Arthur031221/Graticule",
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/Arthur031221/Graticule.git"
+  },
+  "bugs": {
+    "url": "https://github.com/Arthur031221/Graticule/issues"
+  },
+  "keywords": [
+    "map",
+    "choropleth",
+    "cartography",
+    "agent-skill",
+    "claude-code",
+    "codex",
+    "svg",
+    "geojson",
+    "topojson"
+  ],
+  "bin": {
+    "graticule": "skills/graticule/scripts/graticule.mjs"
+  },
+  "files": [
+    "skills",
+    "LICENSE",
+    "NOTICE.md"
+  ],
+  "engines": {
+    "node": ">=20"
+  },
+  "scripts": {
+    "build": "node scripts/build-docs.mjs && node scripts/build.mjs",
+    "build:data": "node scripts/build-data.mjs",
+    "build:fonts": "python3 scripts/build_fonts.py",
+    "test": "node --test tests/unit/*.test.js",
+    "test:e2e": "playwright test",
+    "typecheck": "tsc -p jsconfig.json",
+    "format": "prettier --write .",
+    "format:check": "prettier --check .",
+    "gallery": "node scripts/build-gallery.mjs",
+    "package:skill": "mkdir -p dist && rm -f dist/graticule-skill.zip && cd skills && zip -rq ../dist/graticule-skill.zip graticule",
+    "verify": "node scripts/verify.mjs",
+    "dev": "node scripts/serve.mjs"
+  },
+  "devDependencies": {
+    "@playwright/test": "^1.64.0",
+    "@resvg/resvg-wasm": "^2.6.2",
+    "@types/d3-geo": "^3.1.1",
+    "@types/d3-scale-chromatic": "^3.1.0",
+    "@types/geojson": "^7946.0.16",
+    "@types/node": "^26.6.5",
+    "@types/topojson-specification": "^1.0.5",
+    "buffer": "^6.0.3",
+    "d3-array": "^3.2.4",
+    "d3-color": "^3.1.0",
+    "d3-geo": "^3.1.1",
+    "d3-geo-projection": "^4.0.0",
+    "d3-scale-chromatic": "^3.1.0",
+    "esbuild": "^0.28.2",
+    "harfbuzzjs": "^1.6.3",
+    "pdfkit": "^0.20.2",
+    "polylabel": "^2.1.0",
+    "prettier": "^3.9.10",
+    "topojson-client": "^3.1.0",
+    "topojson-server": "^3.0.1",
+    "topojson-simplify": "^3.0.3",
+    "typescript": "^7.0.2"
+  }
+}

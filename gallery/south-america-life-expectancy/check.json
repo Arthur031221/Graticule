@@ -1,0 +1,140 @@
+{
+  "graticule": "0.1.0",
+  "ok": true,
+  "region": "south-america",
+  "type": "choropleth",
+  "projection": {
+    "name": "azimuthal-equal-area",
+    "equalArea": true
+  },
+  "join": {
+    "column": "iso3",
+    "keyType": "iso3",
+    "rows": 217,
+    "matchedRows": 215,
+    "matchedAreas": 215,
+    "matchedBy": {
+      "code": 215,
+      "name": 0,
+      "alias": 0,
+      "padded": 0
+    },
+    "unmatched": [
+      {
+        "value": "CHI",
+        "rows": 1,
+        "suggestions": []
+      },
+      {
+        "value": "GIB",
+        "rows": 1,
+        "suggestions": []
+      }
+    ],
+    "ambiguous": []
+  },
+  "classes": {
+    "method": "quantile",
+    "edges": [
+      67,
+      72.4,
+      75,
+      76.6,
+      78,
+      83
+    ],
+    "counts": [
+      5,
+      4,
+      5,
+      4,
+      5
+    ],
+    "colors": [
+      "#471063",
+      "#38588c",
+      "#21918c",
+      "#52c569",
+      "#e5e419"
+    ],
+    "palette": "viridis"
+  },
+  "labels": {
+    "placed": 12,
+    "hidden": 17,
+    "dots": 8
+  },
+  "findings": [
+    {
+      "id": "join-unmatched",
+      "level": "warn",
+      "allowed": false,
+      "message": "2 filas no coinciden con ninguna zona y no se dibujan: CHI; GIB.",
+      "reason": "Las filas que desaparecen en silencio hacen que un mapa parezca completo sin serlo. Corrige la ortografía o la columna clave.",
+      "fixable": false
+    },
+    {
+      "id": "labels-hidden",
+      "level": "info",
+      "allowed": false,
+      "message": "Se omitieron 17 etiquetas porque no caben en su zona o se superpondrían con otra.",
+      "reason": "Las etiquetas ocultas se anotan para que un mapa más limpio no se confunda con uno completo.",
+      "fixable": false
+    },
+    {
+      "id": "small-areas-marked",
+      "level": "info",
+      "allowed": false,
+      "message": "8 zonas son demasiado pequeñas para verse a esta escala y se dibujan como puntos.",
+      "reason": "De lo contrario, los países y territorios pequeños desaparecerían del mapa.",
+      "fixable": false
+    },
+    {
+      "id": "outside-frame",
+      "level": "info",
+      "allowed": false,
+      "message": "181 zonas con datos quedan fuera del marco del mapa: Afghanistan, Albania, Algeria, American Samoa, Andorra, ....",
+      "reason": "No se dibujan. Elige una región más amplia para mostrarlas.",
+      "fixable": false
+    }
+  ],
+  "fixes": [],
+  "spec": {
+    "title": "Esperanza de vida al nacer, 2019",
+    "subtitle": "Anos",
+    "source": "World Bank, World Development Indicators, SP.DYN.LE00.IN, 2019",
+    "note": "Data retrieved 2026-10-10.",
+    "region": "south-america",
+    "type": "choropleth",
+    "data": {
+      "file": "data.csv",
+      "key": "iso3",
+      "value": "life_expectancy",
+      "kind": "rate",
+      "label": "Anos"
+    },
+    "classes": {
+      "method": "quantile",
+      "count": 5
+    },
+    "palette": "viridis",
+    "projection": "auto",
+    "language": "es",
+    "labels": {
+      "show": "auto"
+    },
+    "legend": {},
+    "size": {
+      "width": 1200
+    },
+    "theme": "light",
+    "grid": false,
+    "highlight": [],
+    "panels": [],
+    "attribution": true,
+    "symbols": {},
+    "checks": {
+      "allow": []
+    }
+  }
+}

@@ -1,0 +1,333 @@
+{
+  "legend": {
+    "no_data": "No data",
+    "per_person": "per person",
+    "per_population": "per {per} people",
+    "per_area": "per {per} km²",
+    "per_km2": "per km²"
+  },
+  "footer": {
+    "source": "Source: {source}",
+    "made_with": "Made with Graticule"
+  },
+  "rules": {
+    "spec": {
+      "message": "Problem in the spec at {path}: {detail}.",
+      "reason": "The renderer cannot draw a map from a spec it cannot read."
+    },
+    "spec-unknown-key": {
+      "message": "Unknown field {path}. It is ignored. Fields allowed here: {allowed}.",
+      "reason": "A misspelled field is ignored without a word, so the map would not do what you meant."
+    },
+    "source-required": {
+      "message": "The map has no source line.",
+      "reason": "Readers cannot check a map that does not say where the numbers come from. Add \"source\" to the spec."
+    },
+    "title-required": {
+      "message": "The map has no title.",
+      "reason": "Readers should know what the colours measure before they read the legend."
+    },
+    "legend-title": {
+      "message": "The legend has no title, so the unit of {column} is not stated.",
+      "reason": "A number without a unit can be read several ways. Set data.label, for example \"Deaths per 100,000 people\"."
+    },
+    "kind-undeclared": {
+      "message": "data.kind is not set, so raw counts cannot be ruled out.",
+      "reason": "Shading raw counts mostly shows where many people live. Declare \"kind\" as rate, share, index or count."
+    },
+    "value-not-numeric": {
+      "message": "Column {column} is mostly not numeric (for example \"{example}\").",
+      "reason": "Only numbers can be sorted into the classes of a legend."
+    },
+    "no-values": {
+      "message": "No area has a numeric value to draw.",
+      "reason": "The map would be empty."
+    },
+    "join-failed": {
+      "message": "Only {percent}% of the rows in column {column} matched an area of {region} as {kind}. Not matched: {examples}.",
+      "reason": "A map built on a failed join puts values in the wrong places. Check data.key, data.keyType and region."
+    },
+    "join-unmatched": {
+      "message": "{count} rows matched no area and are not drawn: {list}.",
+      "reason": "Rows that vanish quietly make a map look complete when it is not. Fix the spelling or the key column."
+    },
+    "join-ambiguous": {
+      "message": "These names fit more than one area, so they are not drawn: {list}.",
+      "reason": "Guessing which area was meant would put a value in the wrong place."
+    },
+    "duplicate-keys": {
+      "message": "{count} areas have more than one row (for example {example} has {rows}).",
+      "reason": "Only one value can be drawn per area, and keeping the last row hides the others. Set data.aggregate, or data.filter to pick one row such as one year."
+    },
+    "raw-counts": {
+      "message_declared": "The values are raw counts (data.kind is count).",
+      "message_correlated": "The values track population (Spearman correlation {rho} with the population of each area), which is what raw counts do.",
+      "reason": "A map of counts mostly shows where people live. Divide by population or area so that the colours show a rate. --fix does it when the region has population data."
+    },
+    "projection-mercator": {
+      "message": "Mercator on a region {span} degrees of latitude tall.",
+      "reason": "Mercator stretches area away from the equator, so Greenland looks as large as Africa, and a choropleth is compared by area. Use an equal-area projection."
+    },
+    "projection-not-equal-area": {
+      "message": "{name} is not an equal-area projection.",
+      "reason": "Areas read larger or smaller than they are, which biases the comparison a little. Equal Earth, Albers and Lambert azimuthal keep areas true."
+    },
+    "max-classes": {
+      "message": "{count} classes is more than readers can tell apart. The limit is {max}.",
+      "reason": "People can match about seven shades against a legend and no more."
+    },
+    "class-breaks-coverage": {
+      "message": "The class edges run from {low} to {high} but the data runs from {min} to {max}.",
+      "reason": "A value outside the first and last edge gets no colour, so the legend would not describe the map. List every edge, lowest value first and highest last."
+    },
+    "empty-class": {
+      "message": "Class {index} holds no area.",
+      "reason": "A legend entry that nothing uses suggests the breaks do not fit the data."
+    },
+    "skewed-classes": {
+      "message": "{percent}% of the areas fall into one class.",
+      "reason": "Equal intervals and hand-set breaks on skewed data paint most of the map one colour. Quantile or Jenks classes spread the areas out."
+    },
+    "palette-order": {
+      "message": "Palette {palette} does not get steadily lighter or darker.",
+      "reason": "On a sequential scale the order of lightness is the only sign of \"more\". Rainbow palettes jump up and down in lightness and invent boundaries."
+    },
+    "cvd-separation": {
+      "message": "Colours of palette {palette} come as close as a CIEDE2000 difference of {worst} for some viewers with colour vision deficiency.",
+      "reason": "About 1 in 12 men cannot tell some of these colours apart. Neighbouring classes need a difference of at least 3, and 5 is comfortable (8 for categories)."
+    },
+    "diverging-center": {
+      "message": "Diverging palette {palette} needs a centre value.",
+      "reason": "Without a meaningful midpoint, such as 0, a diverging scale suggests a split that the data does not have. Set \"center\"."
+    },
+    "too-many-categories": {
+      "message": "{count} categories is more than the {max} colours a legend can carry.",
+      "reason": "Beyond eight colours readers cannot match the map to the legend. Group the small categories as Other."
+    },
+    "no-data-share": {
+      "message": "{count} of {total} areas ({percent}%) have no value.",
+      "reason": "A map with large grey areas can mislead. Say why in the note, or pick a region that the data covers."
+    },
+    "label-overlap": {
+      "message": "{count} labels overlap.",
+      "reason": "Labels that overlap cannot be read."
+    },
+    "highlight-unmatched": {
+      "message": "Could not find these highlight areas: {list}.",
+      "reason": "A locator map that highlights nothing shows nothing."
+    },
+    "symbols-negative": {
+      "message": "Proportional symbols cannot show {count} values at or below zero.",
+      "reason": "The area of a circle stands for a quantity, so a negative value has no size."
+    },
+    "fix-applied": {
+      "message": "Applied for {rule}: {text}.",
+      "reason": "--fix makes the smallest change that satisfies the rule and lists it here."
+    },
+    "labels-hidden": {
+      "message": "{count} labels were left out because they do not fit inside their area or would overlap another label.",
+      "reason": "Hidden labels are listed so that a quieter map is not mistaken for a complete one."
+    },
+    "small-areas-marked": {
+      "message": "{count} areas are too small to see at this scale and are drawn as dots.",
+      "reason": "Small countries and territories would otherwise vanish from the map."
+    },
+    "outside-frame": {
+      "message": "{count} areas with data lie outside the map frame: {list}.",
+      "reason": "They are not drawn. Pick a larger region to show them."
+    },
+    "normalize-missing": {
+      "message": "{count} areas have no bundled {by} to divide by and are shown as no data.",
+      "reason": "A rate cannot be computed without a denominator. Supply one with normalize.by column, or accept the gaps and say so in the note."
+    },
+    "values-skipped": {
+      "message": "{count} rows reached an area but were left out because a cell is not a number, or a value has a missing or zero denominator (for example {example}).",
+      "reason": "A skipped row changes the value of its area with no sign on the map. Fix the cell, or accept the gap and say so in the note."
+    },
+    "table-ragged": {
+      "message": "{count} rows have a different number of cells than the header.",
+      "reason": "Cells in a short or long row may sit under the wrong column. Check the quoting and the delimiter of the file."
+    },
+    "join-blank": {
+      "message": "{count} rows have an empty name in the key column and are not drawn.",
+      "reason": "A row that names no area cannot be placed. A blank key is often a total row or a note at the end of the table."
+    },
+    "glyphs-missing": {
+      "message": "The embedded fonts have no glyph for these characters: {list}.",
+      "reason": "They would show as empty boxes. Use a different spelling or a different label language."
+    },
+    "symbols-min-size": {
+      "message": "{count} symbols are smaller than the minimum size and were drawn at the minimum.",
+      "reason": "Those circles are slightly larger than their value says. They are listed so that sizes are not read too precisely."
+    }
+  },
+  "html": {
+    "data_table": "Data table",
+    "area": "Area",
+    "value": "Value"
+  },
+  "ui": {
+    "title": "Graticule",
+    "tagline": "Maps that pass a checklist",
+    "skip": "Skip to the map",
+    "nav": {
+      "gallery": "Gallery",
+      "github": "GitHub",
+      "language": "Language",
+      "theme": "Theme"
+    },
+    "theme": {
+      "light": "Light",
+      "dark": "Dark"
+    },
+    "step": {
+      "data": "Data",
+      "map": "Map",
+      "style": "Style",
+      "checks": "Checks",
+      "export": "Export"
+    },
+    "data": {
+      "drop": "Drop a CSV file here",
+      "or": "or",
+      "choose": "Choose a file",
+      "paste": "Paste a table",
+      "pastePlaceholder": "country,value\nFrance,12.5\nJapan,8.1",
+      "examples": "Or start from an example",
+      "loaded": "{rows} rows, {cols} columns",
+      "error": "Could not read that: {detail}",
+      "empty": "Add a table and the map appears here."
+    },
+    "map": {
+      "region": "Region",
+      "type": "Map type",
+      "key": "Column that names the areas",
+      "keyAuto": "Detect automatically",
+      "value": "Column to map",
+      "values": "Columns to map (one panel each)",
+      "kind": "What the numbers are",
+      "normalize": "Divide by",
+      "per": "Per",
+      "unit": "Unit shown in the legend",
+      "highlight": "Areas to highlight (names or codes, separated by commas)"
+    },
+    "type": {
+      "choropleth": "Shaded",
+      "symbols": "Circles",
+      "categorical": "Categories",
+      "locator": "Locator",
+      "small-multiples": "Small multiples"
+    },
+    "kind": {
+      "unset": "Not stated",
+      "count": "Counts",
+      "rate": "Rates",
+      "share": "Shares",
+      "index": "Index or score",
+      "other": "Something else"
+    },
+    "norm": {
+      "none": "Nothing",
+      "population": "Population",
+      "area": "Area in km²",
+      "column": "Another column"
+    },
+    "style": {
+      "title": "Title",
+      "subtitle": "Subtitle",
+      "source": "Source",
+      "note": "Note",
+      "method": "Classes",
+      "count": "Number of classes",
+      "palette": "Palette",
+      "labels": "Labels",
+      "language": "Labels in",
+      "theme": "Map theme",
+      "center": "Center value (diverging palette)"
+    },
+    "method": {
+      "quantile": "Quantile",
+      "jenks": "Natural breaks",
+      "equal": "Equal interval",
+      "manual": "Manual breaks"
+    },
+    "labels": {
+      "auto": "Automatic",
+      "none": "None",
+      "all": "As many as fit"
+    },
+    "checks": {
+      "ok": "No problems found.",
+      "blocked": "{count} problems stop this map.",
+      "warnings": "{count} warnings to read.",
+      "fixAll": "Fix them",
+      "fixed": "Fixed: {list}",
+      "allow": "Accept",
+      "allowed": "Accepted",
+      "why": "Why",
+      "matched": "{matched} of {rows} rows matched {areas} areas",
+      "unmatched": "Not matched: {list}",
+      "pending": "Checking..."
+    },
+    "level": {
+      "error": "Error",
+      "warn": "Warning",
+      "info": "Note"
+    },
+    "export": {
+      "svg": "SVG",
+      "png": "PNG",
+      "png3x": "PNG for print",
+      "pdf": "PDF",
+      "html": "Interactive HTML",
+      "spec": "Spec (JSON)",
+      "report": "Check report (JSON)",
+      "working": "Preparing...",
+      "hint": "Every file is made in your browser."
+    },
+    "stage": {
+      "blocked": "Fix the errors on the left to see the map.",
+      "loading": "Drawing...",
+      "failed": "Could not draw this map: {detail}"
+    },
+    "footer": {
+      "note": "Open source, MIT license. Everything runs in your browser and nothing is uploaded."
+    },
+    "regions": {
+      "world": "World",
+      "europe": "Europe",
+      "asia": "Asia",
+      "africa": "Africa",
+      "north-america": "North America",
+      "south-america": "South America",
+      "oceania": "Oceania",
+      "us-states": "United States, states",
+      "us-counties": "United States, counties",
+      "tw-counties": "Taiwan, counties",
+      "tw-towns": "Taiwan, townships",
+      "jp-prefectures": "Japan, prefectures",
+      "kr-provinces": "South Korea, provinces"
+    },
+    "examples": {
+      "covid-raw": "COVID deaths, drawn badly",
+      "life-expectancy": "Life expectancy",
+      "us-county-unemployment": "US counties",
+      "europe-gdp-per-capita": "Europe GDP",
+      "population-symbols": "Population circles",
+      "taiwan-township-area": "Taiwan townships",
+      "japan-regions": "Japan regions"
+    },
+    "spec": {
+      "title": "Spec (JSON)"
+    },
+    "status": {
+      "detected": "Looks like {region}.",
+      "applied": "Applied: {list}."
+    }
+  },
+  "terms": {
+    "population": "population",
+    "area": "area",
+    "column": "denominator"
+  }
+}

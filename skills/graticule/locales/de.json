@@ -1,0 +1,333 @@
+{
+  "legend": {
+    "no_data": "Keine Daten",
+    "per_person": "pro Person",
+    "per_population": "pro {per} Einwohner",
+    "per_area": "pro {per} km²",
+    "per_km2": "pro km²"
+  },
+  "footer": {
+    "source": "Quelle: {source}",
+    "made_with": "Erstellt mit Graticule"
+  },
+  "html": {
+    "data_table": "Datentabelle",
+    "area": "Gebiet",
+    "value": "Wert"
+  },
+  "terms": {
+    "population": "Einwohnerzahl",
+    "area": "Fläche",
+    "column": "Nenner"
+  },
+  "rules": {
+    "spec": {
+      "message": "Problem in der Spezifikation bei {path}: {detail}.",
+      "reason": "Aus einer Spezifikation, die das Programm nicht lesen kann, lässt sich keine Karte zeichnen."
+    },
+    "spec-unknown-key": {
+      "message": "Unbekanntes Feld {path}. Es wird ignoriert. Hier erlaubte Felder: {allowed}.",
+      "reason": "Ein falsch geschriebenes Feld wird stillschweigend ignoriert, und die Karte tut nicht, was Sie meinen."
+    },
+    "source-required": {
+      "message": "Die Karte nennt keine Quelle.",
+      "reason": "Leser können eine Karte nicht prüfen, wenn nicht steht, woher die Zahlen stammen. Fügen Sie \"source\" zur Spezifikation hinzu."
+    },
+    "title-required": {
+      "message": "Die Karte hat keinen Titel.",
+      "reason": "Leser sollten wissen, was die Farben messen, bevor sie die Legende lesen."
+    },
+    "legend-title": {
+      "message": "Die Legende hat keinen Titel, daher fehlt die Einheit von {column}.",
+      "reason": "Eine Zahl ohne Einheit lässt sich auf mehrere Arten lesen. Setzen Sie data.label, zum Beispiel \"Todesfälle pro 100.000 Einwohner\"."
+    },
+    "kind-undeclared": {
+      "message": "data.kind ist nicht gesetzt, daher lassen sich absolute Zahlen nicht ausschließen.",
+      "reason": "Absolute Zahlen einzufärben zeigt meist nur, wo viele Menschen leben. Setzen Sie \"kind\" auf rate, share, index oder count."
+    },
+    "value-not-numeric": {
+      "message": "Die Spalte {column} ist größtenteils nicht numerisch (zum Beispiel \"{example}\").",
+      "reason": "Nur Zahlen lassen sich in die Klassen einer Legende einordnen."
+    },
+    "no-values": {
+      "message": "Kein Gebiet hat einen numerischen Wert zum Zeichnen.",
+      "reason": "Die Karte wäre leer."
+    },
+    "join-failed": {
+      "message": "Nur {percent} % der Zeilen der Spalte {column} passten als {kind} zu einem Gebiet von {region}. Ohne Treffer: {examples}.",
+      "reason": "Eine Karte auf Basis einer gescheiterten Zuordnung setzt Werte an die falsche Stelle. Prüfen Sie data.key, data.keyType und region."
+    },
+    "join-unmatched": {
+      "message": "{count} Zeilen passen zu keinem Gebiet und werden nicht gezeichnet: {list}.",
+      "reason": "Zeilen, die still verschwinden, lassen eine Karte vollständig wirken, obwohl sie es nicht ist. Korrigieren Sie die Schreibweise oder die Schlüsselspalte."
+    },
+    "join-ambiguous": {
+      "message": "Diese Namen passen zu mehr als einem Gebiet und werden nicht gezeichnet: {list}.",
+      "reason": "Zu raten, welches Gebiet gemeint war, würde einen Wert an die falsche Stelle setzen."
+    },
+    "duplicate-keys": {
+      "message": "{count} Gebiete haben mehr als eine Zeile (zum Beispiel {example} hat {rows}).",
+      "reason": "Pro Gebiet lässt sich nur ein Wert zeichnen, und die letzte Zeile zu behalten verbirgt die übrigen. Setzen Sie data.aggregate oder wählen Sie mit data.filter eine Zeile, etwa ein Jahr."
+    },
+    "raw-counts": {
+      "message_declared": "Die Werte sind absolute Zahlen (data.kind ist count).",
+      "message_correlated": "Die Werte folgen der Einwohnerzahl (Spearman-Korrelation {rho} mit der Einwohnerzahl der Gebiete), wie es bei absoluten Zahlen typisch ist.",
+      "reason": "Eine Karte mit absoluten Zahlen zeigt meist nur, wo Menschen leben. Teilen Sie durch Einwohnerzahl oder Fläche, damit die Farben eine Rate zeigen. --fix erledigt das, wenn die Region Einwohnerdaten hat."
+    },
+    "projection-mercator": {
+      "message": "Mercator-Projektion für eine Region mit {span} Grad Breitenausdehnung.",
+      "reason": "Mercator streckt Flächen mit wachsendem Abstand vom Äquator, sodass Grönland so groß wie Afrika wirkt, und eine Choroplethenkarte wird nach Fläche verglichen. Verwenden Sie eine flächentreue Projektion."
+    },
+    "projection-not-equal-area": {
+      "message": "{name} ist keine flächentreue Projektion.",
+      "reason": "Flächen wirken größer oder kleiner, als sie sind, und verzerren den Vergleich leicht. Equal Earth, Albers und die Lambert-Azimutalprojektion erhalten die Flächen."
+    },
+    "max-classes": {
+      "message": "{count} Klassen sind mehr, als Leser unterscheiden können. Das Limit ist {max}.",
+      "reason": "Menschen können etwa sieben Abstufungen einer Legende zuordnen, nicht mehr."
+    },
+    "class-breaks-coverage": {
+      "message": "Die Klassengrenzen reichen von {low} bis {high}, die Daten aber von {min} bis {max}.",
+      "reason": "Ein Wert außerhalb der ersten und letzten Grenze bekommt keine Farbe, und die Legende würde die Karte nicht beschreiben. Geben Sie alle Grenzen an, vom niedrigsten bis zum höchsten Wert."
+    },
+    "empty-class": {
+      "message": "Klasse {index} enthält kein Gebiet.",
+      "reason": "Ein Legendeneintrag, den nichts verwendet, deutet darauf hin, dass die Grenzen nicht zu den Daten passen."
+    },
+    "skewed-classes": {
+      "message": "{percent} % der Gebiete fallen in eine einzige Klasse.",
+      "reason": "Gleiche Intervalle oder von Hand gesetzte Grenzen bei schiefen Daten färben fast die ganze Karte einheitlich. Quantile oder natürliche Klassengrenzen verteilen die Gebiete."
+    },
+    "palette-order": {
+      "message": "Die Palette {palette} wird nicht gleichmäßig heller oder dunkler.",
+      "reason": "Auf einer sequentiellen Skala ist die Helligkeitsfolge das einzige Zeichen für \"mehr\". Regenbogenpaletten schwanken in der Helligkeit und erfinden Grenzen."
+    },
+    "cvd-separation": {
+      "message": "Farben der Palette {palette} kommen sich für manche Menschen mit Farbsehschwäche bis auf CIEDE2000 {worst} nahe.",
+      "reason": "Etwa 1 von 12 Männern kann einige dieser Farben nicht unterscheiden. Benachbarte Klassen brauchen einen Unterschied von mindestens 3, 5 ist komfortabel (8 bei Kategorien)."
+    },
+    "diverging-center": {
+      "message": "Die divergierende Palette {palette} braucht einen Mittelwert.",
+      "reason": "Ohne sinnvollen Mittelpunkt wie 0 deutet eine divergierende Skala eine Trennung an, die die Daten nicht haben. Setzen Sie \"center\"."
+    },
+    "too-many-categories": {
+      "message": "{count} Kategorien sind mehr als die {max} Farben, die eine Legende tragen kann.",
+      "reason": "Ab über acht Farben lassen sich Karte und Legende nicht mehr zuordnen. Fassen Sie kleine Kategorien als Sonstige zusammen."
+    },
+    "normalize-missing": {
+      "message": "Für {count} Gebiete ist keine eingebaute {by} zum Teilen vorhanden, sie erscheinen ohne Daten.",
+      "reason": "Ohne Nenner lässt sich keine Rate berechnen. Liefern Sie ihn mit normalize.by column oder akzeptieren Sie die Lücken und nennen Sie das in der Anmerkung."
+    },
+    "values-skipped": {
+      "message": "{count} Zeilen erreichten ein Gebiet, wurden aber ausgelassen, weil eine Zelle keine Zahl ist oder der Nenner eines Wertes fehlt oder null ist (zum Beispiel {example}).",
+      "reason": "Eine ausgelassene Zeile verändert den Wert ihres Gebiets, ohne dass die Karte es zeigt. Korrigiere die Zelle oder nimm die Lücke hin und sage es in der Notiz."
+    },
+    "no-data-share": {
+      "message": "{count} von {total} Gebieten ({percent} %) haben keinen Wert.",
+      "reason": "Eine Karte mit großen grauen Flächen kann in die Irre führen. Nennen Sie den Grund in der Anmerkung oder wählen Sie eine Region, die die Daten abdecken."
+    },
+    "label-overlap": {
+      "message": "{count} Beschriftungen überlappen sich.",
+      "reason": "Überlappende Beschriftungen lassen sich nicht lesen."
+    },
+    "highlight-unmatched": {
+      "message": "Diese hervorzuhebenden Gebiete wurden nicht gefunden: {list}.",
+      "reason": "Eine Lagekarte, die nichts hervorhebt, zeigt nichts."
+    },
+    "symbols-negative": {
+      "message": "Proportionale Symbole können {count} Werte kleiner oder gleich null nicht darstellen.",
+      "reason": "Die Fläche eines Kreises steht für eine Menge, ein negativer Wert hat daher keine Größe."
+    },
+    "fix-applied": {
+      "message": "Angewendet für {rule}: {text}.",
+      "reason": "--fix macht die kleinste Änderung, die die Regel erfüllt, und listet sie hier auf."
+    },
+    "labels-hidden": {
+      "message": "{count} Beschriftungen wurden weggelassen, weil sie nicht in ihr Gebiet passen oder eine andere überlappen würden.",
+      "reason": "Weggelassene Beschriftungen werden aufgeführt, damit eine ruhigere Karte nicht für eine vollständige gehalten wird."
+    },
+    "small-areas-marked": {
+      "message": "{count} Gebiete sind in diesem Maßstab zu klein und werden als Punkte gezeichnet.",
+      "reason": "Sonst würden kleine Länder und Gebiete von der Karte verschwinden."
+    },
+    "outside-frame": {
+      "message": "{count} Gebiete mit Daten liegen außerhalb des Kartenausschnitts: {list}.",
+      "reason": "Sie werden nicht gezeichnet. Wählen Sie eine größere Region, um sie zu zeigen."
+    },
+    "table-ragged": {
+      "message": "{count} Zeilen haben eine andere Zellenzahl als die Kopfzeile.",
+      "reason": "In einer zu kurzen oder zu langen Zeile können Zellen unter der falschen Spalte stehen. Prüfen Sie Anführungszeichen und Trennzeichen der Datei."
+    },
+    "join-blank": {
+      "message": "{count} Zeilen haben einen leeren Namen in der Schlüsselspalte und werden nicht gezeichnet.",
+      "reason": "Eine Zeile ohne Namen lässt sich nicht platzieren. Ein leeres Feld ist oft eine Summenzeile oder eine Anmerkung am Tabellenende."
+    },
+    "glyphs-missing": {
+      "message": "Die eingebetteten Schriften haben kein Zeichen für: {list}.",
+      "reason": "Sie würden als leere Kästchen erscheinen. Verwenden Sie eine andere Schreibweise oder eine andere Beschriftungssprache."
+    },
+    "symbols-min-size": {
+      "message": "{count} Symbole sind kleiner als die Mindestgröße und wurden in dieser Größe gezeichnet.",
+      "reason": "Diese Kreise sind etwas größer, als ihr Wert sagt. Sie werden aufgeführt, damit Größen nicht zu genau gelesen werden."
+    }
+  },
+  "ui": {
+    "title": "Graticule",
+    "tagline": "Karten, die eine Checkliste bestehen",
+    "skip": "Zur Karte springen",
+    "nav": {
+      "gallery": "Galerie",
+      "github": "GitHub",
+      "language": "Sprache",
+      "theme": "Design"
+    },
+    "theme": {
+      "light": "Hell",
+      "dark": "Dunkel"
+    },
+    "step": {
+      "data": "Daten",
+      "map": "Karte",
+      "style": "Stil",
+      "checks": "Prüfungen",
+      "export": "Export"
+    },
+    "data": {
+      "drop": "CSV-Datei hier ablegen",
+      "or": "oder",
+      "choose": "Datei auswählen",
+      "paste": "Tabelle einfügen",
+      "pastePlaceholder": "country,value\nFrance,12.5\nJapan,8.1",
+      "examples": "Oder mit einem Beispiel beginnen",
+      "loaded": "{rows} Zeilen, {cols} Spalten",
+      "error": "Konnte nicht gelesen werden: {detail}",
+      "empty": "Fügen Sie eine Tabelle hinzu, dann erscheint hier die Karte."
+    },
+    "map": {
+      "region": "Region",
+      "type": "Kartentyp",
+      "key": "Spalte mit den Gebietsnamen",
+      "keyAuto": "Automatisch erkennen",
+      "value": "Darzustellende Spalte",
+      "values": "Darzustellende Spalten (je ein Feld)",
+      "kind": "Was die Zahlen sind",
+      "normalize": "Teilen durch",
+      "per": "Pro",
+      "unit": "In der Legende angezeigte Einheit",
+      "highlight": "Hervorzuhebende Gebiete (Namen oder Codes, durch Kommas getrennt)"
+    },
+    "type": {
+      "choropleth": "Flächen",
+      "symbols": "Kreise",
+      "categorical": "Kategorien",
+      "locator": "Lagekarte",
+      "small-multiples": "Kleine Mehrfachkarten"
+    },
+    "kind": {
+      "unset": "Nicht angegeben",
+      "count": "Absolute Zahlen",
+      "rate": "Raten",
+      "share": "Anteile",
+      "index": "Index oder Punktzahl",
+      "other": "Etwas anderes"
+    },
+    "norm": {
+      "none": "Nichts",
+      "population": "Einwohnerzahl",
+      "area": "Fläche in km²",
+      "column": "Andere Spalte"
+    },
+    "style": {
+      "title": "Titel",
+      "subtitle": "Untertitel",
+      "source": "Quelle",
+      "note": "Anmerkung",
+      "method": "Klassen",
+      "count": "Anzahl der Klassen",
+      "palette": "Palette",
+      "labels": "Beschriftungen",
+      "language": "Beschriftung in",
+      "theme": "Kartendesign",
+      "center": "Mittelwert (divergierende Palette)"
+    },
+    "method": {
+      "quantile": "Quantile",
+      "jenks": "Natürliche Klassengrenzen",
+      "equal": "Gleiche Intervalle",
+      "manual": "Manuelle Grenzen"
+    },
+    "labels": {
+      "auto": "Automatisch",
+      "none": "Keine",
+      "all": "So viele wie passen"
+    },
+    "checks": {
+      "ok": "Keine Probleme gefunden.",
+      "blocked": "{count} Probleme verhindern diese Karte.",
+      "warnings": "{count} Warnungen zum Lesen.",
+      "fixAll": "Beheben",
+      "fixed": "Behoben: {list}",
+      "allow": "Akzeptieren",
+      "allowed": "Akzeptiert",
+      "why": "Warum",
+      "matched": "{matched} von {rows} Zeilen passten zu {areas} Gebieten",
+      "unmatched": "Ohne Treffer: {list}",
+      "pending": "Prüfe..."
+    },
+    "level": {
+      "error": "Fehler",
+      "warn": "Warnung",
+      "info": "Hinweis"
+    },
+    "export": {
+      "svg": "SVG",
+      "png": "PNG",
+      "png3x": "PNG für den Druck",
+      "pdf": "PDF",
+      "html": "Interaktives HTML",
+      "spec": "Spezifikation (JSON)",
+      "report": "Prüfbericht (JSON)",
+      "working": "Wird vorbereitet...",
+      "hint": "Alle Dateien entstehen in Ihrem Browser."
+    },
+    "stage": {
+      "blocked": "Beheben Sie links die Fehler, um die Karte zu sehen.",
+      "loading": "Zeichne...",
+      "failed": "Diese Karte konnte nicht gezeichnet werden: {detail}"
+    },
+    "footer": {
+      "note": "Open Source, MIT-Lizenz. Alles läuft in Ihrem Browser, nichts wird hochgeladen."
+    },
+    "regions": {
+      "world": "Welt",
+      "europe": "Europa",
+      "asia": "Asien",
+      "africa": "Afrika",
+      "north-america": "Nordamerika",
+      "south-america": "Südamerika",
+      "oceania": "Ozeanien",
+      "us-states": "USA, Bundesstaaten",
+      "us-counties": "USA, Countys",
+      "tw-counties": "Taiwan, Landkreise und Städte",
+      "tw-towns": "Taiwan, Gemeinden und Bezirke",
+      "jp-prefectures": "Japan, Präfekturen",
+      "kr-provinces": "Südkorea, Provinzen"
+    },
+    "examples": {
+      "covid-raw": "COVID-Todesfälle, schlecht gezeichnet",
+      "life-expectancy": "Lebenserwartung",
+      "us-county-unemployment": "US-Countys",
+      "europe-gdp-per-capita": "BIP in Europa",
+      "population-symbols": "Bevölkerungskreise",
+      "taiwan-township-area": "Taiwans Gemeinden",
+      "japan-regions": "Regionen Japans"
+    },
+    "spec": {
+      "title": "Spezifikation (JSON)"
+    },
+    "status": {
+      "detected": "Sieht nach {region} aus.",
+      "applied": "Angewendet: {list}."
+    }
+  }
+}

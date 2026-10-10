@@ -1,0 +1,61 @@
+{
+  "graticule": "0.1.0",
+  "ok": true,
+  "region": "asia",
+  "type": "locator",
+  "projection": {
+    "name": "conic-equal-area",
+    "equalArea": true
+  },
+  "join": null,
+  "classes": null,
+  "labels": {
+    "placed": 1,
+    "hidden": 1,
+    "dots": 0
+  },
+  "findings": [
+    {
+      "id": "labels-hidden",
+      "level": "info",
+      "allowed": false,
+      "message": "有 1 個標籤因為放不進地區或會與其他標籤重疊而省略。",
+      "reason": "列出省略的標籤，避免把較簡潔的地圖誤認為完整。",
+      "fixable": false
+    }
+  ],
+  "fixes": [],
+  "spec": {
+    "title": "台灣在哪裡",
+    "subtitle": "位於東亞，介於日本與菲律賓之間",
+    "source": "Natural Earth",
+    "note": "Data retrieved 2026-10-10.",
+    "region": "asia",
+    "type": "locator",
+    "data": {},
+    "classes": {
+      "method": "quantile",
+      "count": 5
+    },
+    "projection": "auto",
+    "language": "zh-Hant",
+    "labels": {
+      "show": "auto"
+    },
+    "legend": {},
+    "size": {
+      "width": 1200
+    },
+    "theme": "light",
+    "grid": false,
+    "highlight": [
+      "TWN"
+    ],
+    "panels": [],
+    "attribution": true,
+    "symbols": {},
+    "checks": {
+      "allow": []
+    }
+  }
+}

@@ -1,0 +1,24 @@
+{
+  "title": "World Bank income groups",
+  "subtitle": "Classification of economies, fiscal year 2026",
+  "source": "World Bank country classifications",
+  "note": "Data retrieved 2026-10-10.",
+  "region": "world",
+  "type": "categorical",
+  "data": {
+    "file": "data.csv",
+    "key": "iso3",
+    "value": "income_group",
+    "label": "Income group"
+  },
+  "legend": {
+    "order": [
+      "High income",
+      "Upper middle income",
+      "Lower middle income",
+      "Low income"
+    ]
+  },
+  "palette": "okabe-ito",
+  "labels": "none"
+}

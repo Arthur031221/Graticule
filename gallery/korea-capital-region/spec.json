@@ -1,0 +1,16 @@
+{
+  "title": "수도권, 광역시, 도",
+  "subtitle": "대한민국 17개 시도",
+  "source": "일반적인 행정 구분. 경계는 Natural Earth",
+  "note": "작성일 2026-10-10.",
+  "region": "kr-provinces",
+  "language": "ko",
+  "type": "categorical",
+  "data": {
+    "file": "data.csv",
+    "key": "province",
+    "value": "group",
+    "label": "구분"
+  },
+  "palette": "tol-bright"
+}

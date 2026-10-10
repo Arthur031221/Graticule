@@ -1,0 +1,23 @@
+{
+  "title": "COVID-19 deaths per 100,000 people",
+  "subtitle": "Cumulative deaths reported to WHO, by country",
+  "source": "WHO COVID-19 dashboard, cumulative deaths up to 2026-09-20. Population: Natural Earth",
+  "note": "Data retrieved 2026-10-10.",
+  "region": "world",
+  "data": {
+    "file": "data.csv",
+    "key": "country",
+    "value": "deaths",
+    "kind": "count",
+    "normalize": {
+      "by": "population",
+      "per": 100000
+    },
+    "label": "Deaths"
+  },
+  "classes": {
+    "method": "jenks",
+    "count": 5
+  },
+  "palette": "reds"
+}

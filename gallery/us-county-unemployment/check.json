@@ -1,0 +1,99 @@
+{
+  "graticule": "0.1.0",
+  "ok": true,
+  "region": "us-counties",
+  "type": "choropleth",
+  "projection": {
+    "name": "albers-usa",
+    "equalArea": true
+  },
+  "join": {
+    "column": "fips",
+    "keyType": "fips",
+    "rows": 3219,
+    "matchedRows": 3219,
+    "matchedAreas": 3219,
+    "matchedBy": {
+      "code": 3219,
+      "name": 0,
+      "alias": 0,
+      "padded": 0
+    },
+    "unmatched": [],
+    "ambiguous": []
+  },
+  "classes": {
+    "method": "jenks",
+    "edges": [
+      1.7,
+      4,
+      5.4,
+      7.1,
+      9.9,
+      14.3,
+      24
+    ],
+    "counts": [
+      814,
+      1111,
+      820,
+      339,
+      93,
+      42
+    ],
+    "colors": [
+      "#ffffb2",
+      "#fed976",
+      "#feb24c",
+      "#fd8d3c",
+      "#f03b20",
+      "#bd0026"
+    ],
+    "palette": "ylorrd"
+  },
+  "labels": {
+    "placed": 0,
+    "hidden": 0,
+    "dots": 0
+  },
+  "findings": [],
+  "fixes": [],
+  "spec": {
+    "title": "Unemployment rate by county, 2016",
+    "subtitle": "Percent of the labor force",
+    "source": "US Bureau of Labor Statistics, Local Area Unemployment Statistics, 2016 annual average (via plotly/datasets)",
+    "note": "Data retrieved 2026-10-10.",
+    "region": "us-counties",
+    "type": "choropleth",
+    "data": {
+      "file": "data.csv",
+      "key": "fips",
+      "value": "unemployment_rate",
+      "kind": "rate",
+      "label": "Percent"
+    },
+    "classes": {
+      "method": "jenks",
+      "count": 6
+    },
+    "palette": "ylorrd",
+    "projection": "auto",
+    "language": "en",
+    "labels": {
+      "show": "none"
+    },
+    "legend": {},
+    "size": {
+      "width": 1200
+    },
+    "theme": "light",
+    "grid": false,
+    "highlight": [],
+    "panels": [],
+    "attribution": true,
+    "symbols": {},
+    "checks": {
+      "allow": []
+    }
+  }
+}

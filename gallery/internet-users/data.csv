@@ -1,0 +1,183 @@
+country,iso3,percent_online
+Afghanistan,AFG,15.9
+Albania,ALB,82.6
+Algeria,DZA,74.8
+Andorra,AND,94.1
+Angola,AGO,35.8
+Antigua and Barbuda,ATG,71.9
+Argentina,ARG,88.4
+Armenia,ARM,77
+Australia,AUS,96.1
+Austria,AUT,93.6
+Azerbaijan,AZE,88
+"Bahamas, The",BHS,92.3
+Bahrain,BHR,100
+Bangladesh,BGD,41.6
+Barbados,BRB,69.1
+Belarus,BLR,89.5
+Belgium,BEL,94
+Belize,BLZ,70
+Benin,BEN,30.5
+Bhutan,BTN,88.4
+Bolivia,BOL,72.6
+Bosnia and Herzegovina,BIH,78.8
+Botswana,BWA,57.9
+Brazil,BRA,80.5
+Brunei Darussalam,BRN,99
+Bulgaria,BGR,79.1
+Burkina Faso,BFA,25.4
+Burundi,BDI,7.1
+Cabo Verde,CPV,73.3
+Cambodia,KHM,65.5
+Cameroon,CMR,40.1
+Canada,CAN,94
+Central African Republic,CAF,13.8
+Chad,TCD,11.2
+Chile,CHL,92.3
+China,CHN,75.6
+Colombia,COL,72.8
+Comoros,COM,31.4
+"Congo, Dem. Rep.",COD,18
+"Congo, Rep.",COG,41
+Costa Rica,CRI,82.6
+Cote d'Ivoire,CIV,38.4
+Croatia,HRV,82.1
+Cuba,CUB,67.9
+Cyprus,CYP,89.6
+Czechia,CZE,84.5
+Denmark,DNK,97.9
+Djibouti,DJI,63.8
+Dominica,DMA,80.6
+Dominican Republic,DOM,81.5
+Ecuador,ECU,69.7
+"Egypt, Arab Rep.",EGY,72.2
+El Salvador,SLV,60.1
+Equatorial Guinea,GNQ,63.7
+Estonia,EST,91.5
+Eswatini,SWZ,57.3
+Ethiopia,ETH,18
+Fiji,FJI,72.6
+Finland,FIN,93
+France,FRA,85.3
+Gabon,GAB,67.7
+"Gambia, The",GMB,48.2
+Georgia,GEO,78.7
+Germany,DEU,91.6
+Ghana,GHA,69.9
+Greece,GRC,83.2
+Grenada,GRD,68.4
+Guatemala,GTM,54.4
+Guinea,GIN,31.3
+Guinea-Bissau,GNB,27.7
+Guyana,GUY,76.6
+Haiti,HTI,47.8
+Honduras,HND,56.9
+"Hong Kong SAR, China",HKG,95.6
+Hungary,HUN,89.1
+Iceland,ISL,97.6
+India,IND,55.9
+Indonesia,IDN,66.5
+"Iran, Islamic Rep.",IRN,81.7
+Iraq,IRQ,78.7
+Ireland,IRL,95
+Israel,ISR,91.9
+Italy,ITA,85.1
+Jamaica,JAM,85.8
+Japan,JPN,84.9
+Jordan,JOR,90.5
+Kazakhstan,KAZ,92.3
+Kenya,KEN,29.4
+Kiribati,KIR,85
+"Korea, Rep.",KOR,97.2
+Kuwait,KWT,99.7
+Kyrgyz Republic,KGZ,84.2
+Lao PDR,LAO,64.5
+Latvia,LVA,91
+Lebanon,LBN,81.5
+Lesotho,LSO,48.1
+Liberia,LBR,30.4
+Libya,LBY,80.6
+Liechtenstein,LIE,97.9
+Lithuania,LTU,87.7
+Luxembourg,LUX,98.2
+"Macao SAR, China",MAC,89.5
+Madagascar,MDG,17.8
+Malawi,MWI,16.8
+Malaysia,MYS,97.4
+Maldives,MDV,83.9
+Mali,MLI,35.2
+Malta,MLT,91.5
+Marshall Islands,MHL,64.3
+Mauritania,MRT,42.5
+Mauritius,MUS,75.5
+Mexico,MEX,78.6
+"Micronesia, Fed. Sts.",FSM,39
+Moldova,MDA,74.9
+Monaco,MCO,98.8
+Mongolia,MNG,81.1
+Montenegro,MNE,88.2
+Morocco,MAR,89.9
+Mozambique,MOZ,19
+Namibia,NAM,63
+Naoero,NRU,83.2
+Nepal,NPL,45.5
+Netherlands,NLD,92.5
+New Zealand,NZL,93.1
+Nicaragua,NIC,59.4
+Niger,NER,13.1
+Nigeria,NGA,39.1
+North Macedonia,MKD,83.9
+Norway,NOR,99
+Oman,OMN,95.2
+Palau,PLW,82.6
+Panama,PAN,67.3
+Papua New Guinea,PNG,18.3
+Paraguay,PRY,76.3
+Peru,PER,74.7
+Philippines,PHL,75.2
+Poland,POL,86.9
+Portugal,PRT,84.5
+Puerto Rico (US),PRI,87.3
+Qatar,QAT,98
+Romania,ROU,85.5
+Russian Federation,RUS,90.4
+Rwanda,RWA,28
+San Marino,SMR,97.3
+Sao Tome and Principe,STP,58.6
+Saudi Arabia,SAU,100
+Senegal,SEN,56.8
+Serbia,SRB,83.5
+Seychelles,SYC,84.8
+Sierra Leone,SLE,21.5
+Singapore,SGP,96
+Slovak Republic,SVK,89.1
+Slovenia,SVN,88.9
+Solomon Islands,SLB,28
+"Somalia, Fed. Rep.",SOM,27.6
+South Africa,ZAF,78.3
+Spain,ESP,94.5
+Sri Lanka,LKA,48.3
+St. Kitts and Nevis,KNA,75.8
+St. Lucia,LCA,67
+St. Vincent and the Grenadines,VCT,74.8
+Sweden,SWE,95
+Switzerland,CHE,96.5
+Tajikistan,TJK,48.9
+Tanzania,TZA,26.9
+Thailand,THA,88
+Togo,TGO,35.6
+Tonga,TON,61.6
+Trinidad and Tobago,TTO,81.7
+Turkiye,TUR,83.4
+Uganda,UGA,9.6
+Ukraine,UKR,80.5
+United Arab Emirates,ARE,100
+United Kingdom,GBR,95.5
+United States,USA,92.7
+Uruguay,URY,89.9
+Uzbekistan,UZB,83.9
+"Venezuela, RB",VEN,75.8
+Viet Nam,VNM,78.6
+West Bank and Gaza,PSE,88.6
+Zambia,ZMB,15
+Zimbabwe,ZWE,36.3

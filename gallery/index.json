@@ -1,0 +1,176 @@
+[
+  {
+    "id": "life-expectancy",
+    "title": "Life expectancy at birth, 2019",
+    "prompt": "Map life expectancy by country.",
+    "promptEn": "Map life expectancy by country.",
+    "region": "world",
+    "type": "choropleth",
+    "language": "en",
+    "findings": [
+      "join-unmatched"
+    ]
+  },
+  {
+    "id": "covid-deaths",
+    "title": "COVID-19 deaths per 100,000 people",
+    "prompt": "Map COVID deaths by country from deaths.csv.",
+    "promptEn": "Map COVID deaths by country from deaths.csv.",
+    "region": "world",
+    "type": "choropleth",
+    "language": "en",
+    "findings": [
+      "join-unmatched"
+    ]
+  },
+  {
+    "id": "co2-per-capita",
+    "title": "Carbon dioxide emissions per person, 2020",
+    "prompt": "Show CO2 emissions per person for every country.",
+    "promptEn": "Show CO2 emissions per person for every country.",
+    "region": "world",
+    "type": "choropleth",
+    "language": "en",
+    "findings": [
+      "join-unmatched"
+    ]
+  },
+  {
+    "id": "internet-users",
+    "title": "People using the internet, 2022",
+    "prompt": "Which countries have the most people online? Use a map.",
+    "promptEn": "Which countries have the most people online? Use a map.",
+    "region": "world",
+    "type": "choropleth",
+    "language": "en",
+    "findings": []
+  },
+  {
+    "id": "population-symbols",
+    "title": "Population, 2022",
+    "prompt": "Draw the population of every country as circles on a map.",
+    "promptEn": "Draw the population of every country as circles on a map.",
+    "region": "world",
+    "type": "symbols",
+    "language": "en",
+    "findings": [
+      "join-unmatched"
+    ]
+  },
+  {
+    "id": "income-groups",
+    "title": "World Bank income groups",
+    "prompt": "Color countries by World Bank income group.",
+    "promptEn": "Color countries by World Bank income group.",
+    "region": "world",
+    "type": "categorical",
+    "language": "en",
+    "findings": [
+      "join-unmatched"
+    ]
+  },
+  {
+    "id": "fertility-small-multiples",
+    "title": "Births per woman",
+    "prompt": "Compare fertility rates by country in 1990, 2000, 2010 and 2022 side by side.",
+    "promptEn": "Compare fertility rates by country in 1990, 2000, 2010 and 2022 side by side.",
+    "region": "world",
+    "type": "small-multiples",
+    "language": "en",
+    "findings": [
+      "join-unmatched"
+    ]
+  },
+  {
+    "id": "europe-gdp-per-capita",
+    "title": "GDP per person in Europe, 2022",
+    "prompt": "Map GDP per person in Europe.",
+    "promptEn": "Map GDP per person in Europe.",
+    "region": "europe",
+    "type": "choropleth",
+    "language": "en",
+    "findings": []
+  },
+  {
+    "id": "africa-internet-users",
+    "title": "Utilisateurs d'internet, 2022",
+    "prompt": "Show internet use across Africa, labels in French.",
+    "promptEn": "Show internet use across Africa, labels in French.",
+    "region": "africa",
+    "type": "choropleth",
+    "language": "fr",
+    "findings": []
+  },
+  {
+    "id": "south-america-life-expectancy",
+    "title": "Esperanza de vida al nacer, 2019",
+    "prompt": "Esperanza de vida en Sudamerica, con nombres en espanol.",
+    "promptEn": "Life expectancy in South America, with names in Spanish.",
+    "region": "south-america",
+    "type": "choropleth",
+    "language": "es",
+    "findings": [
+      "join-unmatched"
+    ]
+  },
+  {
+    "id": "us-state-density",
+    "title": "Population density by state, 2023",
+    "prompt": "Map population density by US state.",
+    "promptEn": "Map population density by US state.",
+    "region": "us-states",
+    "type": "choropleth",
+    "language": "en",
+    "findings": []
+  },
+  {
+    "id": "us-county-unemployment",
+    "title": "Unemployment rate by county, 2016",
+    "prompt": "Show unemployment by county for the whole US.",
+    "promptEn": "Show unemployment by county for the whole US.",
+    "region": "us-counties",
+    "type": "choropleth",
+    "language": "en",
+    "findings": []
+  },
+  {
+    "id": "taiwan-township-area",
+    "title": "台灣各鄉鎮市區的面積",
+    "prompt": "把台灣每個鄉鎮市區的面積畫成地圖，用繁體中文。",
+    "promptEn": "Map the area of every Taiwan township and district, in Traditional Chinese.",
+    "region": "tw-towns",
+    "type": "choropleth",
+    "language": "zh-TW",
+    "findings": []
+  },
+  {
+    "id": "taiwan-locator",
+    "title": "台灣在哪裡",
+    "prompt": "Show where Taiwan is, in Traditional Chinese.",
+    "promptEn": "Show where Taiwan is, in Traditional Chinese.",
+    "region": "asia",
+    "type": "locator",
+    "language": "zh-TW",
+    "findings": []
+  },
+  {
+    "id": "japan-regions",
+    "title": "日本の地方区分",
+    "prompt": "日本の都道府県を地方ごとに色分けして。",
+    "promptEn": "Color the Japanese prefectures by region.",
+    "region": "jp-prefectures",
+    "type": "categorical",
+    "language": "ja",
+    "findings": []
+  },
+  {
+    "id": "korea-capital-region",
+    "title": "수도권, 광역시, 도",
+    "prompt": "대한민국 시도를 수도권, 광역시, 도로 나누어 색칠해 줘.",
+    "promptEn": "Color the South Korean provinces as capital region, metropolitan cities and provinces.",
+    "region": "kr-provinces",
+    "type": "categorical",
+    "language": "ko",
+    "findings": []
+  }
+]

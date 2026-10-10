@@ -1,0 +1,124 @@
+{
+  "graticule": "0.1.0",
+  "ok": true,
+  "region": "europe",
+  "type": "choropleth",
+  "projection": {
+    "name": "azimuthal-equal-area",
+    "equalArea": true
+  },
+  "join": {
+    "column": "iso3",
+    "keyType": "iso3",
+    "rows": 199,
+    "matchedRows": 199,
+    "matchedAreas": 199,
+    "matchedBy": {
+      "code": 199,
+      "name": 0,
+      "alias": 0,
+      "padded": 0
+    },
+    "unmatched": [],
+    "ambiguous": []
+  },
+  "classes": {
+    "method": "jenks",
+    "edges": [
+      4900,
+      18000,
+      30000,
+      50000,
+      63000,
+      100000,
+      150000
+    ],
+    "counts": [
+      10,
+      9,
+      12,
+      10,
+      12,
+      3
+    ],
+    "colors": [
+      "#eff3ff",
+      "#c6dbef",
+      "#9ecae1",
+      "#6baed6",
+      "#3182bd",
+      "#08519c"
+    ],
+    "palette": "blues"
+  },
+  "labels": {
+    "placed": 46,
+    "hidden": 21,
+    "dots": 3
+  },
+  "findings": [
+    {
+      "id": "labels-hidden",
+      "level": "info",
+      "allowed": false,
+      "message": "21 labels were left out because they do not fit inside their area or would overlap another label.",
+      "reason": "Hidden labels are listed so that a quieter map is not mistaken for a complete one.",
+      "fixable": false
+    },
+    {
+      "id": "small-areas-marked",
+      "level": "info",
+      "allowed": false,
+      "message": "3 areas are too small to see at this scale and are drawn as dots.",
+      "reason": "Small countries and territories would otherwise vanish from the map.",
+      "fixable": false
+    },
+    {
+      "id": "outside-frame",
+      "level": "info",
+      "allowed": false,
+      "message": "137 areas with data lie outside the map frame: Afghanistan, Angola, Antigua and Barbuda, Argentina, Aruba, ....",
+      "reason": "They are not drawn. Pick a larger region to show them.",
+      "fixable": false
+    }
+  ],
+  "fixes": [],
+  "spec": {
+    "title": "GDP per person in Europe, 2022",
+    "subtitle": "Current international dollars, purchasing power parity",
+    "source": "World Bank, World Development Indicators, NY.GDP.PCAP.PP.CD, 2022",
+    "note": "Data retrieved 2026-10-10.",
+    "region": "europe",
+    "type": "choropleth",
+    "data": {
+      "file": "data.csv",
+      "key": "iso3",
+      "value": "gdp_per_person",
+      "kind": "rate",
+      "label": "International dollars"
+    },
+    "classes": {
+      "method": "jenks",
+      "count": 6
+    },
+    "palette": "blues",
+    "projection": "auto",
+    "language": "en",
+    "labels": {
+      "show": "auto"
+    },
+    "legend": {},
+    "size": {
+      "width": 1200
+    },
+    "theme": "light",
+    "grid": false,
+    "highlight": [],
+    "panels": [],
+    "attribution": true,
+    "symbols": {},
+    "checks": {
+      "allow": []
+    }
+  }
+}

@@ -1,0 +1,8 @@
+numpy==2.5.3
+pyproj==3.8.0
+mapclassify==2.11.0
+colour-science==0.4.7
+colorspacious==1.1.2
+fonttools==4.66.1
+pillow==12.3.0
+pypdf==6.20.0

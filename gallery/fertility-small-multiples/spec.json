@@ -1,0 +1,49 @@
+{
+  "title": "Births per woman",
+  "subtitle": "Total fertility rate, by country",
+  "source": "World Bank, World Development Indicators, SP.DYN.TFRT.IN, 1990, 2000, 2010 and 2022",
+  "note": "Data retrieved 2026-10-10.",
+  "region": "world",
+  "type": "small-multiples",
+  "columns": 2,
+  "data": {
+    "file": "data.csv",
+    "key": "iso3",
+    "value": [
+      "y1990",
+      "y2000",
+      "y2010",
+      "y2022"
+    ],
+    "kind": "rate",
+    "label": "Births per woman"
+  },
+  "panels": [
+    {
+      "title": "1990"
+    },
+    {
+      "title": "2000"
+    },
+    {
+      "title": "2010"
+    },
+    {
+      "title": "2022"
+    }
+  ],
+  "classes": {
+    "method": "manual",
+    "breaks": [
+      0.5,
+      1.5,
+      2.1,
+      3,
+      4.5,
+      6,
+      9
+    ]
+  },
+  "palette": "oranges",
+  "labels": "none"
+}

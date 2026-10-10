@@ -1,0 +1,333 @@
+{
+  "legend": {
+    "no_data": "데이터 없음",
+    "per_person": "1인당",
+    "per_population": "{per}명당",
+    "per_area": "{per} km²당",
+    "per_km2": "km²당"
+  },
+  "footer": {
+    "source": "출처: {source}",
+    "made_with": "Graticule로 제작"
+  },
+  "html": {
+    "data_table": "데이터 표",
+    "area": "지역",
+    "value": "값"
+  },
+  "terms": {
+    "population": "인구",
+    "area": "면적",
+    "column": "분모"
+  },
+  "rules": {
+    "spec": {
+      "message": "설정의 {path}에 문제가 있습니다: {detail}.",
+      "reason": "읽을 수 없는 설정으로는 지도를 그릴 수 없습니다."
+    },
+    "spec-unknown-key": {
+      "message": "알 수 없는 항목 {path}은(는) 무시했습니다. 여기서 쓸 수 있는 항목: {allowed}.",
+      "reason": "철자가 틀린 항목은 조용히 무시되어 지도가 의도와 다르게 나옵니다."
+    },
+    "source-required": {
+      "message": "이 지도에는 출처가 없습니다.",
+      "reason": "숫자의 출처가 없으면 독자가 확인할 수 없습니다. 설정에 \"source\"를 추가하세요."
+    },
+    "title-required": {
+      "message": "이 지도에는 제목이 없습니다.",
+      "reason": "독자는 범례를 읽기 전에 색이 무엇을 뜻하는지 알아야 합니다."
+    },
+    "legend-title": {
+      "message": "범례에 제목이 없어 {column}의 단위를 알 수 없습니다.",
+      "reason": "단위가 없는 숫자는 여러 가지로 읽힙니다. data.label을 설정하세요. 예: \"10만 명당 사망자 수\"."
+    },
+    "kind-undeclared": {
+      "message": "data.kind가 설정되지 않아 원시 건수일 가능성을 배제할 수 없습니다.",
+      "reason": "원시 건수를 색으로 칠하면 대개 사람이 많이 사는 곳만 보여 줍니다. \"kind\"를 rate, share, index, count 중 하나로 지정하세요."
+    },
+    "value-not-numeric": {
+      "message": "{column} 열은 대부분 숫자가 아닙니다(예: \"{example}\").",
+      "reason": "범례의 구간으로 나눌 수 있는 것은 숫자뿐입니다."
+    },
+    "no-values": {
+      "message": "그릴 수 있는 값이 있는 지역이 없습니다.",
+      "reason": "지도가 비어 있게 됩니다."
+    },
+    "join-failed": {
+      "message": "{column} 열의 행 중 {region}의 지역과 {kind}(으)로 일치한 것은 {percent}%뿐입니다. 일치하지 않은 값: {examples}.",
+      "reason": "결합에 실패한 지도는 값을 엉뚱한 곳에 놓습니다. data.key, data.keyType, region을 확인하세요."
+    },
+    "join-unmatched": {
+      "message": "{count}개 행이 어느 지역과도 일치하지 않아 그려지지 않았습니다: {list}.",
+      "reason": "조용히 사라지는 행이 있으면 지도가 완전해 보이지만 사실은 그렇지 않습니다. 철자나 키 열을 고치세요."
+    },
+    "join-ambiguous": {
+      "message": "다음 이름은 여러 지역에 해당하므로 그려지지 않았습니다: {list}.",
+      "reason": "어느 지역인지 짐작하면 값이 엉뚱한 곳에 놓입니다."
+    },
+    "duplicate-keys": {
+      "message": "{count}개 지역에 행이 둘 이상 있습니다(예: {example}은(는) {rows}개).",
+      "reason": "지역마다 하나의 값만 그릴 수 있고, 마지막 행만 남기면 나머지가 가려집니다. data.aggregate를 설정하거나 data.filter로 한 해처럼 한 행만 고르세요."
+    },
+    "raw-counts": {
+      "message_declared": "값이 원시 건수입니다(data.kind가 count).",
+      "message_correlated": "값이 인구와 함께 움직입니다(각 지역 인구와의 스피어만 상관계수 {rho}). 원시 건수의 특징입니다.",
+      "reason": "건수 지도는 대개 사람이 사는 곳을 보여 줄 뿐입니다. 인구나 면적으로 나누어 색이 비율을 나타내게 하세요. 지역에 인구 데이터가 있으면 --fix가 처리합니다."
+    },
+    "projection-mercator": {
+      "message": "위도 폭이 {span}도인 지역에서 메르카토르 도법을 쓰고 있습니다.",
+      "reason": "메르카토르 도법은 적도에서 멀수록 면적을 늘려 그린란드가 아프리카만큼 커 보이는데, 단계구분도는 면적으로 비교합니다. 정적 도법을 쓰세요."
+    },
+    "projection-not-equal-area": {
+      "message": "{name}은(는) 정적 도법이 아닙니다.",
+      "reason": "면적이 실제보다 크거나 작게 보여 비교가 조금 치우칩니다. Equal Earth, 알베르스, 람베르트 정적 방위 도법은 면적을 보존합니다."
+    },
+    "max-classes": {
+      "message": "{count}개 구간은 독자가 구별할 수 있는 수를 넘습니다. 최대는 {max}개입니다.",
+      "reason": "범례와 대조할 수 있는 색 단계는 7개 정도가 한계입니다."
+    },
+    "class-breaks-coverage": {
+      "message": "구간 경계는 {low}에서 {high}까지인데 데이터는 {min}에서 {max}까지입니다.",
+      "reason": "첫 경계와 마지막 경계 밖의 값에는 색이 없어 범례가 지도를 설명하지 못합니다. 가장 낮은 값부터 가장 높은 값까지 모든 경계를 적으세요."
+    },
+    "empty-class": {
+      "message": "{index}번째 구간에 해당하는 지역이 없습니다.",
+      "reason": "아무도 쓰지 않는 범례 항목은 구분 기준이 데이터에 맞지 않음을 뜻합니다."
+    },
+    "skewed-classes": {
+      "message": "지역의 {percent}%가 한 구간에 들어 있습니다.",
+      "reason": "치우친 데이터에 등간격이나 수동 구간을 쓰면 지도 대부분이 한 색이 됩니다. 분위수나 자연 구분은 지역을 고르게 나눕니다."
+    },
+    "palette-order": {
+      "message": "팔레트 {palette}은(는) 밝기가 한 방향으로 변하지 않습니다.",
+      "reason": "순차 척도에서는 밝기의 순서가 '더 많음'을 나타내는 유일한 단서입니다. 무지개 팔레트는 밝기가 오르내리며 없는 경계를 만들어 냅니다."
+    },
+    "cvd-separation": {
+      "message": "색각 이상이 있는 일부 독자에게 팔레트 {palette}의 색은 CIEDE2000 기준 {worst}까지 가까워집니다.",
+      "reason": "남성 약 12명 중 1명은 이 색 중 일부를 구별하지 못합니다. 이웃한 구간은 3 이상, 5이면 충분합니다(범주는 8)."
+    },
+    "diverging-center": {
+      "message": "발산형 팔레트 {palette}에는 중심값이 필요합니다.",
+      "reason": "0처럼 의미 있는 중간점이 없으면 데이터에 없는 분기를 암시합니다. \"center\"를 설정하세요."
+    },
+    "too-many-categories": {
+      "message": "{count}개 범주는 범례가 담을 수 있는 {max}가지 색을 넘습니다.",
+      "reason": "8색을 넘으면 독자가 지도와 범례를 맞춰 볼 수 없습니다. 작은 범주는 '기타'로 묶으세요."
+    },
+    "normalize-missing": {
+      "message": "{count}개 지역에는 나눌 {by} 정보가 내장되어 있지 않아 데이터 없음으로 표시됩니다.",
+      "reason": "분모가 없으면 비율을 계산할 수 없습니다. normalize.by column으로 제공하거나 빈칸을 받아들이고 주석에 밝히세요."
+    },
+    "values-skipped": {
+      "message": "{count}개 행이 지역에 연결되었지만 셀이 숫자가 아니거나 값의 분모가 없거나 0이어서 제외되었습니다(예: {example}).",
+      "reason": "제외된 행은 지도에 아무 표시 없이 해당 지역의 값을 바꿉니다. 셀을 고치거나, 빈 곳을 받아들이고 주석에 밝혀 주세요."
+    },
+    "no-data-share": {
+      "message": "{total}개 지역 중 {count}개({percent}%)에 값이 없습니다.",
+      "reason": "회색 영역이 넓은 지도는 오해를 부를 수 있습니다. 주석에 이유를 밝히거나 데이터가 다루는 지역을 고르세요."
+    },
+    "label-overlap": {
+      "message": "라벨 {count}개가 겹칩니다.",
+      "reason": "겹친 라벨은 읽을 수 없습니다."
+    },
+    "highlight-unmatched": {
+      "message": "강조할 지역을 찾지 못했습니다: {list}.",
+      "reason": "아무것도 강조하지 않는 위치 지도는 아무것도 보여 주지 않습니다."
+    },
+    "symbols-negative": {
+      "message": "비례 원으로는 0 이하의 값 {count}개를 나타낼 수 없습니다.",
+      "reason": "원의 면적은 양을 뜻하므로 음수에는 크기가 없습니다."
+    },
+    "fix-applied": {
+      "message": "{rule}에 적용함: {text}.",
+      "reason": "--fix는 규칙을 만족하는 최소한의 변경만 하고 여기에 기록합니다."
+    },
+    "labels-hidden": {
+      "message": "라벨 {count}개는 지역 안에 들어가지 않거나 다른 라벨과 겹쳐 생략했습니다.",
+      "reason": "깔끔한 지도가 완전하다고 오해되지 않도록 생략한 라벨을 기록합니다."
+    },
+    "small-areas-marked": {
+      "message": "{count}개 지역은 이 축척에서 너무 작아 보이지 않아 점으로 그렸습니다.",
+      "reason": "그러지 않으면 작은 나라와 영토가 지도에서 사라집니다."
+    },
+    "outside-frame": {
+      "message": "데이터가 있는 {count}개 지역이 지도 범위 밖에 있습니다: {list}.",
+      "reason": "그려지지 않았습니다. 보려면 더 넓은 지역을 고르세요."
+    },
+    "table-ragged": {
+      "message": "{count}개 행의 셀 수가 머리글과 다릅니다.",
+      "reason": "짧거나 긴 행에서는 셀이 엉뚱한 열 아래에 있을 수 있습니다. 파일의 따옴표와 구분 기호를 확인하세요."
+    },
+    "join-blank": {
+      "message": "{count}개 행은 지역 이름 열이 비어 있어 그려지지 않았습니다.",
+      "reason": "이름이 없는 행은 위치를 정할 수 없습니다. 빈 칸은 대개 합계 행이나 표 끝의 메모입니다."
+    },
+    "glyphs-missing": {
+      "message": "내장된 글꼴에 이 글자들의 글리프가 없습니다: {list}.",
+      "reason": "빈 상자로 표시됩니다. 다른 표기나 다른 라벨 언어를 사용하세요."
+    },
+    "symbols-min-size": {
+      "message": "원 {count}개가 최소 크기보다 작아 최소 크기로 그렸습니다.",
+      "reason": "이 원들은 값보다 약간 크게 그려졌습니다. 크기를 지나치게 정밀하게 읽지 않도록 기록합니다."
+    }
+  },
+  "ui": {
+    "title": "Graticule",
+    "tagline": "점검표를 통과하는 지도",
+    "skip": "지도로 건너뛰기",
+    "nav": {
+      "gallery": "갤러리",
+      "github": "GitHub",
+      "language": "언어",
+      "theme": "테마"
+    },
+    "theme": {
+      "light": "라이트",
+      "dark": "다크"
+    },
+    "step": {
+      "data": "데이터",
+      "map": "지도",
+      "style": "스타일",
+      "checks": "점검",
+      "export": "내보내기"
+    },
+    "data": {
+      "drop": "CSV 파일을 여기에 놓으세요",
+      "or": "또는",
+      "choose": "파일 선택",
+      "paste": "표 붙여넣기",
+      "pastePlaceholder": "country,value\nFrance,12.5\nJapan,8.1",
+      "examples": "또는 예시로 시작",
+      "loaded": "{rows}행, {cols}열",
+      "error": "읽을 수 없습니다: {detail}",
+      "empty": "표를 추가하면 지도가 여기에 나타납니다."
+    },
+    "map": {
+      "region": "지역",
+      "type": "지도 종류",
+      "key": "지역 이름 열",
+      "keyAuto": "자동 감지",
+      "value": "지도로 그릴 열",
+      "values": "지도로 그릴 열(열마다 한 장)",
+      "kind": "숫자의 종류",
+      "normalize": "나눌 값",
+      "per": "당",
+      "unit": "범례에 표시할 단위",
+      "highlight": "강조할 지역(이름 또는 코드, 쉼표로 구분)"
+    },
+    "type": {
+      "choropleth": "색칠",
+      "symbols": "원",
+      "categorical": "범주",
+      "locator": "위치도",
+      "small-multiples": "작은 다중 지도"
+    },
+    "kind": {
+      "unset": "지정 안 함",
+      "count": "건수",
+      "rate": "비율",
+      "share": "구성비",
+      "index": "지수 또는 점수",
+      "other": "기타"
+    },
+    "norm": {
+      "none": "없음",
+      "population": "인구",
+      "area": "면적(km²)",
+      "column": "다른 열"
+    },
+    "style": {
+      "title": "제목",
+      "subtitle": "부제목",
+      "source": "출처",
+      "note": "주석",
+      "method": "구간",
+      "count": "구간 수",
+      "palette": "팔레트",
+      "labels": "라벨",
+      "language": "라벨 언어",
+      "theme": "지도 테마",
+      "center": "중심값(발산형 팔레트)"
+    },
+    "method": {
+      "quantile": "분위수",
+      "jenks": "자연 구분",
+      "equal": "등간격",
+      "manual": "수동 구간"
+    },
+    "labels": {
+      "auto": "자동",
+      "none": "없음",
+      "all": "들어가는 만큼"
+    },
+    "checks": {
+      "ok": "문제가 없습니다.",
+      "blocked": "문제 {count}개 때문에 이 지도를 그릴 수 없습니다.",
+      "warnings": "읽어볼 경고가 {count}개 있습니다.",
+      "fixAll": "한 번에 고치기",
+      "fixed": "고침: {list}",
+      "allow": "허용",
+      "allowed": "허용됨",
+      "why": "이유",
+      "matched": "{rows}행 중 {matched}행이 {areas}개 지역과 일치",
+      "unmatched": "일치하지 않음: {list}",
+      "pending": "점검 중..."
+    },
+    "level": {
+      "error": "오류",
+      "warn": "경고",
+      "info": "참고"
+    },
+    "export": {
+      "svg": "SVG",
+      "png": "PNG",
+      "png3x": "인쇄용 PNG",
+      "pdf": "PDF",
+      "html": "인터랙티브 HTML",
+      "spec": "설정(JSON)",
+      "report": "점검 보고서(JSON)",
+      "working": "준비 중...",
+      "hint": "모든 파일은 브라우저 안에서 만들어집니다."
+    },
+    "stage": {
+      "blocked": "왼쪽의 오류를 고치면 지도가 나타납니다.",
+      "loading": "그리는 중...",
+      "failed": "이 지도를 그릴 수 없습니다: {detail}"
+    },
+    "footer": {
+      "note": "오픈 소스, MIT 라이선스. 모든 처리는 브라우저 안에서 이루어지며 아무것도 업로드되지 않습니다."
+    },
+    "regions": {
+      "world": "세계",
+      "europe": "유럽",
+      "asia": "아시아",
+      "africa": "아프리카",
+      "north-america": "북아메리카",
+      "south-america": "남아메리카",
+      "oceania": "오세아니아",
+      "us-states": "미국, 주",
+      "us-counties": "미국, 카운티",
+      "tw-counties": "대만, 현과 시",
+      "tw-towns": "대만, 향진시구",
+      "jp-prefectures": "일본, 도도부현",
+      "kr-provinces": "대한민국, 도와 광역시"
+    },
+    "examples": {
+      "covid-raw": "코로나 사망자(잘못 그린 지도)",
+      "life-expectancy": "기대수명",
+      "us-county-unemployment": "미국 카운티",
+      "europe-gdp-per-capita": "유럽 GDP",
+      "population-symbols": "인구 원",
+      "taiwan-township-area": "대만 향진시구",
+      "japan-regions": "일본 지방"
+    },
+    "spec": {
+      "title": "설정(JSON)"
+    },
+    "status": {
+      "detected": "{region}(으)로 보입니다.",
+      "applied": "적용함: {list}."
+    }
+  }
+}

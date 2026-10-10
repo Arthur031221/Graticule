@@ -1,0 +1,333 @@
+{
+  "legend": {
+    "no_data": "Sin datos",
+    "per_person": "por persona",
+    "per_population": "por {per} personas",
+    "per_area": "por {per} km²",
+    "per_km2": "por km²"
+  },
+  "footer": {
+    "source": "Fuente: {source}",
+    "made_with": "Hecho con Graticule"
+  },
+  "html": {
+    "data_table": "Tabla de datos",
+    "area": "Zona",
+    "value": "Valor"
+  },
+  "terms": {
+    "population": "población",
+    "area": "superficie",
+    "column": "denominador"
+  },
+  "rules": {
+    "spec": {
+      "message": "Problema en la especificación, en {path}: {detail}.",
+      "reason": "El programa no puede dibujar un mapa con una especificación que no puede leer."
+    },
+    "spec-unknown-key": {
+      "message": "Campo desconocido {path}. Se ignora. Campos permitidos aquí: {allowed}.",
+      "reason": "Un campo mal escrito se ignora sin avisar y el mapa no haría lo que pretendías."
+    },
+    "source-required": {
+      "message": "El mapa no indica su fuente.",
+      "reason": "Los lectores no pueden comprobar un mapa que no dice de dónde salen los números. Añade \"source\" a la especificación."
+    },
+    "title-required": {
+      "message": "El mapa no tiene título.",
+      "reason": "Quien lee debe saber qué miden los colores antes de leer la leyenda."
+    },
+    "legend-title": {
+      "message": "La leyenda no tiene título, así que no se indica la unidad de {column}.",
+      "reason": "Un número sin unidad puede leerse de varias maneras. Define data.label, por ejemplo \"Muertes por 100.000 habitantes\"."
+    },
+    "kind-undeclared": {
+      "message": "data.kind no está definido, así que no se pueden descartar recuentos brutos.",
+      "reason": "Colorear recuentos brutos suele mostrar solo dónde vive mucha gente. Declara \"kind\" como rate, share, index o count."
+    },
+    "value-not-numeric": {
+      "message": "La columna {column} en su mayoría no es numérica (por ejemplo \"{example}\").",
+      "reason": "Solo los números pueden clasificarse en las clases de una leyenda."
+    },
+    "no-values": {
+      "message": "Ninguna zona tiene un valor numérico que dibujar.",
+      "reason": "El mapa quedaría vacío."
+    },
+    "join-failed": {
+      "message": "Solo el {percent}% de las filas de la columna {column} coincidió con una zona de {region} como {kind}. Sin coincidencia: {examples}.",
+      "reason": "Un mapa construido sobre una unión fallida coloca valores en sitios equivocados. Revisa data.key, data.keyType y region."
+    },
+    "join-unmatched": {
+      "message": "{count} filas no coinciden con ninguna zona y no se dibujan: {list}.",
+      "reason": "Las filas que desaparecen en silencio hacen que un mapa parezca completo sin serlo. Corrige la ortografía o la columna clave."
+    },
+    "join-ambiguous": {
+      "message": "Estos nombres encajan con más de una zona y no se dibujan: {list}.",
+      "reason": "Adivinar qué zona se quería pondría un valor en el lugar equivocado."
+    },
+    "duplicate-keys": {
+      "message": "{count} zonas tienen más de una fila (por ejemplo {example} tiene {rows}).",
+      "reason": "Solo se puede dibujar un valor por zona, y quedarse con la última fila oculta las demás. Define data.aggregate o usa data.filter para elegir una fila, por ejemplo un año."
+    },
+    "raw-counts": {
+      "message_declared": "Los valores son recuentos brutos (data.kind es count).",
+      "message_correlated": "Los valores siguen a la población (correlación de Spearman {rho} con la población de cada zona), como ocurre con los recuentos brutos.",
+      "reason": "Un mapa de recuentos suele mostrar solo dónde vive la gente. Divide por población o superficie para que los colores muestren una tasa. --fix lo hace si la región tiene datos de población."
+    },
+    "projection-mercator": {
+      "message": "Mercator en una región de {span} grados de latitud.",
+      "reason": "Mercator estira la superficie lejos del ecuador, de modo que Groenlandia parece tan grande como África, y un mapa coroplético se compara por área. Usa una proyección de área equivalente."
+    },
+    "projection-not-equal-area": {
+      "message": "{name} no es una proyección de área equivalente.",
+      "reason": "Las superficies parecen mayores o menores de lo que son, lo que sesga un poco la comparación. Equal Earth, Albers y la acimutal de Lambert conservan las áreas."
+    },
+    "max-classes": {
+      "message": "{count} clases son más de las que se pueden distinguir. El límite es {max}.",
+      "reason": "Una persona puede emparejar unos siete tonos con una leyenda y no más."
+    },
+    "class-breaks-coverage": {
+      "message": "Los límites de clase van de {low} a {high}, pero los datos van de {min} a {max}.",
+      "reason": "Un valor fuera del primer y el último límite se queda sin color y la leyenda no describiría el mapa. Indica todos los límites, del valor más bajo al más alto."
+    },
+    "empty-class": {
+      "message": "La clase {index} no contiene ninguna zona.",
+      "reason": "Una entrada de la leyenda que nada usa sugiere que los cortes no se ajustan a los datos."
+    },
+    "skewed-classes": {
+      "message": "El {percent}% de las zonas cae en una sola clase.",
+      "reason": "Los intervalos iguales o los cortes manuales con datos sesgados pintan casi todo el mapa de un color. Los cuantiles o las rupturas naturales reparten las zonas."
+    },
+    "palette-order": {
+      "message": "La paleta {palette} no se aclara ni se oscurece de forma continua.",
+      "reason": "En una escala secuencial, el orden de luminosidad es la única pista de \"más\". Las paletas arcoíris suben y bajan en luminosidad e inventan fronteras."
+    },
+    "cvd-separation": {
+      "message": "Los colores de la paleta {palette} llegan a diferir solo {worst} (CIEDE2000) para algunas personas con daltonismo.",
+      "reason": "Aproximadamente 1 de cada 12 hombres no distingue algunos de estos colores. Las clases vecinas necesitan una diferencia de al menos 3, y 5 es holgada (8 para categorías)."
+    },
+    "diverging-center": {
+      "message": "La paleta divergente {palette} necesita un valor central.",
+      "reason": "Sin un punto medio con sentido, como 0, una escala divergente sugiere una división que los datos no tienen. Define \"center\"."
+    },
+    "too-many-categories": {
+      "message": "{count} categorías son más de los {max} colores que cabe en una leyenda.",
+      "reason": "Con más de ocho colores no se puede relacionar el mapa con la leyenda. Agrupa las categorías pequeñas como Otros."
+    },
+    "normalize-missing": {
+      "message": "{count} zonas no tienen {by} incorporada para dividir y se muestran sin datos.",
+      "reason": "Sin denominador no se puede calcular una tasa. Apórtalo con normalize.by column o acepta los huecos y acláralo en la nota."
+    },
+    "values-skipped": {
+      "message": "{count} filas llegaron a un área pero se dejaron fuera porque una celda no es un número, o un valor tiene el denominador ausente o en cero (por ejemplo {example}).",
+      "reason": "Una fila omitida cambia el valor de su área sin ninguna señal en el mapa. Corrige la celda, o acepta el hueco y dilo en la nota."
+    },
+    "no-data-share": {
+      "message": "{count} de {total} zonas ({percent}%) no tienen valor.",
+      "reason": "Un mapa con grandes zonas grises puede engañar. Explica el motivo en la nota o elige una región que los datos cubran."
+    },
+    "label-overlap": {
+      "message": "{count} etiquetas se superponen.",
+      "reason": "Las etiquetas superpuestas no se pueden leer."
+    },
+    "highlight-unmatched": {
+      "message": "No se encontraron estas zonas para resaltar: {list}.",
+      "reason": "Un mapa de localización que no resalta nada no muestra nada."
+    },
+    "symbols-negative": {
+      "message": "Los símbolos proporcionales no pueden mostrar {count} valores iguales o menores que cero.",
+      "reason": "El área de un círculo representa una cantidad, así que un valor negativo no tiene tamaño."
+    },
+    "fix-applied": {
+      "message": "Aplicado para {rule}: {text}.",
+      "reason": "--fix hace el cambio más pequeño que cumple la regla y lo anota aquí."
+    },
+    "labels-hidden": {
+      "message": "Se omitieron {count} etiquetas porque no caben en su zona o se superpondrían con otra.",
+      "reason": "Las etiquetas ocultas se anotan para que un mapa más limpio no se confunda con uno completo."
+    },
+    "small-areas-marked": {
+      "message": "{count} zonas son demasiado pequeñas para verse a esta escala y se dibujan como puntos.",
+      "reason": "De lo contrario, los países y territorios pequeños desaparecerían del mapa."
+    },
+    "outside-frame": {
+      "message": "{count} zonas con datos quedan fuera del marco del mapa: {list}.",
+      "reason": "No se dibujan. Elige una región más amplia para mostrarlas."
+    },
+    "table-ragged": {
+      "message": "{count} filas tienen un número de celdas distinto al del encabezado.",
+      "reason": "En una fila corta o larga las celdas pueden quedar bajo la columna equivocada. Revisa las comillas y el delimitador del archivo."
+    },
+    "join-blank": {
+      "message": "{count} filas tienen vacía la columna que nombra la zona y no se dibujan.",
+      "reason": "Una fila sin nombre no se puede colocar. Un campo vacío suele ser una fila de totales o una nota al final de la tabla."
+    },
+    "glyphs-missing": {
+      "message": "Las fuentes incrustadas no tienen glifo para estos caracteres: {list}.",
+      "reason": "Se verían como cuadros vacíos. Usa otra grafía u otro idioma de etiquetas."
+    },
+    "symbols-min-size": {
+      "message": "{count} símbolos son menores que el tamaño mínimo y se dibujaron con ese mínimo.",
+      "reason": "Esos círculos son algo mayores de lo que dice su valor. Se anotan para que los tamaños no se lean con demasiada precisión."
+    }
+  },
+  "ui": {
+    "title": "Graticule",
+    "tagline": "Mapas que superan una lista de control",
+    "skip": "Saltar al mapa",
+    "nav": {
+      "gallery": "Galería",
+      "github": "GitHub",
+      "language": "Idioma",
+      "theme": "Tema"
+    },
+    "theme": {
+      "light": "Claro",
+      "dark": "Oscuro"
+    },
+    "step": {
+      "data": "Datos",
+      "map": "Mapa",
+      "style": "Estilo",
+      "checks": "Comprobaciones",
+      "export": "Exportar"
+    },
+    "data": {
+      "drop": "Suelta aquí un archivo CSV",
+      "or": "o",
+      "choose": "Elegir un archivo",
+      "paste": "Pegar una tabla",
+      "pastePlaceholder": "country,value\nFrance,12.5\nJapan,8.1",
+      "examples": "O empieza con un ejemplo",
+      "loaded": "{rows} filas, {cols} columnas",
+      "error": "No se pudo leer: {detail}",
+      "empty": "Añade una tabla y el mapa aparecerá aquí."
+    },
+    "map": {
+      "region": "Región",
+      "type": "Tipo de mapa",
+      "key": "Columna que nombra las zonas",
+      "keyAuto": "Detectar automáticamente",
+      "value": "Columna a mapear",
+      "values": "Columnas a mapear (un panel cada una)",
+      "kind": "Qué son los números",
+      "normalize": "Dividir por",
+      "per": "Por",
+      "unit": "Unidad que se muestra en la leyenda",
+      "highlight": "Zonas a resaltar (nombres o códigos, separados por comas)"
+    },
+    "type": {
+      "choropleth": "Coroplético",
+      "symbols": "Círculos",
+      "categorical": "Categorías",
+      "locator": "Localización",
+      "small-multiples": "Pequeños múltiplos"
+    },
+    "kind": {
+      "unset": "Sin indicar",
+      "count": "Recuentos",
+      "rate": "Tasas",
+      "share": "Porcentajes",
+      "index": "Índice o puntuación",
+      "other": "Otra cosa"
+    },
+    "norm": {
+      "none": "Nada",
+      "population": "Población",
+      "area": "Superficie en km²",
+      "column": "Otra columna"
+    },
+    "style": {
+      "title": "Título",
+      "subtitle": "Subtítulo",
+      "source": "Fuente",
+      "note": "Nota",
+      "method": "Clases",
+      "count": "Número de clases",
+      "palette": "Paleta",
+      "labels": "Etiquetas",
+      "language": "Etiquetas en",
+      "theme": "Tema del mapa",
+      "center": "Valor central (paleta divergente)"
+    },
+    "method": {
+      "quantile": "Cuantiles",
+      "jenks": "Rupturas naturales",
+      "equal": "Intervalos iguales",
+      "manual": "Cortes manuales"
+    },
+    "labels": {
+      "auto": "Automáticas",
+      "none": "Ninguna",
+      "all": "Todas las que quepan"
+    },
+    "checks": {
+      "ok": "No se encontraron problemas.",
+      "blocked": "{count} problemas impiden dibujar este mapa.",
+      "warnings": "{count} avisos que leer.",
+      "fixAll": "Corregirlos",
+      "fixed": "Corregido: {list}",
+      "allow": "Aceptar",
+      "allowed": "Aceptado",
+      "why": "Por qué",
+      "matched": "{matched} de {rows} filas coinciden con {areas} zonas",
+      "unmatched": "Sin coincidencia: {list}",
+      "pending": "Comprobando..."
+    },
+    "level": {
+      "error": "Error",
+      "warn": "Aviso",
+      "info": "Nota"
+    },
+    "export": {
+      "svg": "SVG",
+      "png": "PNG",
+      "png3x": "PNG para imprimir",
+      "pdf": "PDF",
+      "html": "HTML interactivo",
+      "spec": "Especificación (JSON)",
+      "report": "Informe de comprobación (JSON)",
+      "working": "Preparando...",
+      "hint": "Todos los archivos se crean en tu navegador."
+    },
+    "stage": {
+      "blocked": "Corrige los errores de la izquierda para ver el mapa.",
+      "loading": "Dibujando...",
+      "failed": "No se pudo dibujar este mapa: {detail}"
+    },
+    "footer": {
+      "note": "Código abierto, licencia MIT. Todo se ejecuta en tu navegador y no se sube nada."
+    },
+    "regions": {
+      "world": "Mundo",
+      "europe": "Europa",
+      "asia": "Asia",
+      "africa": "África",
+      "north-america": "Norteamérica",
+      "south-america": "Sudamérica",
+      "oceania": "Oceanía",
+      "us-states": "Estados Unidos, estados",
+      "us-counties": "Estados Unidos, condados",
+      "tw-counties": "Taiwán, condados y ciudades",
+      "tw-towns": "Taiwán, municipios y distritos",
+      "jp-prefectures": "Japón, prefecturas",
+      "kr-provinces": "Corea del Sur, provincias"
+    },
+    "examples": {
+      "covid-raw": "Muertes por COVID, mal dibujado",
+      "life-expectancy": "Esperanza de vida",
+      "us-county-unemployment": "Condados de EE. UU.",
+      "europe-gdp-per-capita": "PIB de Europa",
+      "population-symbols": "Círculos de población",
+      "taiwan-township-area": "Municipios de Taiwán",
+      "japan-regions": "Regiones de Japón"
+    },
+    "spec": {
+      "title": "Especificación (JSON)"
+    },
+    "status": {
+      "detected": "Parece {region}.",
+      "applied": "Aplicado: {list}."
+    }
+  }
+}

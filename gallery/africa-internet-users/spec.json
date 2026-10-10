@@ -1,0 +1,20 @@
+{
+  "title": "Utilisateurs d'internet, 2022",
+  "subtitle": "Part de la population, en pourcentage",
+  "source": "World Bank, World Development Indicators, IT.NET.USER.ZS, 2022",
+  "note": "Data retrieved 2026-10-10.",
+  "region": "africa",
+  "language": "fr",
+  "data": {
+    "file": "data.csv",
+    "key": "iso3",
+    "value": "percent_online",
+    "kind": "share",
+    "label": "Pourcentage"
+  },
+  "classes": {
+    "method": "quantile",
+    "count": 5
+  },
+  "palette": "greens"
+}

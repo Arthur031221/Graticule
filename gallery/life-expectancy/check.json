@@ -1,0 +1,132 @@
+{
+  "graticule": "0.1.0",
+  "ok": true,
+  "region": "world",
+  "type": "choropleth",
+  "projection": {
+    "name": "equal-earth",
+    "equalArea": true
+  },
+  "join": {
+    "column": "iso3",
+    "keyType": "iso3",
+    "rows": 217,
+    "matchedRows": 215,
+    "matchedAreas": 215,
+    "matchedBy": {
+      "code": 215,
+      "name": 0,
+      "alias": 0,
+      "padded": 0
+    },
+    "unmatched": [
+      {
+        "value": "CHI",
+        "rows": 1,
+        "suggestions": []
+      },
+      {
+        "value": "GIB",
+        "rows": 1,
+        "suggestions": []
+      }
+    ],
+    "ambiguous": []
+  },
+  "classes": {
+    "method": "quantile",
+    "edges": [
+      31,
+      66,
+      71.6,
+      76.2,
+      80.3,
+      87
+    ],
+    "counts": [
+      43,
+      43,
+      43,
+      43,
+      43
+    ],
+    "colors": [
+      "#ffffcc",
+      "#a1dab4",
+      "#41b6c4",
+      "#2c7fb8",
+      "#253494"
+    ],
+    "palette": "ylgnbu"
+  },
+  "labels": {
+    "placed": 31,
+    "hidden": 150,
+    "dots": 60
+  },
+  "findings": [
+    {
+      "id": "join-unmatched",
+      "level": "warn",
+      "allowed": false,
+      "message": "2 rows matched no area and are not drawn: CHI; GIB.",
+      "reason": "Rows that vanish quietly make a map look complete when it is not. Fix the spelling or the key column.",
+      "fixable": false
+    },
+    {
+      "id": "labels-hidden",
+      "level": "info",
+      "allowed": false,
+      "message": "150 labels were left out because they do not fit inside their area or would overlap another label.",
+      "reason": "Hidden labels are listed so that a quieter map is not mistaken for a complete one.",
+      "fixable": false
+    },
+    {
+      "id": "small-areas-marked",
+      "level": "info",
+      "allowed": false,
+      "message": "60 areas are too small to see at this scale and are drawn as dots.",
+      "reason": "Small countries and territories would otherwise vanish from the map.",
+      "fixable": false
+    }
+  ],
+  "fixes": [],
+  "spec": {
+    "title": "Life expectancy at birth, 2019",
+    "subtitle": "Years, by country",
+    "source": "World Bank, World Development Indicators, SP.DYN.LE00.IN, 2019",
+    "note": "Data retrieved 2026-10-10.",
+    "region": "world",
+    "type": "choropleth",
+    "data": {
+      "file": "data.csv",
+      "key": "iso3",
+      "value": "life_expectancy",
+      "kind": "rate",
+      "label": "Years"
+    },
+    "classes": {
+      "method": "quantile",
+      "count": 5
+    },
+    "palette": "ylgnbu",
+    "projection": "auto",
+    "language": "en",
+    "labels": {
+      "show": "auto"
+    },
+    "legend": {},
+    "size": {
+      "width": 1200
+    },
+    "theme": "light",
+    "grid": false,
+    "highlight": [],
+    "panels": [],
+    "attribution": true,
+    "symbols": {},
+    "checks": {
+      "allow": []
+    }
+  }
+}

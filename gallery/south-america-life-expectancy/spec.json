@@ -1,0 +1,20 @@
+{
+  "title": "Esperanza de vida al nacer, 2019",
+  "subtitle": "Anos",
+  "source": "World Bank, World Development Indicators, SP.DYN.LE00.IN, 2019",
+  "note": "Data retrieved 2026-10-10.",
+  "region": "south-america",
+  "language": "es",
+  "data": {
+    "file": "data.csv",
+    "key": "iso3",
+    "value": "life_expectancy",
+    "kind": "rate",
+    "label": "Anos"
+  },
+  "classes": {
+    "method": "quantile",
+    "count": 5
+  },
+  "palette": "viridis"
+}

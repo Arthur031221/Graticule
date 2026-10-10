@@ -1,0 +1,17 @@
+node_modules
+site
+dist
+.tmp
+skills/graticule/scripts/graticule.mjs
+skills/graticule/data
+skills/graticule/vendor
+skills/graticule/fonts
+src/palette-data.js
+package-lock.json
+tests/fixtures
+tests/snapshots.json
+docs/gallery
+gallery
+eval/runs
+verify/projections.json
+*.md

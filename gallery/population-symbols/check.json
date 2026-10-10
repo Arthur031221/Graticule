@@ -1,0 +1,98 @@
+{
+  "graticule": "0.1.0",
+  "ok": true,
+  "region": "world",
+  "type": "symbols",
+  "projection": {
+    "name": "equal-earth",
+    "equalArea": true
+  },
+  "join": {
+    "column": "iso3",
+    "keyType": "iso3",
+    "rows": 217,
+    "matchedRows": 215,
+    "matchedAreas": 215,
+    "matchedBy": {
+      "code": 215,
+      "name": 0,
+      "alias": 0,
+      "padded": 0
+    },
+    "unmatched": [
+      {
+        "value": "CHI",
+        "rows": 1,
+        "suggestions": []
+      },
+      {
+        "value": "GIB",
+        "rows": 1,
+        "suggestions": []
+      }
+    ],
+    "ambiguous": []
+  },
+  "classes": null,
+  "labels": {
+    "placed": 0,
+    "hidden": 0,
+    "dots": 0
+  },
+  "findings": [
+    {
+      "id": "join-unmatched",
+      "level": "warn",
+      "allowed": false,
+      "message": "2 rows matched no area and are not drawn: CHI; GIB.",
+      "reason": "Rows that vanish quietly make a map look complete when it is not. Fix the spelling or the key column.",
+      "fixable": false
+    },
+    {
+      "id": "symbols-min-size",
+      "level": "info",
+      "allowed": false,
+      "message": "67 symbols are smaller than the minimum size and were drawn at the minimum.",
+      "reason": "Those circles are slightly larger than their value says. They are listed so that sizes are not read too precisely.",
+      "fixable": false
+    }
+  ],
+  "fixes": [],
+  "spec": {
+    "title": "Population, 2022",
+    "subtitle": "Circle area is proportional to the number of people",
+    "source": "World Bank, World Development Indicators, SP.POP.TOTL, 2022",
+    "note": "Data retrieved 2026-10-10.",
+    "region": "world",
+    "type": "symbols",
+    "data": {
+      "file": "data.csv",
+      "key": "iso3",
+      "value": "population",
+      "kind": "count",
+      "label": "People"
+    },
+    "classes": {
+      "method": "quantile",
+      "count": 5
+    },
+    "projection": "auto",
+    "language": "en",
+    "labels": {
+      "show": "auto"
+    },
+    "legend": {},
+    "size": {
+      "width": 1200
+    },
+    "theme": "light",
+    "grid": false,
+    "highlight": [],
+    "panels": [],
+    "attribution": true,
+    "symbols": {},
+    "checks": {
+      "allow": []
+    }
+  }
+}

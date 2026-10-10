@@ -1,0 +1,127 @@
+{
+  "graticule": "0.1.0",
+  "ok": true,
+  "region": "world",
+  "type": "categorical",
+  "projection": {
+    "name": "equal-earth",
+    "equalArea": true
+  },
+  "join": {
+    "column": "iso3",
+    "keyType": "iso3",
+    "rows": 217,
+    "matchedRows": 215,
+    "matchedAreas": 215,
+    "matchedBy": {
+      "code": 215,
+      "name": 0,
+      "alias": 0,
+      "padded": 0
+    },
+    "unmatched": [
+      {
+        "value": "CHI",
+        "rows": 1,
+        "suggestions": []
+      },
+      {
+        "value": "GIB",
+        "rows": 1,
+        "suggestions": []
+      }
+    ],
+    "ambiguous": []
+  },
+  "classes": {
+    "method": "categorical",
+    "edges": [],
+    "categories": [
+      "High income",
+      "Upper middle income",
+      "Lower middle income",
+      "Low income"
+    ],
+    "counts": [
+      84,
+      59,
+      47,
+      25
+    ],
+    "colors": [
+      "#0072B2",
+      "#E69F00",
+      "#009E73",
+      "#CC79A7"
+    ],
+    "palette": "okabe-ito"
+  },
+  "labels": {
+    "placed": 0,
+    "hidden": 0,
+    "dots": 60
+  },
+  "findings": [
+    {
+      "id": "join-unmatched",
+      "level": "warn",
+      "allowed": false,
+      "message": "2 rows matched no area and are not drawn: CHI; GIB.",
+      "reason": "Rows that vanish quietly make a map look complete when it is not. Fix the spelling or the key column.",
+      "fixable": false
+    },
+    {
+      "id": "small-areas-marked",
+      "level": "info",
+      "allowed": false,
+      "message": "60 areas are too small to see at this scale and are drawn as dots.",
+      "reason": "Small countries and territories would otherwise vanish from the map.",
+      "fixable": false
+    }
+  ],
+  "fixes": [],
+  "spec": {
+    "title": "World Bank income groups",
+    "subtitle": "Classification of economies, fiscal year 2026",
+    "source": "World Bank country classifications",
+    "note": "Data retrieved 2026-10-10.",
+    "region": "world",
+    "type": "categorical",
+    "data": {
+      "file": "data.csv",
+      "key": "iso3",
+      "value": "income_group",
+      "label": "Income group"
+    },
+    "classes": {
+      "method": "quantile",
+      "count": 5
+    },
+    "palette": "okabe-ito",
+    "projection": "auto",
+    "language": "en",
+    "labels": {
+      "show": "none"
+    },
+    "legend": {
+      "order": [
+        "High income",
+        "Upper middle income",
+        "Lower middle income",
+        "Low income"
+      ]
+    },
+    "size": {
+      "width": 1200
+    },
+    "theme": "light",
+    "grid": false,
+    "highlight": [],
+    "panels": [],
+    "attribution": true,
+    "symbols": {},
+    "checks": {
+      "allow": []
+    }
+  }
+}

@@ -1,0 +1,13 @@
+{
+  "title": "台灣在哪裡",
+  "subtitle": "位於東亞，介於日本與菲律賓之間",
+  "source": "Natural Earth",
+  "note": "Data retrieved 2026-10-10.",
+  "region": "asia",
+  "type": "locator",
+  "language": "zh-TW",
+  "highlight": [
+    "TWN"
+  ],
+  "data": {}
+}

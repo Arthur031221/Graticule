@@ -1,0 +1,196 @@
+{
+  "graticule": "0.1.0",
+  "ok": true,
+  "region": "world",
+  "type": "choropleth",
+  "projection": {
+    "name": "equal-earth",
+    "equalArea": true
+  },
+  "join": {
+    "column": "country",
+    "keyType": "name",
+    "rows": 240,
+    "matchedRows": 226,
+    "matchedAreas": 226,
+    "matchedBy": {
+      "code": 0,
+      "name": 218,
+      "alias": 8,
+      "padded": 0
+    },
+    "unmatched": [
+      {
+        "value": "Bonaire, Saint Eustatius and Saba",
+        "rows": 1,
+        "suggestions": []
+      },
+      {
+        "value": "French Guiana",
+        "rows": 1,
+        "suggestions": []
+      },
+      {
+        "value": "Gibraltar",
+        "rows": 1,
+        "suggestions": []
+      },
+      {
+        "value": "Martinique",
+        "rows": 1,
+        "suggestions": []
+      },
+      {
+        "value": "Mayotte",
+        "rows": 1,
+        "suggestions": []
+      },
+      {
+        "value": "R�union",
+        "rows": 1,
+        "suggestions": []
+      },
+      {
+        "value": "International conveyance (American Samoa)",
+        "rows": 1,
+        "suggestions": []
+      },
+      {
+        "value": "International conveyance (Solomon Islands)",
+        "rows": 1,
+        "suggestions": []
+      },
+      {
+        "value": "International conveyance (Vanuatu)",
+        "rows": 1,
+        "suggestions": []
+      },
+      {
+        "value": "International conveyance (Diamond Princess)",
+        "rows": 1,
+        "suggestions": []
+      },
+      {
+        "value": "Guadeloupe",
+        "rows": 1,
+        "suggestions": []
+      },
+      {
+        "value": "Tokelau",
+        "rows": 1,
+        "suggestions": []
+      },
+      {
+        "value": "International conveyance (Kiribati)",
+        "rows": 1,
+        "suggestions": []
+      },
+      {
+        "value": "International commercial vessel",
+        "rows": 1,
+        "suggestions": []
+      }
+    ],
+    "ambiguous": []
+  },
+  "classes": {
+    "method": "jenks",
+    "edges": [
+      0,
+      58,
+      151,
+      270,
+      420,
+      690
+    ],
+    "counts": [
+      97,
+      52,
+      44,
+      23,
+      10
+    ],
+    "colors": [
+      "#fee5d9",
+      "#fcae91",
+      "#fb6a4a",
+      "#de2d26",
+      "#a50f15"
+    ],
+    "palette": "reds"
+  },
+  "labels": {
+    "placed": 31,
+    "hidden": 139,
+    "dots": 71
+  },
+  "findings": [
+    {
+      "id": "join-unmatched",
+      "level": "warn",
+      "allowed": false,
+      "message": "14 rows matched no area and are not drawn: Bonaire, Saint Eustatius and Saba; French Guiana; Gibraltar; Martinique; Mayotte; R�union; International conveyance (American Samoa); International conveyance (Solomon Islands); International conveyance (Vanuatu); International conveyance (Diamond Princess); Guadeloupe; Tokelau; International conveyance (Kiribati); International commercial vessel.",
+      "reason": "Rows that vanish quietly make a map look complete when it is not. Fix the spelling or the key column.",
+      "fixable": false
+    },
+    {
+      "id": "labels-hidden",
+      "level": "info",
+      "allowed": false,
+      "message": "139 labels were left out because they do not fit inside their area or would overlap another label.",
+      "reason": "Hidden labels are listed so that a quieter map is not mistaken for a complete one.",
+      "fixable": false
+    },
+    {
+      "id": "small-areas-marked",
+      "level": "info",
+      "allowed": false,
+      "message": "71 areas are too small to see at this scale and are drawn as dots.",
+      "reason": "Small countries and territories would otherwise vanish from the map.",
+      "fixable": false
+    }
+  ],
+  "fixes": [],
+  "spec": {
+    "title": "COVID-19 deaths per 100,000 people",
+    "subtitle": "Cumulative deaths reported to WHO, by country",
+    "source": "WHO COVID-19 dashboard, cumulative deaths up to 2026-09-20. Population: Natural Earth",
+    "note": "Data retrieved 2026-10-10.",
+    "region": "world",
+    "type": "choropleth",
+    "data": {
+      "file": "data.csv",
+      "key": "country",
+      "value": "deaths",
+      "kind": "count",
+      "normalize": {
+        "by": "population",
+        "per": 100000
+      },
+      "label": "Deaths"
+    },
+    "classes": {
+      "method": "jenks",
+      "count": 5
+    },
+    "palette": "reds",
+    "projection": "auto",
+    "language": "en",
+    "labels": {
+      "show": "auto"
+    },
+    "legend": {},
+    "size": {
+      "width": 1200
+    },
+    "theme": "light",
+    "grid": false,
+    "highlight": [],
+    "panels": [],
+    "attribution": true,
+    "symbols": {},
+    "checks": {
+      "allow": []
+    }
+  }
+}

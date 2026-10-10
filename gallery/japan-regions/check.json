@@ -1,0 +1,113 @@
+{
+  "graticule": "0.1.0",
+  "ok": true,
+  "region": "jp-prefectures",
+  "type": "categorical",
+  "projection": {
+    "name": "conic-equal-area",
+    "equalArea": true
+  },
+  "join": {
+    "column": "prefecture",
+    "keyType": "name",
+    "rows": 47,
+    "matchedRows": 47,
+    "matchedAreas": 47,
+    "matchedBy": {
+      "code": 0,
+      "name": 47,
+      "alias": 0,
+      "padded": 0
+    },
+    "unmatched": [],
+    "ambiguous": []
+  },
+  "classes": {
+    "method": "categorical",
+    "edges": [],
+    "categories": [
+      "中部",
+      "九州沖縄",
+      "近畿",
+      "関東",
+      "東北",
+      "中国",
+      "四国",
+      "北海道"
+    ],
+    "counts": [
+      9,
+      8,
+      7,
+      7,
+      6,
+      5,
+      4,
+      1
+    ],
+    "colors": [
+      "#0072B2",
+      "#E69F00",
+      "#009E73",
+      "#CC79A7",
+      "#56B4E9",
+      "#D55E00",
+      "#F0E442",
+      "#555555"
+    ],
+    "palette": "okabe-ito"
+  },
+  "labels": {
+    "placed": 21,
+    "hidden": 26,
+    "dots": 0
+  },
+  "findings": [
+    {
+      "id": "labels-hidden",
+      "level": "info",
+      "allowed": false,
+      "message": "26 個のラベルは、地域に収まらないか他のラベルと重なるため省略しました。",
+      "reason": "すっきりした地図が完全だと誤解されないよう、省略したラベルを記録します。",
+      "fixable": false
+    }
+  ],
+  "fixes": [],
+  "spec": {
+    "title": "日本の地方区分",
+    "subtitle": "47都道府県を8地方に分けたもの",
+    "source": "一般的な地方区分。境界はNatural Earth",
+    "note": "作成日 2026-10-10。",
+    "region": "jp-prefectures",
+    "type": "categorical",
+    "data": {
+      "file": "data.csv",
+      "key": "prefecture",
+      "value": "region",
+      "label": "地方"
+    },
+    "classes": {
+      "method": "quantile",
+      "count": 5
+    },
+    "palette": "okabe-ito",
+    "projection": "auto",
+    "language": "ja",
+    "labels": {
+      "show": "auto"
+    },
+    "legend": {},
+    "size": {
+      "width": 1200
+    },
+    "theme": "light",
+    "grid": false,
+    "highlight": [],
+    "panels": [],
+    "attribution": true,
+    "symbols": {},
+    "checks": {
+      "allow": []
+    }
+  }
+}

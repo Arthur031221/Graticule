@@ -1,0 +1,21 @@
+{
+  "title": "台灣各鄉鎮市區的面積",
+  "subtitle": "平方公里",
+  "source": "內政部國土測繪中心鄉鎮市區界線，面積由邊界計算（球面近似）",
+  "note": "資料產生於 2026-10-10。",
+  "region": "tw-towns",
+  "language": "zh-TW",
+  "data": {
+    "file": "data.csv",
+    "key": "code",
+    "value": "area_km2",
+    "kind": "other",
+    "label": "平方公里"
+  },
+  "classes": {
+    "method": "jenks",
+    "count": 6
+  },
+  "palette": "viridis",
+  "labels": "none"
+}

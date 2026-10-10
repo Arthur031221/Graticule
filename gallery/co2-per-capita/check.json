@@ -1,0 +1,130 @@
+{
+  "graticule": "0.1.0",
+  "ok": true,
+  "region": "world",
+  "type": "choropleth",
+  "projection": {
+    "name": "equal-earth",
+    "equalArea": true
+  },
+  "join": {
+    "column": "iso3",
+    "keyType": "iso3",
+    "rows": 203,
+    "matchedRows": 202,
+    "matchedAreas": 202,
+    "matchedBy": {
+      "code": 202,
+      "name": 0,
+      "alias": 0,
+      "padded": 0
+    },
+    "unmatched": [
+      {
+        "value": "GIB",
+        "rows": 1,
+        "suggestions": []
+      }
+    ],
+    "ambiguous": []
+  },
+  "classes": {
+    "method": "jenks",
+    "edges": [
+      0,
+      2.33,
+      6.2,
+      14,
+      30,
+      50,
+      72
+    ],
+    "counts": [
+      101,
+      58,
+      31,
+      10,
+      1,
+      1
+    ],
+    "colors": [
+      "#ffffb2",
+      "#fed976",
+      "#feb24c",
+      "#fd8d3c",
+      "#f03b20",
+      "#bd0026"
+    ],
+    "palette": "ylorrd"
+  },
+  "labels": {
+    "placed": 31,
+    "hidden": 160,
+    "dots": 50
+  },
+  "findings": [
+    {
+      "id": "join-unmatched",
+      "level": "warn",
+      "allowed": false,
+      "message": "1 rows matched no area and are not drawn: GIB.",
+      "reason": "Rows that vanish quietly make a map look complete when it is not. Fix the spelling or the key column.",
+      "fixable": false
+    },
+    {
+      "id": "labels-hidden",
+      "level": "info",
+      "allowed": false,
+      "message": "160 labels were left out because they do not fit inside their area or would overlap another label.",
+      "reason": "Hidden labels are listed so that a quieter map is not mistaken for a complete one.",
+      "fixable": false
+    },
+    {
+      "id": "small-areas-marked",
+      "level": "info",
+      "allowed": false,
+      "message": "50 areas are too small to see at this scale and are drawn as dots.",
+      "reason": "Small countries and territories would otherwise vanish from the map.",
+      "fixable": false
+    }
+  ],
+  "fixes": [],
+  "spec": {
+    "title": "Carbon dioxide emissions per person, 2020",
+    "subtitle": "Tonnes of CO2 per person, excluding land use",
+    "source": "World Bank, World Development Indicators, EN.GHG.CO2.PC.CE.AR5, 2020",
+    "note": "Data retrieved 2026-10-10.",
+    "region": "world",
+    "type": "choropleth",
+    "data": {
+      "file": "data.csv",
+      "key": "iso3",
+      "value": "tonnes_per_person",
+      "kind": "rate",
+      "label": "Tonnes per person"
+    },
+    "classes": {
+      "method": "jenks",
+      "count": 6
+    },
+    "palette": "ylorrd",
+    "projection": "auto",
+    "language": "en",
+    "labels": {
+      "show": "auto"
+    },
+    "legend": {},
+    "size": {
+      "width": 1200
+    },
+    "theme": "light",
+    "grid": false,
+    "highlight": [],
+    "panels": [],
+    "attribution": true,
+    "symbols": {},
+    "checks": {
+      "allow": []
+    }
+  }
+}

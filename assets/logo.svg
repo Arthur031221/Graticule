@@ -1,0 +1,7 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 64 64" width="64" height="64" role="img" aria-label="Graticule">
+  <circle cx="32" cy="32" r="28" fill="none" stroke="#c8412b" stroke-width="3.5"/>
+  <ellipse cx="32" cy="32" rx="12" ry="28" fill="none" stroke="#c8412b" stroke-width="2.5"/>
+  <line x1="32" y1="4" x2="32" y2="60" stroke="#c8412b" stroke-width="2.5"/>
+  <path d="M6.5 22 Q32 28 57.5 22 M4 32 H60 M6.5 42 Q32 36 57.5 42" fill="none" stroke="#c8412b" stroke-width="2.5"/>
+  <circle cx="43" cy="24" r="4.2" fill="#c8412b"/>
+</svg>

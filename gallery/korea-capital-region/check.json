@@ -1,0 +1,98 @@
+{
+  "graticule": "0.1.0",
+  "ok": true,
+  "region": "kr-provinces",
+  "type": "categorical",
+  "projection": {
+    "name": "conic-equal-area",
+    "equalArea": true
+  },
+  "join": {
+    "column": "province",
+    "keyType": "name",
+    "rows": 17,
+    "matchedRows": 17,
+    "matchedAreas": 17,
+    "matchedBy": {
+      "code": 0,
+      "name": 17,
+      "alias": 0,
+      "padded": 0
+    },
+    "unmatched": [],
+    "ambiguous": []
+  },
+  "classes": {
+    "method": "categorical",
+    "edges": [],
+    "categories": [
+      "도",
+      "광역시",
+      "수도권"
+    ],
+    "counts": [
+      8,
+      6,
+      3
+    ],
+    "colors": [
+      "#4477AA",
+      "#EE6677",
+      "#228833"
+    ],
+    "palette": "tol-bright"
+  },
+  "labels": {
+    "placed": 10,
+    "hidden": 7,
+    "dots": 0
+  },
+  "findings": [
+    {
+      "id": "labels-hidden",
+      "level": "info",
+      "allowed": false,
+      "message": "라벨 7개는 지역 안에 들어가지 않거나 다른 라벨과 겹쳐 생략했습니다.",
+      "reason": "깔끔한 지도가 완전하다고 오해되지 않도록 생략한 라벨을 기록합니다.",
+      "fixable": false
+    }
+  ],
+  "fixes": [],
+  "spec": {
+    "title": "수도권, 광역시, 도",
+    "subtitle": "대한민국 17개 시도",
+    "source": "일반적인 행정 구분. 경계는 Natural Earth",
+    "note": "작성일 2026-10-10.",
+    "region": "kr-provinces",
+    "type": "categorical",
+    "data": {
+      "file": "data.csv",
+      "key": "province",
+      "value": "group",
+      "label": "구분"
+    },
+    "classes": {
+      "method": "quantile",
+      "count": 5
+    },
+    "palette": "tol-bright",
+    "projection": "auto",
+    "language": "ko",
+    "labels": {
+      "show": "auto"
+    },
+    "legend": {},
+    "size": {
+      "width": 1200
+    },
+    "theme": "light",
+    "grid": false,
+    "highlight": [],
+    "panels": [],
+    "attribution": true,
+    "symbols": {},
+    "checks": {
+      "allow": []
+    }
+  }
+}

@@ -1,0 +1,333 @@
+{
+  "legend": {
+    "no_data": "データなし",
+    "per_person": "1人あたり",
+    "per_population": "人口{per}人あたり",
+    "per_area": "{per} km²あたり",
+    "per_km2": "km²あたり"
+  },
+  "footer": {
+    "source": "出典：{source}",
+    "made_with": "Graticuleで作成"
+  },
+  "html": {
+    "data_table": "データ表",
+    "area": "地域",
+    "value": "値"
+  },
+  "terms": {
+    "population": "人口",
+    "area": "面積",
+    "column": "分母"
+  },
+  "rules": {
+    "spec": {
+      "message": "設定ファイルの {path} に問題があります：{detail}。",
+      "reason": "読み取れない設定からは地図を描けません。"
+    },
+    "spec-unknown-key": {
+      "message": "{path} という項目は不明なので無視しました。ここで使える項目：{allowed}。",
+      "reason": "綴りを間違えた項目は黙って無視され、地図が意図どおりになりません。"
+    },
+    "source-required": {
+      "message": "この地図には出典がありません。",
+      "reason": "数値の出どころがなければ、読者は確かめられません。設定に \"source\" を追加してください。"
+    },
+    "title-required": {
+      "message": "この地図にはタイトルがありません。",
+      "reason": "凡例を読む前に、色が何を表すかを読者が知っている必要があります。"
+    },
+    "legend-title": {
+      "message": "凡例にタイトルがなく、{column} の単位が示されていません。",
+      "reason": "単位のない数値は何通りにも読めます。data.label を設定してください（例：「10万人あたりの死亡数」）。"
+    },
+    "kind-undeclared": {
+      "message": "data.kind が未設定のため、生の件数かどうか判断できません。",
+      "reason": "生の件数を塗り分けると、人が多い場所を示すだけになりがちです。\"kind\" を rate、share、index、count のいずれかで宣言してください。"
+    },
+    "value-not-numeric": {
+      "message": "{column} 列の大半は数値ではありません（例：「{example}」）。",
+      "reason": "凡例の階級に分けられるのは数値だけです。"
+    },
+    "no-values": {
+      "message": "描ける数値を持つ地域がありません。",
+      "reason": "地図が空になってしまいます。"
+    },
+    "join-failed": {
+      "message": "{column} 列のうち {region} の地域に {kind} で一致した行は {percent}% だけです。一致しなかったもの：{examples}。",
+      "reason": "結合に失敗した地図は、値を違う場所に置いてしまいます。data.key、data.keyType、region を確認してください。"
+    },
+    "join-unmatched": {
+      "message": "{count} 行がどの地域にも一致せず、描画されません：{list}。",
+      "reason": "黙って消える行があると、地図は完全に見えて実はそうではありません。綴りやキー列を直してください。"
+    },
+    "join-ambiguous": {
+      "message": "次の名前は複数の地域に当てはまるため、描画されません：{list}。",
+      "reason": "どの地域か推測すると、値を違う場所に置いてしまいます。"
+    },
+    "duplicate-keys": {
+      "message": "{count} 地域に複数の行があります（例：{example} は {rows} 行）。",
+      "reason": "1地域に描ける値は1つで、最後の行だけを残すと他が隠れます。data.aggregate を設定するか、data.filter で1年分など1行に絞ってください。"
+    },
+    "raw-counts": {
+      "message_declared": "値は生の件数です（data.kind が count）。",
+      "message_correlated": "値が人口と連動しています（各地域の人口とのスピアマン相関 {rho}）。生の件数に見られる特徴です。",
+      "reason": "件数の地図は、人が住む場所を示すだけになりがちです。人口や面積で割り、色が割合を示すようにしてください。人口データのある地域なら --fix で自動的に行えます。"
+    },
+    "projection-mercator": {
+      "message": "緯度の幅が {span} 度ある地域でメルカトル図法を使っています。",
+      "reason": "メルカトル図法は赤道から離れるほど面積を引き伸ばし、グリーンランドがアフリカと同じ大きさに見えます。階級区分図は面積で比べるので、正積図法を使ってください。"
+    },
+    "projection-not-equal-area": {
+      "message": "{name} は正積図法ではありません。",
+      "reason": "面積が実際より大きく、または小さく見え、比較がわずかに偏ります。Equal Earth、アルベルス、ランベルト正積方位図法は面積を保ちます。"
+    },
+    "max-classes": {
+      "message": "{count} 階級は読者が見分けられる数を超えています。上限は {max} です。",
+      "reason": "凡例と照合できる色の濃淡は7段階ほどが限度です。"
+    },
+    "class-breaks-coverage": {
+      "message": "階級の境界は {low} から {high} ですが、データは {min} から {max} です。",
+      "reason": "最初と最後の境界の外にある値には色が付かず、凡例が地図を説明できなくなります。最小値から最大値まで、すべての境界を並べてください。"
+    },
+    "empty-class": {
+      "message": "{index} 番目の階級に当てはまる地域がありません。",
+      "reason": "誰も使っていない凡例の項目は、区切りがデータに合っていないことを示します。"
+    },
+    "skewed-classes": {
+      "message": "{percent}% の地域が1つの階級に入っています。",
+      "reason": "偏ったデータに等間隔や手動の区切りを使うと、地図の大半が同じ色になります。分位数や自然分類なら地域が散らばります。"
+    },
+    "palette-order": {
+      "message": "パレット {palette} は明るさが一方向に変化していません。",
+      "reason": "順序のある配色では、明るさの順序が「多い」を伝える唯一の手がかりです。虹色は明るさが上下して、存在しない境界を作ります。"
+    },
+    "cvd-separation": {
+      "message": "色覚特性のある一部の読者にとって、パレット {palette} の色は CIEDE2000 で {worst} まで近づきます。",
+      "reason": "男性の約12人に1人は、これらの色の一部を見分けられません。隣り合う階級には3以上の差が必要で、5あれば安心です（カテゴリは8）。"
+    },
+    "diverging-center": {
+      "message": "発散型パレット {palette} には中心値が必要です。",
+      "reason": "0のような意味のある中間点がないと、データにない分かれ目を示唆してしまいます。\"center\" を設定してください。"
+    },
+    "too-many-categories": {
+      "message": "{count} カテゴリは、凡例で扱える {max} 色を超えています。",
+      "reason": "8色を超えると、読者は地図と凡例を照合できません。小さなカテゴリは「その他」にまとめてください。"
+    },
+    "normalize-missing": {
+      "message": "{count} 地域には割る基準となる{by}が内蔵されておらず、データなしとして表示されます。",
+      "reason": "分母がなければ割合は計算できません。normalize.by column で与えるか、欠けを受け入れて注記で説明してください。"
+    },
+    "values-skipped": {
+      "message": "{count} 行が地域に対応しましたが、セルが数値でない、または値の分母が欠けているか 0 のため除外されました（例: {example}）。",
+      "reason": "除外された行は地域の値を変えますが、地図には何も表れません。セルを直すか、欠けを受け入れて注記に書いてください。"
+    },
+    "no-data-share": {
+      "message": "{total} 地域のうち {count} 地域（{percent}%）に値がありません。",
+      "reason": "灰色の広い地図は誤解を招くことがあります。注記で理由を述べるか、データが対象とする地域を選んでください。"
+    },
+    "label-overlap": {
+      "message": "{count} 個のラベルが重なっています。",
+      "reason": "重なったラベルは読めません。"
+    },
+    "highlight-unmatched": {
+      "message": "強調する地域が見つかりません：{list}。",
+      "reason": "何も強調しない位置図は何も示しません。"
+    },
+    "symbols-negative": {
+      "message": "比例円では、0以下の値 {count} 件は表せません。",
+      "reason": "円の面積は量を表すので、負の値には大きさがありません。"
+    },
+    "fix-applied": {
+      "message": "{rule} に適用しました：{text}。",
+      "reason": "--fix は規則を満たす最小の変更だけを行い、ここに記録します。"
+    },
+    "labels-hidden": {
+      "message": "{count} 個のラベルは、地域に収まらないか他のラベルと重なるため省略しました。",
+      "reason": "すっきりした地図が完全だと誤解されないよう、省略したラベルを記録します。"
+    },
+    "small-areas-marked": {
+      "message": "{count} 地域はこの縮尺では小さすぎて見えないため、点で描きました。",
+      "reason": "そうしないと、小さな国や領土が地図から消えてしまいます。"
+    },
+    "outside-frame": {
+      "message": "データのある {count} 地域が地図の範囲外です：{list}。",
+      "reason": "描画されていません。表示するにはより広い地域を選んでください。"
+    },
+    "table-ragged": {
+      "message": "{count} 行のセル数が見出し行と異なります。",
+      "reason": "短い行や長い行では、セルが違う列の下に入っている可能性があります。ファイルの引用符と区切り文字を確認してください。"
+    },
+    "join-blank": {
+      "message": "{count} 行は地域名の列が空で、描画されません。",
+      "reason": "名前のない行は配置できません。空欄は合計行や末尾の注記であることが多いです。"
+    },
+    "glyphs-missing": {
+      "message": "埋め込みフォントに次の文字の字形がありません：{list}。",
+      "reason": "空の四角で表示されます。別の表記か別のラベル言語を使ってください。"
+    },
+    "symbols-min-size": {
+      "message": "{count} 個の円は最小サイズより小さいため、最小サイズで描きました。",
+      "reason": "これらの円は値よりわずかに大きく描かれています。大きさを厳密に読み取らないよう記録します。"
+    }
+  },
+  "ui": {
+    "title": "Graticule",
+    "tagline": "チェックリストを通る地図",
+    "skip": "地図へ移動",
+    "nav": {
+      "gallery": "ギャラリー",
+      "github": "GitHub",
+      "language": "言語",
+      "theme": "テーマ"
+    },
+    "theme": {
+      "light": "ライト",
+      "dark": "ダーク"
+    },
+    "step": {
+      "data": "データ",
+      "map": "地図",
+      "style": "スタイル",
+      "checks": "チェック",
+      "export": "書き出し"
+    },
+    "data": {
+      "drop": "CSVファイルをここにドロップ",
+      "or": "または",
+      "choose": "ファイルを選ぶ",
+      "paste": "表を貼り付け",
+      "pastePlaceholder": "country,value\nFrance,12.5\nJapan,8.1",
+      "examples": "または例から始める",
+      "loaded": "{rows} 行、{cols} 列",
+      "error": "読み込めませんでした：{detail}",
+      "empty": "表を追加すると、ここに地図が表示されます。"
+    },
+    "map": {
+      "region": "地域",
+      "type": "地図の種類",
+      "key": "地域名の列",
+      "keyAuto": "自動で検出",
+      "value": "地図にする列",
+      "values": "地図にする列（1列につき1枚）",
+      "kind": "数値の種類",
+      "normalize": "割る値",
+      "per": "あたり",
+      "unit": "凡例に表示する単位",
+      "highlight": "強調する地域（名前またはコード、カンマ区切り）"
+    },
+    "type": {
+      "choropleth": "塗り分け",
+      "symbols": "円",
+      "categorical": "カテゴリ",
+      "locator": "位置図",
+      "small-multiples": "小さな複数図"
+    },
+    "kind": {
+      "unset": "未指定",
+      "count": "件数",
+      "rate": "割合",
+      "share": "構成比",
+      "index": "指数・スコア",
+      "other": "その他"
+    },
+    "norm": {
+      "none": "なし",
+      "population": "人口",
+      "area": "面積（km²）",
+      "column": "別の列"
+    },
+    "style": {
+      "title": "タイトル",
+      "subtitle": "サブタイトル",
+      "source": "出典",
+      "note": "注記",
+      "method": "階級",
+      "count": "階級の数",
+      "palette": "パレット",
+      "labels": "ラベル",
+      "language": "ラベルの言語",
+      "theme": "地図のテーマ",
+      "center": "中心値（発散型パレット）"
+    },
+    "method": {
+      "quantile": "分位数",
+      "jenks": "自然分類",
+      "equal": "等間隔",
+      "manual": "手動の区切り"
+    },
+    "labels": {
+      "auto": "自動",
+      "none": "なし",
+      "all": "入るだけ表示"
+    },
+    "checks": {
+      "ok": "問題は見つかりませんでした。",
+      "blocked": "{count} 件の問題でこの地図を描けません。",
+      "warnings": "確認が必要な警告が {count} 件あります。",
+      "fixAll": "まとめて直す",
+      "fixed": "修正済み：{list}",
+      "allow": "許可",
+      "allowed": "許可済み",
+      "why": "理由",
+      "matched": "{rows} 行のうち {matched} 行が {areas} 地域に一致",
+      "unmatched": "一致なし：{list}",
+      "pending": "チェック中..."
+    },
+    "level": {
+      "error": "エラー",
+      "warn": "警告",
+      "info": "メモ"
+    },
+    "export": {
+      "svg": "SVG",
+      "png": "PNG",
+      "png3x": "印刷用PNG",
+      "pdf": "PDF",
+      "html": "インタラクティブHTML",
+      "spec": "設定（JSON）",
+      "report": "チェックレポート（JSON）",
+      "working": "準備中...",
+      "hint": "すべてのファイルはブラウザー内で作られます。"
+    },
+    "stage": {
+      "blocked": "左側のエラーを直すと地図が表示されます。",
+      "loading": "描画中...",
+      "failed": "この地図を描けませんでした：{detail}"
+    },
+    "footer": {
+      "note": "オープンソース、MITライセンス。すべてブラウザー内で処理され、何もアップロードされません。"
+    },
+    "regions": {
+      "world": "世界",
+      "europe": "ヨーロッパ",
+      "asia": "アジア",
+      "africa": "アフリカ",
+      "north-america": "北アメリカ",
+      "south-america": "南アメリカ",
+      "oceania": "オセアニア",
+      "us-states": "アメリカ、州",
+      "us-counties": "アメリカ、郡",
+      "tw-counties": "台湾、県市",
+      "tw-towns": "台湾、郷鎮市区",
+      "jp-prefectures": "日本、都道府県",
+      "kr-provinces": "韓国、道と広域市"
+    },
+    "examples": {
+      "covid-raw": "COVID死者数（悪い例）",
+      "life-expectancy": "平均寿命",
+      "us-county-unemployment": "アメリカの郡",
+      "europe-gdp-per-capita": "ヨーロッパのGDP",
+      "population-symbols": "人口の円",
+      "taiwan-township-area": "台湾の郷鎮市区",
+      "japan-regions": "日本の地方"
+    },
+    "spec": {
+      "title": "設定（JSON）"
+    },
+    "status": {
+      "detected": "{region}のようです。",
+      "applied": "適用しました：{list}。"
+    }
+  }
+}

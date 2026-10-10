@@ -1,0 +1,121 @@
+{
+  "graticule": "0.1.0",
+  "ok": true,
+  "region": "africa",
+  "type": "choropleth",
+  "projection": {
+    "name": "azimuthal-equal-area",
+    "equalArea": true
+  },
+  "join": {
+    "column": "iso3",
+    "keyType": "iso3",
+    "rows": 182,
+    "matchedRows": 182,
+    "matchedAreas": 182,
+    "matchedBy": {
+      "code": 182,
+      "name": 0,
+      "alias": 0,
+      "padded": 0
+    },
+    "unmatched": [],
+    "ambiguous": []
+  },
+  "classes": {
+    "method": "quantile",
+    "edges": [
+      7.1,
+      27,
+      39,
+      68,
+      87,
+      100
+    ],
+    "counts": [
+      14,
+      13,
+      14,
+      13,
+      14
+    ],
+    "colors": [
+      "#edf8e9",
+      "#bae4b3",
+      "#74c476",
+      "#31a354",
+      "#006d2c"
+    ],
+    "palette": "greens"
+  },
+  "labels": {
+    "placed": 41,
+    "hidden": 40,
+    "dots": 6
+  },
+  "findings": [
+    {
+      "id": "labels-hidden",
+      "level": "info",
+      "allowed": false,
+      "message": "40 étiquettes ont été omises car elles ne tiennent pas dans leur zone ou en chevaucheraient une autre.",
+      "reason": "Les étiquettes omises sont notées pour qu'une carte plus épurée ne passe pas pour une carte complète.",
+      "fixable": false
+    },
+    {
+      "id": "small-areas-marked",
+      "level": "info",
+      "allowed": false,
+      "message": "6 zones sont trop petites pour être vues à cette échelle et sont dessinées en points.",
+      "reason": "Sinon les petits pays et territoires disparaîtraient de la carte.",
+      "fixable": false
+    },
+    {
+      "id": "outside-frame",
+      "level": "info",
+      "allowed": false,
+      "message": "107 zones avec des données sont hors du cadre de la carte : Andorra, Antigua and Barbuda, Argentina, Australia, Austria, ....",
+      "reason": "Elles ne sont pas dessinées. Choisissez une région plus large pour les montrer.",
+      "fixable": false
+    }
+  ],
+  "fixes": [],
+  "spec": {
+    "title": "Utilisateurs d'internet, 2022",
+    "subtitle": "Part de la population, en pourcentage",
+    "source": "World Bank, World Development Indicators, IT.NET.USER.ZS, 2022",
+    "note": "Data retrieved 2026-10-10.",
+    "region": "africa",
+    "type": "choropleth",
+    "data": {
+      "file": "data.csv",
+      "key": "iso3",
+      "value": "percent_online",
+      "kind": "share",
+      "label": "Pourcentage"
+    },
+    "classes": {
+      "method": "quantile",
+      "count": 5
+    },
+    "palette": "greens",
+    "projection": "auto",
+    "language": "fr",
+    "labels": {
+      "show": "auto"
+    },
+    "legend": {},
+    "size": {
+      "width": 1200
+    },
+    "theme": "light",
+    "grid": false,
+    "highlight": [],
+    "panels": [],
+    "attribution": true,
+    "symbols": {},
+    "checks": {
+      "allow": []
+    }
+  }
+}

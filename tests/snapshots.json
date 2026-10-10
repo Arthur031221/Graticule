@@ -1,0 +1,522 @@
+{
+ "choropleth": {
+  "size": [
+   1200,
+   757
+  ],
+  "counts": {
+   "text": 43,
+   "rect": 6,
+   "g": 3,
+   "path": 228,
+   "circle": 60
+  },
+  "fills": {
+   "#1b1f23": 24,
+   "#253494": 58,
+   "#2c7fb8": 56,
+   "#41b6c4": 55,
+   "#5b626b": 8,
+   "#939aa3": 2,
+   "#a1dab4": 56,
+   "#e5e2d9": 21,
+   "#ffffcc": 48,
+   "#ffffff": 9
+  },
+  "texts": [
+   "Life expectancy at birth, 2019",
+   "Years, by country",
+   "Years",
+   "31.0",
+   "66.0",
+   "71.6",
+   "76.2",
+   "80.3",
+   "87.0",
+   "No data",
+   "Russia",
+   "Brazil",
+   "Canada",
+   "United States of America",
+   "Australia",
+   "India",
+   "Arg.",
+   "Kazakhstan",
+   "D.R.C.",
+   "Algeria",
+   "Grlnd.",
+   "Mex.",
+   "Saud.",
+   "Sudan",
+   "Libya",
+   "Iran",
+   "Mongolia",
+   "Peru",
+   "Chad",
+   "Mali",
+   "S.Af.",
+   "Ang.",
+   "Niger",
+   "Col.",
+   "Eth.",
+   "Mrt.",
+   "Egypt",
+   "Tanz.",
+   "Pak.",
+   "Tur.",
+   "Afg.",
+   "Source: World Bank, World Development Indicators, SP.DYN.LE00.IN, 2019. Data retrieved 2026-10-10.",
+   "Made with Graticule  |  Boundaries: Natural Earth (public domain)"
+  ]
+ },
+ "raw counts normalised by population": {
+  "size": [
+   1200,
+   757
+  ],
+  "counts": {
+   "text": 43,
+   "rect": 6,
+   "g": 3,
+   "path": 228,
+   "circle": 71
+  },
+  "fills": {
+   "#1b1f23": 27,
+   "#5b626b": 8,
+   "#939aa3": 2,
+   "#a50f15": 11,
+   "#de2d26": 25,
+   "#e5e2d9": 14,
+   "#fb6a4a": 63,
+   "#fcae91": 73,
+   "#fee5d9": 119,
+   "#ffffff": 6
+  },
+  "texts": [
+   "COVID-19 deaths per 100,000 people",
+   "Cumulative deaths reported to WHO, by country",
+   "Deaths per 100,000 people",
+   "0",
+   "58",
+   "151",
+   "270",
+   "420",
+   "690",
+   "No data",
+   "Russia",
+   "Brazil",
+   "Canada",
+   "United States of America",
+   "Australia",
+   "India",
+   "Arg.",
+   "Kazakhstan",
+   "D.R.C.",
+   "Algeria",
+   "Grlnd.",
+   "Mex.",
+   "Saud.",
+   "Sudan",
+   "Libya",
+   "Iran",
+   "Mongolia",
+   "Peru",
+   "Chad",
+   "Mali",
+   "S.Af.",
+   "Ang.",
+   "Niger",
+   "Col.",
+   "Eth.",
+   "Mrt.",
+   "Egypt",
+   "Tanz.",
+   "Pak.",
+   "Tur.",
+   "Afg.",
+   "Source: WHO COVID-19 dashboard, cumulative deaths up to 2026-09-20. Population: Natural Earth. Data retrieved 2026-10-10.",
+   "Made with Graticule  |  Boundaries: Natural Earth (public domain)"
+  ]
+ },
+ "symbols": {
+  "size": [
+   1200,
+   787
+  ],
+  "counts": {
+   "text": 8,
+   "circle": 218,
+   "path": 244,
+   "g": 2
+  },
+  "fills": {
+   "#1b1f23": 2,
+   "#5b626b": 4,
+   "#939aa3": 2,
+   "#c8412b": 218,
+   "#e9e6dd": 241
+  },
+  "texts": [
+   "Population, 2022",
+   "Circle area is proportional to the number of people",
+   "People",
+   "1B",
+   "200M",
+   "50M",
+   "Source: World Bank, World Development Indicators, SP.POP.TOTL, 2022. Data retrieved 2026-10-10.",
+   "Made with Graticule  |  Boundaries: Natural Earth (public domain)"
+  ]
+ },
+ "categorical": {
+  "size": [
+   1200,
+   746
+  ],
+  "counts": {
+   "text": 10,
+   "rect": 5,
+   "g": 3,
+   "path": 228,
+   "circle": 60
+  },
+  "fills": {
+   "#0072B2": 117,
+   "#009E73": 55,
+   "#1b1f23": 2,
+   "#5b626b": 6,
+   "#939aa3": 2,
+   "#CC79A7": 27,
+   "#E69F00": 73,
+   "#e5e2d9": 21
+  },
+  "texts": [
+   "World Bank income groups",
+   "Classification of economies, fiscal year 2026",
+   "Income group",
+   "High income",
+   "Upper middle income",
+   "Lower middle income",
+   "Low income",
+   "No data",
+   "Source: World Bank country classifications. Data retrieved 2026-10-10.",
+   "Made with Graticule  |  Boundaries: Natural Earth (public domain)"
+  ]
+ },
+ "small multiples": {
+  "size": [
+   1200,
+   827
+  ],
+  "counts": {
+   "text": 17,
+   "rect": 7,
+   "g": 12,
+   "path": 964,
+   "circle": 364
+  },
+  "fills": {
+   "#1b1f23": 6,
+   "#5b626b": 9,
+   "#939aa3": 2,
+   "#a63603": 80,
+   "#e5e2d9": 105,
+   "#e6550d": 159,
+   "#fd8d3c": 223,
+   "#fdae6b": 262,
+   "#fdd0a2": 327,
+   "#feedde": 179
+  },
+  "texts": [
+   "Births per woman",
+   "Total fertility rate, by country",
+   "Births per woman",
+   "0.5",
+   "1.5",
+   "2.1",
+   "3.0",
+   "4.5",
+   "6.0",
+   "9.0",
+   "No data",
+   "1990",
+   "2000",
+   "2010",
+   "2022",
+   "Source: World Bank, World Development Indicators, SP.DYN.TFRT.IN, 1990, 2000, 2010 and 2022. Data retrieved 2026-10-10.",
+   "Made with Graticule  |  Boundaries: Natural Earth (public domain)"
+  ]
+ },
+ "locator with globe": {
+  "size": [
+   1200,
+   834
+  ],
+  "counts": {
+   "text": 5,
+   "g": 3,
+   "path": 240,
+   "circle": 4
+  },
+  "fills": {
+   "#1b1f23": 2,
+   "#5b626b": 1,
+   "#939aa3": 2,
+   "#c8412b": 2,
+   "#e9e6dd": 237,
+   "#eef1f3": 1
+  },
+  "texts": [
+   "台灣在哪裡",
+   "位於東亞，介於日本與菲律賓之間",
+   "台灣",
+   "資料來源：Natural Earth。 Data retrieved 2026-10-10.",
+   "以 Graticule 製作  |  Boundaries: Natural Earth (public domain)"
+  ]
+ },
+ "Japan with an Okinawa inset": {
+  "size": [
+   1200,
+   1176
+  ],
+  "counts": {
+   "text": 34,
+   "rect": 9,
+   "g": 3,
+   "path": 47
+  },
+  "fills": {
+   "#0072B2": 10,
+   "#009E73": 8,
+   "#1b1f23": 16,
+   "#555555": 2,
+   "#56B4E9": 7,
+   "#5b626b": 9,
+   "#939aa3": 2,
+   "#CC79A7": 8,
+   "#D55E00": 6,
+   "#E69F00": 9,
+   "#F0E442": 5,
+   "#ffffff": 7
+  },
+  "texts": [
+   "日本の地方区分",
+   "47都道府県を8地方に分けたもの",
+   "地方",
+   "中部",
+   "九州沖縄",
+   "近畿",
+   "関東",
+   "東北",
+   "中国",
+   "四国",
+   "北海道",
+   "北海道",
+   "岩手県",
+   "福島県",
+   "長野県",
+   "秋田県",
+   "新潟県",
+   "岐阜県",
+   "山形県",
+   "広島県",
+   "兵庫県",
+   "静岡県",
+   "宮城県",
+   "岡山県",
+   "栃木県",
+   "群馬県",
+   "熊本県",
+   "茨城県",
+   "愛知県",
+   "山梨県",
+   "徳島県",
+   "埼玉県",
+   "出典：一般的な地方区分。境界はNatural Earth。 作成日 2026-10-10。",
+   "Graticuleで作成  |  Boundaries: Natural Earth (public domain)"
+  ]
+ },
+ "US states normalised by area": {
+  "size": [
+   1200,
+   923
+  ],
+  "counts": {
+   "text": 51,
+   "rect": 6,
+   "g": 3,
+   "path": 52
+  },
+  "fills": {
+   "#1b1f23": 41,
+   "#5b626b": 8,
+   "#939aa3": 2,
+   "#bd0026": 2,
+   "#f03b20": 3,
+   "#fd8d3c": 4,
+   "#feb24c": 5,
+   "#fed976": 14,
+   "#ffffb2": 30
+  },
+  "texts": [
+   "Population density by state, 2023",
+   "People per square kilometer",
+   "People per km²",
+   "0.48",
+   "50.00",
+   "120.00",
+   "230.00",
+   "360.00",
+   "1,000.00",
+   "4,000.00",
+   "Texas",
+   "California",
+   "Montana",
+   "New Mexico",
+   "Arizona",
+   "Nevada",
+   "Colorado",
+   "Wyoming",
+   "Oregon",
+   "Utah",
+   "Minnesota",
+   "Idaho",
+   "Kansas",
+   "Nebraska",
+   "South Dakota",
+   "North Dakota",
+   "Oklahoma",
+   "Missouri",
+   "Alaska",
+   "Washington",
+   "Georgia",
+   "Florida",
+   "Illinois",
+   "Iowa",
+   "Wisconsin",
+   "Arkansas",
+   "Alabama",
+   "North Carolina",
+   "New York",
+   "Mississippi",
+   "Louisiana",
+   "Pennsylvania",
+   "Tennessee",
+   "Ohio",
+   "Michigan",
+   "Kentucky",
+   "Virginia",
+   "Indiana",
+   "Maine",
+   "Source: US Census Bureau, Vintage 2023 population estimates (July 1, 2023). Area computed from Census boundaries. Data retrieved 2026-10-10.",
+   "Made with Graticule  |  Boundaries: US Census Bureau (public domain)"
+  ]
+ },
+ "Taiwan townships in Traditional Chinese": {
+  "size": [
+   1200,
+   1187
+  ],
+  "counts": {
+   "text": 12,
+   "rect": 8,
+   "g": 3,
+   "path": 367
+  },
+  "fills": {
+   "#1b1f23": 2,
+   "#21a685": 6,
+   "#297a8e": 11,
+   "#3e4a89": 79,
+   "#471063": 268,
+   "#5b626b": 8,
+   "#6ccd5a": 6,
+   "#939aa3": 2,
+   "#e5e419": 3
+  },
+  "texts": [
+   "台灣各鄉鎮市區的面積",
+   "平方公里",
+   "平方公里",
+   "0.9",
+   "89.0",
+   "250.0",
+   "500.0",
+   "800.0",
+   "1,300.0",
+   "1,700.0",
+   "資料來源：內政部國土測繪中心鄉鎮市區界線，面積由邊界計算（球面近似）。 資料產生於 2026-10-10。",
+   "以 Graticule 製作  |  Boundaries: Ministry of the Interior, Taiwan (Open Government Data License 1.0)"
+  ]
+ },
+ "dark theme": {
+  "size": [
+   1200,
+   757
+  ],
+  "counts": {
+   "text": 43,
+   "rect": 6,
+   "g": 3,
+   "path": 228,
+   "circle": 60
+  },
+  "fills": {
+   "#253494": 48,
+   "#2a2f37": 21,
+   "#2c7fb8": 56,
+   "#41b6c4": 55,
+   "#78808a": 2,
+   "#a1dab4": 56,
+   "#a5adb7": 8,
+   "#eef0f2": 4,
+   "#ffffcc": 58,
+   "#ffffff": 29
+  },
+  "texts": [
+   "Life expectancy at birth, 2019",
+   "Years, by country",
+   "Years",
+   "31.0",
+   "66.0",
+   "71.6",
+   "76.2",
+   "80.3",
+   "87.0",
+   "No data",
+   "Russia",
+   "Brazil",
+   "Canada",
+   "United States of America",
+   "Australia",
+   "India",
+   "Arg.",
+   "Kazakhstan",
+   "D.R.C.",
+   "Algeria",
+   "Grlnd.",
+   "Mex.",
+   "Saud.",
+   "Sudan",
+   "Libya",
+   "Iran",
+   "Mongolia",
+   "Peru",
+   "Chad",
+   "Mali",
+   "S.Af.",
+   "Ang.",
+   "Niger",
+   "Col.",
+   "Eth.",
+   "Mrt.",
+   "Egypt",
+   "Tanz.",
+   "Pak.",
+   "Tur.",
+   "Afg.",
+   "Source: World Bank, World Development Indicators, SP.DYN.LE00.IN, 2019. Data retrieved 2026-10-10.",
+   "Made with Graticule  |  Boundaries: Natural Earth (public domain)"
+  ]
+ }
+}

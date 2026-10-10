@@ -1,0 +1,12 @@
+{
+  "agent": "claude",
+  "condition": "skill",
+  "prompt": "Map COVID deaths by country from deaths.csv.",
+  "repetition": 2,
+  "seconds": 25,
+  "steps": 14,
+  "produced": [
+    "map.png"
+  ],
+  "note": "Only PNG outputs are kept here. Other files the agent wrote (HTML, SVG) were left out to keep the repository small."
+}

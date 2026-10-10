@@ -1,0 +1,108 @@
+{
+  "graticule": "0.1.0",
+  "ok": true,
+  "region": "tw-towns",
+  "type": "choropleth",
+  "projection": {
+    "name": "azimuthal-equal-area",
+    "equalArea": true
+  },
+  "join": {
+    "column": "code",
+    "keyType": "code",
+    "rows": 368,
+    "matchedRows": 368,
+    "matchedAreas": 368,
+    "matchedBy": {
+      "code": 368,
+      "name": 0,
+      "alias": 0,
+      "padded": 0
+    },
+    "unmatched": [],
+    "ambiguous": []
+  },
+  "classes": {
+    "method": "jenks",
+    "edges": [
+      0.9,
+      89,
+      250,
+      500,
+      800,
+      1300,
+      1700
+    ],
+    "counts": [
+      268,
+      78,
+      10,
+      5,
+      5,
+      2
+    ],
+    "colors": [
+      "#471063",
+      "#3e4a89",
+      "#297a8e",
+      "#21a685",
+      "#6ccd5a",
+      "#e5e419"
+    ],
+    "palette": "viridis"
+  },
+  "labels": {
+    "placed": 0,
+    "hidden": 0,
+    "dots": 0
+  },
+  "findings": [
+    {
+      "id": "outside-frame",
+      "level": "info",
+      "allowed": false,
+      "message": "有 1 個有資料的地區在地圖範圍之外：Wuqiu Township。",
+      "reason": "它們沒有畫出來。請選更大的區域來顯示。",
+      "fixable": false
+    }
+  ],
+  "fixes": [],
+  "spec": {
+    "title": "台灣各鄉鎮市區的面積",
+    "subtitle": "平方公里",
+    "source": "內政部國土測繪中心鄉鎮市區界線，面積由邊界計算（球面近似）",
+    "note": "資料產生於 2026-10-10。",
+    "region": "tw-towns",
+    "type": "choropleth",
+    "data": {
+      "file": "data.csv",
+      "key": "code",
+      "value": "area_km2",
+      "kind": "other",
+      "label": "平方公里"
+    },
+    "classes": {
+      "method": "jenks",
+      "count": 6
+    },
+    "palette": "viridis",
+    "projection": "auto",
+    "language": "zh-Hant",
+    "labels": {
+      "show": "none"
+    },
+    "legend": {},
+    "size": {
+      "width": 1200
+    },
+    "theme": "light",
+    "grid": false,
+    "highlight": [],
+    "panels": [],
+    "attribution": true,
+    "symbols": {},
+    "checks": {
+      "allow": []
+    }
+  }
+}

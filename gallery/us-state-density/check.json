@@ -1,0 +1,112 @@
+{
+  "graticule": "0.1.0",
+  "ok": true,
+  "region": "us-states",
+  "type": "choropleth",
+  "projection": {
+    "name": "albers-usa",
+    "equalArea": true
+  },
+  "join": {
+    "column": "fips",
+    "keyType": "fips",
+    "rows": 52,
+    "matchedRows": 52,
+    "matchedAreas": 52,
+    "matchedBy": {
+      "code": 52,
+      "name": 0,
+      "alias": 0,
+      "padded": 0
+    },
+    "unmatched": [],
+    "ambiguous": []
+  },
+  "classes": {
+    "method": "jenks",
+    "edges": [
+      0.48,
+      50,
+      120,
+      230,
+      360,
+      1000,
+      4000
+    ],
+    "counts": [
+      29,
+      13,
+      4,
+      3,
+      2,
+      1
+    ],
+    "colors": [
+      "#ffffb2",
+      "#fed976",
+      "#feb24c",
+      "#fd8d3c",
+      "#f03b20",
+      "#bd0026"
+    ],
+    "palette": "ylorrd"
+  },
+  "labels": {
+    "placed": 39,
+    "hidden": 13,
+    "dots": 0
+  },
+  "findings": [
+    {
+      "id": "labels-hidden",
+      "level": "info",
+      "allowed": false,
+      "message": "13 labels were left out because they do not fit inside their area or would overlap another label.",
+      "reason": "Hidden labels are listed so that a quieter map is not mistaken for a complete one.",
+      "fixable": false
+    }
+  ],
+  "fixes": [],
+  "spec": {
+    "title": "Population density by state, 2023",
+    "subtitle": "People per square kilometer",
+    "source": "US Census Bureau, Vintage 2023 population estimates (July 1, 2023). Area computed from Census boundaries",
+    "note": "Data retrieved 2026-10-10.",
+    "region": "us-states",
+    "type": "choropleth",
+    "data": {
+      "file": "data.csv",
+      "key": "fips",
+      "value": "population",
+      "kind": "count",
+      "normalize": {
+        "by": "area",
+        "per": 1
+      },
+      "label": "People"
+    },
+    "classes": {
+      "method": "jenks",
+      "count": 6
+    },
+    "palette": "ylorrd",
+    "projection": "auto",
+    "language": "en",
+    "labels": {
+      "show": "auto"
+    },
+    "legend": {},
+    "size": {
+      "width": 1200
+    },
+    "theme": "light",
+    "grid": false,
+    "highlight": [],
+    "panels": [],
+    "attribution": true,
+    "symbols": {},
+    "checks": {
+      "allow": []
+    }
+  }
+}

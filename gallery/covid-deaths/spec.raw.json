@@ -1,0 +1,29 @@
+{
+  "title": "COVID-19 deaths",
+  "subtitle": "Cumulative deaths reported to WHO",
+  "source": "WHO COVID-19 dashboard, cumulative deaths up to 2026-09-20",
+  "region": "world",
+  "projection": "mercator",
+  "data": {
+    "file": "data.csv",
+    "key": "country",
+    "value": "deaths",
+    "kind": "count",
+    "label": "Deaths"
+  },
+  "classes": {
+    "method": "jenks",
+    "count": 9
+  },
+  "palette": [
+    "#00007f",
+    "#0000ff",
+    "#007fff",
+    "#00ffff",
+    "#7fff7f",
+    "#ffff00",
+    "#ff7f00",
+    "#ff0000",
+    "#7f0000"
+  ]
+}

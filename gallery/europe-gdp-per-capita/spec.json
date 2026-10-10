@@ -1,0 +1,19 @@
+{
+  "title": "GDP per person in Europe, 2022",
+  "subtitle": "Current international dollars, purchasing power parity",
+  "source": "World Bank, World Development Indicators, NY.GDP.PCAP.PP.CD, 2022",
+  "note": "Data retrieved 2026-10-10.",
+  "region": "europe",
+  "data": {
+    "file": "data.csv",
+    "key": "iso3",
+    "value": "gdp_per_person",
+    "kind": "rate",
+    "label": "International dollars"
+  },
+  "classes": {
+    "method": "jenks",
+    "count": 6
+  },
+  "palette": "blues"
+}

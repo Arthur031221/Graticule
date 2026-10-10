@@ -1,0 +1,19 @@
+{
+  "title": "Unemployment rate by county, 2016",
+  "subtitle": "Percent of the labor force",
+  "source": "US Bureau of Labor Statistics, Local Area Unemployment Statistics, 2016 annual average (via plotly/datasets)",
+  "note": "Data retrieved 2026-10-10.",
+  "region": "us-counties",
+  "data": {
+    "file": "data.csv",
+    "key": "fips",
+    "value": "unemployment_rate",
+    "kind": "rate",
+    "label": "Percent"
+  },
+  "classes": {
+    "method": "jenks",
+    "count": 6
+  },
+  "palette": "ylorrd"
+}

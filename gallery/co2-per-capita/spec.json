@@ -1,0 +1,19 @@
+{
+  "title": "Carbon dioxide emissions per person, 2020",
+  "subtitle": "Tonnes of CO2 per person, excluding land use",
+  "source": "World Bank, World Development Indicators, EN.GHG.CO2.PC.CE.AR5, 2020",
+  "note": "Data retrieved 2026-10-10.",
+  "region": "world",
+  "data": {
+    "file": "data.csv",
+    "key": "iso3",
+    "value": "tonnes_per_person",
+    "kind": "rate",
+    "label": "Tonnes per person"
+  },
+  "classes": {
+    "method": "jenks",
+    "count": 6
+  },
+  "palette": "ylorrd"
+}

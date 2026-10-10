@@ -1,0 +1,16 @@
+{
+  "title": "日本の地方区分",
+  "subtitle": "47都道府県を8地方に分けたもの",
+  "source": "一般的な地方区分。境界はNatural Earth",
+  "note": "作成日 2026-10-10。",
+  "region": "jp-prefectures",
+  "language": "ja",
+  "type": "categorical",
+  "data": {
+    "file": "data.csv",
+    "key": "prefecture",
+    "value": "region",
+    "label": "地方"
+  },
+  "palette": "okabe-ito"
+}

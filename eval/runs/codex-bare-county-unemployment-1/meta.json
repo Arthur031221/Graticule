@@ -1,0 +1,12 @@
+{
+  "agent": "codex",
+  "condition": "bare",
+  "prompt": "Make a map of unemployment by county from unemployment.csv.",
+  "repetition": 1,
+  "seconds": 139,
+  "steps": 11,
+  "produced": [
+    "unemployment_map.png"
+  ],
+  "note": "Only PNG outputs are kept here. Other files the agent wrote (HTML, SVG) were left out to keep the repository small."
+}

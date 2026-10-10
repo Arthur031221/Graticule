@@ -1,0 +1,244 @@
+<!doctype html>
+<html lang="en" data-theme="light">
+  <head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1" />
+    <title>Graticule: maps that pass a checklist</title>
+    <meta
+      name="description"
+      content="Make a map from a spreadsheet. Graticule checks it against cartography rules and exports SVG, PNG, PDF or interactive HTML. Everything runs in your browser."
+    />
+    <meta property="og:title" content="Graticule" />
+    <meta
+      property="og:description"
+      content="Make a map from a spreadsheet. Checked against cartography rules, exported offline."
+    />
+    <meta property="og:image" content="https://arthur031221.github.io/Graticule/social-card.png" />
+    <meta name="twitter:card" content="summary_large_image" />
+    <link rel="icon" href="logo.svg" type="image/svg+xml" />
+    <link rel="stylesheet" href="style.css" />
+    <script>
+      // Set the theme before the first paint to avoid a flash.
+      (function () {
+        var saved = null;
+        try {
+          saved = localStorage.getItem("graticule.theme");
+        } catch (e) {}
+        var dark = saved ? saved === "dark" : window.matchMedia("(prefers-color-scheme: dark)").matches;
+        document.documentElement.dataset.theme = dark ? "dark" : "light";
+      })();
+    </script>
+  </head>
+  <body>
+    <a class="skip" href="#sheet" data-i18n="skip">Skip to the map</a>
+
+    <header class="top">
+      <a class="brand" href="./" aria-label="Graticule">
+        <img src="logo.svg" alt="" width="34" height="34" />
+        <span class="brand-name">Graticule</span>
+        <span class="brand-tag" data-i18n="tagline">Maps that pass a checklist</span>
+      </a>
+      <nav class="tools" aria-label="Site">
+        <a
+          class="link"
+          href="https://github.com/Arthur031221/Graticule/blob/main/docs/gallery.md"
+          data-i18n="nav.gallery"
+          >Gallery</a
+        >
+        <a class="link" href="https://github.com/Arthur031221/Graticule" data-i18n="nav.github">GitHub</a>
+        <label class="select-chip">
+          <span class="sr" data-i18n="nav.language">Language</span>
+          <select id="ui-lang"></select>
+        </label>
+        <button
+          class="icon-btn"
+          id="theme-toggle"
+          type="button"
+          aria-pressed="false"
+          data-i18n-attr="aria-label:nav.theme"
+          aria-label="Theme"
+        >
+          <svg viewBox="0 0 24 24" width="18" height="18" aria-hidden="true">
+            <path
+              class="sun"
+              d="M12 4V2m0 20v-2m8-8h2M2 12h2m13.66-5.66 1.41-1.41M4.93 19.07l1.41-1.41m0-11.32L4.93 4.93m14.14 14.14-1.41-1.41M12 7a5 5 0 1 0 0 10 5 5 0 0 0 0-10Z"
+              fill="none"
+              stroke="currentColor"
+              stroke-width="1.8"
+              stroke-linecap="round"
+            />
+          </svg>
+        </button>
+      </nav>
+    </header>
+
+    <main class="app">
+      <aside class="panel" id="panel">
+        <section class="card" id="step-data" aria-labelledby="h-data">
+          <h2 id="h-data"><span class="n">1</span><span data-i18n="step.data">Data</span></h2>
+          <div class="drop" id="drop" tabindex="0" role="button" aria-describedby="drop-help">
+            <svg viewBox="0 0 24 24" width="26" height="26" aria-hidden="true">
+              <path
+                d="M12 16V4m0 0-4 4m4-4 4 4M4 15v3a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2v-3"
+                fill="none"
+                stroke="currentColor"
+                stroke-width="1.7"
+                stroke-linecap="round"
+                stroke-linejoin="round"
+              />
+            </svg>
+            <span id="drop-help"
+              ><strong data-i18n="data.drop">Drop a CSV file here</strong>
+              <span class="muted"
+                ><span data-i18n="data.or">or</span> <u data-i18n="data.choose">Choose a file</u></span
+              ></span
+            >
+            <input type="file" id="file" accept=".csv,.tsv,.txt,text/csv,text/plain" hidden />
+          </div>
+          <details class="paste">
+            <summary data-i18n="data.paste">Paste a table</summary>
+            <textarea
+              id="paste"
+              rows="5"
+              spellcheck="false"
+              data-i18n-attr="placeholder:data.pastePlaceholder"
+            ></textarea>
+          </details>
+          <p class="muted small" data-i18n="data.examples">Or start from an example</p>
+          <div class="chips" id="examples"></div>
+          <p class="status" id="data-status" role="status"></p>
+        </section>
+
+        <section class="card" id="step-map" aria-labelledby="h-map">
+          <h2 id="h-map"><span class="n">2</span><span data-i18n="step.map">Map</span></h2>
+          <label class="field"
+            ><span data-i18n="map.region">Region</span
+            ><select id="region"></select
+          ></label>
+          <fieldset class="field">
+            <legend data-i18n="map.type">Map type</legend>
+            <div class="segmented" id="type"></div>
+          </fieldset>
+          <div class="row">
+            <label class="field"
+              ><span data-i18n="map.key">Column that names the areas</span
+              ><select id="key"></select
+            ></label>
+          </div>
+          <label class="field" id="field-value"
+            ><span data-i18n="map.value">Column to map</span
+            ><select id="value"></select
+          ></label>
+          <fieldset class="field" id="field-values" hidden>
+            <legend data-i18n="map.values">Columns to map (one panel each)</legend>
+            <div class="checks" id="values"></div>
+          </fieldset>
+          <div class="row" id="row-kind">
+            <label class="field"
+              ><span data-i18n="map.kind">What the numbers are</span
+              ><select id="kind"></select
+            ></label>
+          </div>
+          <div class="row two" id="row-normalize">
+            <label class="field"
+              ><span data-i18n="map.normalize">Divide by</span
+              ><select id="normalize"></select
+            ></label>
+            <label class="field"
+              ><span data-i18n="map.per">Per</span
+              ><input id="per" type="number" min="1" step="1" value="100000" inputmode="numeric"
+            /></label>
+          </div>
+          <label class="field" id="field-unit"
+            ><span data-i18n="map.unit">Unit shown in the legend</span><input id="unit" type="text" autocomplete="off"
+          /></label>
+          <label class="field" id="field-highlight" hidden
+            ><span data-i18n="map.highlight">Areas to highlight</span
+            ><input id="highlight" type="text" autocomplete="off"
+          /></label>
+        </section>
+
+        <section class="card" id="step-style" aria-labelledby="h-style">
+          <h2 id="h-style"><span class="n">3</span><span data-i18n="step.style">Style</span></h2>
+          <label class="field"
+            ><span data-i18n="style.title">Title</span><input id="title" type="text" autocomplete="off"
+          /></label>
+          <label class="field"
+            ><span data-i18n="style.subtitle">Subtitle</span><input id="subtitle" type="text" autocomplete="off"
+          /></label>
+          <label class="field"
+            ><span data-i18n="style.source">Source</span><input id="source" type="text" autocomplete="off"
+          /></label>
+          <label class="field"
+            ><span data-i18n="style.note">Note</span><input id="note" type="text" autocomplete="off"
+          /></label>
+          <div class="row two" id="row-classes">
+            <label class="field"
+              ><span data-i18n="style.method">Classes</span
+              ><select id="method"></select
+            ></label>
+            <label class="field"
+              ><span data-i18n="style.count">Number of classes</span
+              ><input id="count" type="range" min="3" max="7" step="1" value="5" /><output id="count-out"
+                >5</output
+              ></label
+            >
+          </div>
+          <fieldset class="field" id="field-palette">
+            <legend data-i18n="style.palette">Palette</legend>
+            <div class="palettes" id="palettes"></div>
+          </fieldset>
+          <div class="row two">
+            <label class="field"
+              ><span data-i18n="style.labels">Labels</span
+              ><select id="labels"></select
+            ></label>
+            <label class="field"
+              ><span data-i18n="style.language">Labels in</span
+              ><select id="map-lang"></select
+            ></label>
+          </div>
+          <div class="row two">
+            <label class="field"
+              ><span data-i18n="style.theme">Map theme</span
+              ><select id="map-theme"></select
+            ></label>
+            <label class="field"
+              ><span data-i18n="style.center">Center value (diverging palette)</span
+              ><input id="center" type="number" step="any" inputmode="decimal"
+            /></label>
+          </div>
+        </section>
+
+        <section class="card" id="step-checks" aria-labelledby="h-checks">
+          <h2 id="h-checks"><span class="n">4</span><span data-i18n="step.checks">Checks</span></h2>
+          <div class="summary" id="check-summary" role="status" aria-live="polite"></div>
+          <button class="btn primary" id="fix-all" type="button" hidden data-i18n="checks.fixAll">Fix them</button>
+          <ul class="findings" id="findings"></ul>
+        </section>
+
+        <section class="card" id="step-export" aria-labelledby="h-export">
+          <h2 id="h-export"><span class="n">5</span><span data-i18n="step.export">Export</span></h2>
+          <div class="exports" id="exports"></div>
+          <p class="muted small" data-i18n="export.hint">Every file is made in your browser.</p>
+        </section>
+      </aside>
+
+      <section class="stage" aria-label="Map">
+        <div class="sheet-wrap">
+          <div class="sheet" id="sheet" aria-live="polite"></div>
+          <div class="stage-note" id="stage-note"></div>
+        </div>
+        <div class="join" id="join-summary"></div>
+      </section>
+    </main>
+
+    <footer class="foot">
+      <span data-i18n="footer.note"
+        >Open source, MIT license. Everything runs in your browser and nothing is uploaded.</span
+      >
+    </footer>
+    <div class="toast" id="toast" role="status" aria-live="polite" hidden></div>
+    <script type="module" src="app.js"></script>
+  </body>
+</html>
