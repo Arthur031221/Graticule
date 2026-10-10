@@ -169,6 +169,10 @@
       "message_one": "{count} fila tiene un número de celdas distinto al del encabezado.",
       "reason": "En una fila corta o larga las celdas pueden quedar bajo la columna equivocada. Revisa las comillas y el delimitador del archivo."
     },
+    "table-encoding": {
+      "message": "{file} no es UTF-8 válido, así que se leyó como {encoding}. Si los nombres se ven mal, indica data.encoding (por ejemplo big5, shift_jis, euc-kr o gbk) o guarda el archivo como UTF-8.",
+      "reason": "Las hojas de cálculo de Windows suelen guardar el CSV con la página de códigos del sistema. Leído con otra, un nombre se convierte en otros caracteres y su fila no coincide con ninguna zona."
+    },
     "join-blank": {
       "message": "{count} filas tienen vacía la columna que nombra la zona y no se dibujan.",
       "message_one": "{count} fila tiene vacía la columna que nombra la zona y no se dibuja.",
@@ -214,6 +218,8 @@
       "examples": "O empieza con un ejemplo",
       "loaded": "{rows} filas, {cols} columnas",
       "loaded_one": "{rows} fila, {cols} columnas",
+      "encodingNote": "Este archivo no es UTF-8, así que se leyó como {encoding}. Si los nombres se ven mal, elige la codificación correcta.",
+      "encoding": "Codificación del archivo",
       "error": "No se pudo leer: {detail}",
       "empty": "Añade una tabla y el mapa aparecerá aquí."
     },

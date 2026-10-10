@@ -142165,7 +142165,7 @@ var require_b64 = __commonJS({
       var UPPER = "A".charCodeAt(0);
       var PLUS_URL_SAFE = "-".charCodeAt(0);
       var SLASH_URL_SAFE = "_".charCodeAt(0);
-      function decode(elt) {
+      function decode2(elt) {
         var code = elt.charCodeAt(0);
         if (code === PLUS || code === PLUS_URL_SAFE)
           return 62;
@@ -142194,16 +142194,16 @@ var require_b64 = __commonJS({
           arr[L++] = v;
         }
         for (i2 = 0, j = 0; i2 < l; i2 += 4, j += 3) {
-          tmp = decode(b64.charAt(i2)) << 18 | decode(b64.charAt(i2 + 1)) << 12 | decode(b64.charAt(i2 + 2)) << 6 | decode(b64.charAt(i2 + 3));
+          tmp = decode2(b64.charAt(i2)) << 18 | decode2(b64.charAt(i2 + 1)) << 12 | decode2(b64.charAt(i2 + 2)) << 6 | decode2(b64.charAt(i2 + 3));
           push((tmp & 16711680) >> 16);
           push((tmp & 65280) >> 8);
           push(tmp & 255);
         }
         if (placeHolders === 2) {
-          tmp = decode(b64.charAt(i2)) << 2 | decode(b64.charAt(i2 + 1)) >> 4;
+          tmp = decode2(b64.charAt(i2)) << 2 | decode2(b64.charAt(i2 + 1)) >> 4;
           push(tmp & 255);
         } else if (placeHolders === 1) {
-          tmp = decode(b64.charAt(i2)) << 10 | decode(b64.charAt(i2 + 1)) << 4 | decode(b64.charAt(i2 + 2)) >> 2;
+          tmp = decode2(b64.charAt(i2)) << 10 | decode2(b64.charAt(i2 + 1)) << 4 | decode2(b64.charAt(i2 + 2)) >> 2;
           push(tmp >> 8 & 255);
           push(tmp & 255);
         }
@@ -153711,6 +153711,23 @@ function nameIn(area, lang) {
 }
 
 // src/csv.js
+function decodeBytes(bytes, label) {
+  const data = bytes instanceof Uint8Array ? bytes : new Uint8Array(bytes);
+  if (label) {
+    const decoder = new TextDecoder(label);
+    return { text: decoder.decode(data), encoding: decoder.encoding, guessed: false };
+  }
+  const mark = data.length > 1 ? `${data[0]},${data[1]}` : "";
+  if (mark === "255,254")
+    return { text: new TextDecoder("utf-16le").decode(data), encoding: "utf-16le", guessed: false };
+  if (mark === "254,255")
+    return { text: new TextDecoder("utf-16be").decode(data), encoding: "utf-16be", guessed: false };
+  try {
+    return { text: new TextDecoder("utf-8", { fatal: true }).decode(data), encoding: "utf-8", guessed: false };
+  } catch {
+    return { text: new TextDecoder("windows-1252").decode(data), encoding: "windows-1252", guessed: true };
+  }
+}
 var NULLS = /* @__PURE__ */ new Set(["", "na", "n/a", "nan", "null", "none", "..", "-", "--", "\u2014", "#n/a"]);
 function parseTable(text) {
   const source = text.replace(/^\uFEFF/, "");
@@ -153851,33 +153868,41 @@ function lookup(index, kind, raw) {
   }
   return { entries: [], padded: false };
 }
+function hitsFor(distinct, index, kind) {
+  return distinct.filter((v) => lookup(index, kind, v).entries.length === 1).length;
+}
 function detectKind(values, index, order) {
   const distinct = [...new Set(values.filter((v) => v !== ""))];
   let best = { kind: order[0], hits: -1 };
   for (const kind of order.filter((k) => index.kinds[k])) {
-    const hits = distinct.filter((v) => lookup(index, kind, v).entries.length === 1).length;
-    if (hits > best.hits) best = { kind, hits };
+    const hits2 = hitsFor(distinct, index, kind);
+    if (hits2 > best.hits) best = { kind, hits: hits2 };
   }
-  return {
-    kind: best.kind,
-    rate: distinct.length ? Math.max(0, best.hits) / distinct.length : 0,
-    hits: Math.max(0, best.hits)
-  };
+  const hits = Math.max(0, best.hits);
+  return { kind: best.kind, rate: distinct.length ? hits / distinct.length : 0, hits };
+}
+function forcedKind(distinct, index, kind) {
+  const hits = hitsFor(distinct, index, kind);
+  return { kind, rate: hits / distinct.length, hits };
 }
 function isPlainNumbers(cells) {
   const filled = cells.filter((c) => c !== "");
   return filled.length > 0 && filled.every((c) => parseNumber(c) !== null && !/^0\d/.test(c));
 }
-function rankKeyColumns(columns, rows, index, order, exclude = []) {
+function rankKeyColumns(columns, rows, index, order, { exclude = [], kind: wanted } = {}) {
   const ranked = [];
   for (const column of columns) {
     if (exclude.includes(column)) continue;
     const cells = rows.map((r) => (r[column] ?? "").trim());
-    if (new Set(cells.filter((c) => c !== "")).size < Math.min(3, cells.length)) continue;
-    const { kind, rate, hits } = detectKind(cells, index, order);
+    const distinct = [...new Set(cells.filter((c) => c !== ""))];
+    if (!distinct.length) continue;
+    const found = wanted ? forcedKind(distinct, index, wanted) : detectKind(cells, index, order);
+    const { kind, rate, hits } = found;
     ranked.push({ column, kind, rate, hits, strong: !isPlainNumbers(cells) && rate >= 0.5 });
   }
-  return ranked.sort((p, q) => Number(q.strong) - Number(p.strong) || q.rate - p.rate || q.hits - p.hits);
+  return ranked.sort(
+    (p, q) => Number(q.strong) - Number(p.strong) || (p.strong && q.strong ? q.hits - p.hits || q.rate - p.rate : q.rate - p.rate || q.hits - p.hits)
+  );
 }
 function joinKeys(values, index, kind) {
   const rowsByArea = /* @__PURE__ */ new Map();
@@ -154901,7 +154926,20 @@ var KEYS = {
     "attribution",
     "checks"
   ],
-  data: ["file", "csv", "rows", "key", "keyType", "value", "kind", "label", "normalize", "aggregate", "filter"],
+  data: [
+    "file",
+    "csv",
+    "rows",
+    "key",
+    "keyType",
+    "encoding",
+    "value",
+    "kind",
+    "label",
+    "normalize",
+    "aggregate",
+    "filter"
+  ],
   classes: ["method", "count", "breaks"]
 };
 function normalizeSpec(input) {
@@ -154965,6 +155003,13 @@ function normalizeSpec(input) {
   if (type === "categorical" && data.aggregate !== void 0 && !["first", "last"].includes(data.aggregate))
     bad("data.aggregate", "categories can only use first or last");
   if (data.kind !== void 0 && !KINDS.includes(data.kind)) bad("data.kind", `must be one of: ${KINDS.join(", ")}`);
+  if (data.encoding !== void 0) {
+    try {
+      new TextDecoder(String(data.encoding));
+    } catch {
+      bad("data.encoding", "must be an encoding name such as utf-8, windows-1252, big5, shift_jis, euc-kr or gbk");
+    }
+  }
   const sources = ["file", "csv", "rows"].filter((k) => data[k] !== void 0);
   if (input.data && type !== "locator" && sources.length !== 1)
     bad("data", `give exactly one of file, csv or rows (found ${sources.length})`);
@@ -155062,10 +155107,16 @@ async function loadTable(data, readText) {
     const rows = data.rows.map(
       (r) => Object.fromEntries(columns.map((c) => [c, r[c] === void 0 || r[c] === null ? "" : String(r[c])]))
     );
-    return { columns, rows, problems: { duplicateColumns: [], unterminatedQuote: false, raggedRows: 0 } };
+    return {
+      columns,
+      rows,
+      problems: { duplicateColumns: [], unterminatedQuote: false, raggedRows: 0 },
+      guessedEncoding: ""
+    };
   }
-  const text = data.csv ?? await readText(data.file);
-  return parseTable(text);
+  const read = data.csv ?? await readText(data.file, data.encoding);
+  const { text, encoding, guessed } = typeof read === "string" ? { text: read, encoding: "", guessed: false } : read;
+  return { ...parseTable(text), guessedEncoding: guessed ? encoding : "" };
 }
 function applyFilter(rows, filter) {
   if (!filter) return rows;
@@ -155108,6 +155159,12 @@ async function analyze(input, ctx) {
     return { ...analysis, ok: false };
   }
   analysis.table = table;
+  if (table.guessedEncoding)
+    findings.push({
+      id: "table-encoding",
+      level: "warn",
+      params: { file: spec.data.file, encoding: table.guessedEncoding }
+    });
   const columns = table.columns;
   const { duplicateColumns, unterminatedQuote, raggedRows } = table.problems;
   if (duplicateColumns.length)
@@ -155187,7 +155244,7 @@ async function analyze(input, ctx) {
   return analysis;
 }
 function guessKeyColumn(columns, rows, valueColumns, index, region) {
-  const best = rankKeyColumns(columns, rows, index, region.keys, valueColumns)[0];
+  const best = rankKeyColumns(columns, rows, index, region.keys, { exclude: valueColumns })[0];
   return best && best.rate >= 0.5 ? best.column : "";
 }
 function areaValue(rowIdx, nums, dens, aggregate, per) {
@@ -158118,8 +158175,8 @@ var USAGE = `graticule ${VERSION}: maps that pass a checklist, from a small JSON
 Usage
   graticule render <spec.json> [-o base] [-f svg,png,pdf,html] [--fix] [--lang xx] [--dpi 300] [--json]
   graticule check  <spec.json> [--fix] [--write] [--lang xx] [--json]
-  graticule join   <table.csv> --region <id> [--key column] [--key-type kind] [--json]
-  graticule init   <table.csv> --region <id> [--value column] [-o spec.json]
+  graticule join   <table.csv> --region <id> [--key column] [--key-type kind] [--encoding name] [--json]
+  graticule init   <table.csv> --region <id> [--value column] [--encoding name] [-o spec.json]
   graticule regions | projections | palettes | rules [--lang xx]
 
 Options
@@ -158130,6 +158187,7 @@ Options
   --lang          map label language and message language (en, zh-TW, zh-CN, ja, ko, es, fr, de, pt-BR)
   --dpi           PNG resolution, 96 is screen size, 300 is print (default 96)
   --json          print the report as JSON
+  --encoding      how a table that is not UTF-8 is read: big5, shift_jis, euc-kr, gbk, windows-1252 (join, init)
   --data-root     also allow data files from this folder (by default only the spec's own folder)
 Exit codes: 0 done, 1 usage or file error, 2 blocked by a rule.`;
 var BOOLEAN = /* @__PURE__ */ new Set(["fix", "json", "write", "help", "version"]);
@@ -158192,14 +158250,30 @@ async function translator(assets, lang) {
     code
   );
 }
-async function readInsideRoots(full, name, roots) {
+async function readInsideRoots(full, name, roots, encoding) {
   const real = await realpath(full);
   if (!roots.some((root) => real === root || real.startsWith(root + sep))) {
     throw new Error(
       `${name} is outside the folder of the spec. Move the file next to the spec or pass --data-root <folder>`
     );
   }
-  return readFile2(real, "utf8");
+  return decode(await readFile2(real), encoding, name);
+}
+function decode(bytes, encoding, name) {
+  try {
+    return decodeBytes(bytes, encoding);
+  } catch (error) {
+    if (error instanceof RangeError) throw new UsageError(`${name}: "${encoding}" is not an encoding name`);
+    throw error;
+  }
+}
+async function readTable(path, encoding) {
+  const { text, encoding: used, guessed } = decode(await readFile2(path), encoding, path);
+  if (guessed)
+    console.error(
+      `${path} is not valid UTF-8, so it was read as ${used}. If names look wrong, pass --encoding (big5, shift_jis, euc-kr, gbk) or save the file as UTF-8.`
+    );
+  return parseTable(text);
 }
 async function build(specPath, flags, assets) {
   const spec = await readSpec(specPath);
@@ -158210,7 +158284,7 @@ async function build(specPath, flags, assets) {
   );
   const result = await buildMap(spec, {
     assets,
-    readText: (path) => readInsideRoots(resolve2(base, path), path, roots),
+    readText: (path, encoding) => readInsideRoots(resolve2(base, path), path, roots, encoding),
     fix: Boolean(flags.fix),
     allow: flags.allow ? String(flags.allow).split(",").map((s) => s.trim()) : [],
     locale: flags.lang
@@ -158262,11 +158336,13 @@ async function commandJoin(args, assets) {
   if (!tablePath) throw new UsageError("give the table: graticule join <table.csv> --region world");
   const region = REGIONS[regionId];
   if (!region) throw new UsageError(`unknown region "${regionId}". Run: graticule regions`);
-  const table = parseTable(await readFile2(tablePath, "utf8"));
+  const table = await readTable(tablePath, args.flags.encoding && String(args.flags.encoding));
   const { areas } = await loadAreas(regionId, assets);
   const aliases = region.level === "country" ? (await assets.json("data/aliases.json")).country : {};
   const index = buildIndex(areas, aliases);
-  const ranked = rankKeyColumns(table.columns, table.rows, index, region.keys);
+  const ranked = rankKeyColumns(table.columns, table.rows, index, region.keys, {
+    kind: args.flags["key-type"] && String(args.flags["key-type"])
+  });
   const column = args.flags.key ? String(args.flags.key) : ranked[0]?.column ?? table.columns[0];
   if (column === void 0) throw new UsageError("the table has no columns");
   if (!table.columns.includes(column))
@@ -158303,17 +158379,13 @@ async function commandInit(args, assets) {
   if (!tablePath) throw new UsageError("give the table: graticule init <table.csv> --region world");
   const region = REGIONS[regionId];
   if (!region) throw new UsageError(`unknown region "${regionId}". Run: graticule regions`);
-  const table = parseTable(await readFile2(tablePath, "utf8"));
+  const table = await readTable(tablePath, args.flags.encoding && String(args.flags.encoding));
   const { areas } = await loadAreas(regionId, assets);
   const aliases = region.level === "country" ? (await assets.json("data/aliases.json")).country : {};
   const index = buildIndex(areas, aliases);
-  const ranked = rankKeyColumns(
-    table.columns,
-    table.rows,
-    index,
-    region.keys,
-    args.flags.value ? [String(args.flags.value)] : []
-  );
+  const ranked = rankKeyColumns(table.columns, table.rows, index, region.keys, {
+    exclude: args.flags.value ? [String(args.flags.value)] : []
+  });
   const key = ranked[0]?.rate >= 0.5 ? ranked[0] : null;
   if (!key)
     throw new UsageError(
@@ -158332,7 +158404,14 @@ async function commandInit(args, assets) {
     source: "",
     region: regionId,
     type: "choropleth",
-    data: { file, key: key.column, keyType: key.kind, value, label: value },
+    data: {
+      file,
+      key: key.column,
+      keyType: key.kind,
+      ...args.flags.encoding ? { encoding: String(args.flags.encoding) } : {},
+      value,
+      label: value
+    },
     classes: { method: "quantile", count: 5 }
   };
   const text = JSON.stringify(spec, null, 2) + "\n";

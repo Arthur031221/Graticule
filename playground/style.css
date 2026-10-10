@@ -81,6 +81,11 @@ body {
   outline: 2px solid var(--accent);
   outline-offset: 2px;
 }
+/* Focus lands here after Fix; they are not controls, so they carry no ring. */
+#sheet:focus-visible,
+#check-summary:focus-visible {
+  outline: none;
+}
 .muted {
   color: var(--muted);
 }
@@ -227,41 +232,6 @@ body {
   }
   .link {
     display: none;
-  }
-}
-
-@media (max-width: 520px) {
-  .stage-errors li {
-    grid-template-columns: 1fr;
-    gap: 2px;
-  }
-  .stage-note {
-    padding: 18px 16px;
-  }
-}
-@media (pointer: coarse) {
-  .chip,
-  .btn.small {
-    min-height: 44px;
-  }
-  .chip {
-    padding: 0 14px;
-  }
-  input[type="text"],
-  input[type="number"],
-  select,
-  textarea {
-    min-height: 44px;
-  }
-  .select-chip select,
-  .icon-btn {
-    height: 44px;
-  }
-  .icon-btn {
-    width: 44px;
-  }
-  .finding summary {
-    padding: 10px 0;
   }
 }
 
@@ -885,6 +855,41 @@ button {
     transform: translateX(250%);
   }
 }
+@media (max-width: 520px) {
+  .stage-errors li {
+    grid-template-columns: 1fr;
+    gap: 2px;
+  }
+  .stage-note {
+    padding: 18px 16px;
+  }
+}
+@media (pointer: coarse) {
+  .chip,
+  .btn.small {
+    min-height: 44px;
+  }
+  .chip {
+    padding: 0 14px;
+  }
+  input[type="text"],
+  input[type="number"],
+  select,
+  textarea {
+    min-height: 44px;
+  }
+  .select-chip select,
+  .icon-btn {
+    height: 44px;
+  }
+  .icon-btn {
+    width: 44px;
+  }
+  .finding summary {
+    padding: 10px 0;
+  }
+}
+
 @media (prefers-reduced-motion: reduce) {
   *,
   *::before,

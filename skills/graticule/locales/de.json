@@ -169,6 +169,10 @@
       "message_one": "{count} Zeile hat eine andere Zellenzahl als die Kopfzeile.",
       "reason": "In einer zu kurzen oder zu langen Zeile können Zellen unter der falschen Spalte stehen. Prüfen Sie Anführungszeichen und Trennzeichen der Datei."
     },
+    "table-encoding": {
+      "message": "{file} ist kein gültiges UTF-8 und wurde deshalb als {encoding} gelesen. Wenn Namen falsch aussehen, setzen Sie data.encoding (zum Beispiel big5, shift_jis, euc-kr oder gbk) oder speichern Sie die Datei als UTF-8.",
+      "reason": "Tabellenkalkulationen unter Windows speichern CSV oft in der Systemcodepage. Mit der falschen gelesen, werden aus einem Namen andere Zeichen, und seine Zeile passt zu keinem Gebiet."
+    },
     "join-blank": {
       "message": "{count} Zeilen haben einen leeren Namen in der Schlüsselspalte und werden nicht gezeichnet.",
       "message_one": "{count} Zeile hat einen leeren Namen in der Schlüsselspalte und wird nicht gezeichnet.",
@@ -214,6 +218,8 @@
       "examples": "Oder mit einem Beispiel beginnen",
       "loaded": "{rows} Zeilen, {cols} Spalten",
       "loaded_one": "{rows} Zeile, {cols} Spalten",
+      "encodingNote": "Diese Datei ist nicht UTF-8 und wurde deshalb als {encoding} gelesen. Wenn Namen falsch aussehen, wählen Sie die richtige Kodierung.",
+      "encoding": "Dateikodierung",
       "error": "Konnte nicht gelesen werden: {detail}",
       "empty": "Fügen Sie eine Tabelle hinzu, dann erscheint hier die Karte."
     },

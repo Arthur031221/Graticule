@@ -1,7 +1,9 @@
 import assert from "node:assert/strict";
 import { test } from "node:test";
 import { RULES } from "../../src/checks.js";
-import { base, build, errors, ids } from "./helpers.js";
+import { readFile } from "node:fs/promises";
+import { decodeBytes } from "../../src/csv.js";
+import { base, build, errors, fixture, ids } from "./helpers.js";
 
 const countries = [
   "USA",
@@ -464,4 +466,63 @@ test("rows left out of an area are reported, plain gaps are not", async () => {
   const dropped = zero.findings.find((f) => f.id === "values-skipped");
   assert.ok(dropped, "a row with a zero denominator is reported even though another row of the area is used");
   assert.match(dropped.message, /90 \/ 0/);
+});
+
+const readDecoded = async (path, encoding) => decodeBytes(await readFile(fixture(path)), encoding);
+
+test("a table that is not UTF-8 is read as Windows-1252 and the report says so", async () => {
+  const spec = base({
+    data: { file: "countries-latin1.csv", key: "country", value: "value", kind: "rate", label: "Units" },
+  });
+  const result = await build(spec, { readText: readDecoded });
+  const finding = result.findings.find((f) => f.id === "table-encoding");
+  assert.equal(finding.level, "warn");
+  assert.match(finding.message, /countries-latin1\.csv is not valid UTF-8, so it was read as windows-1252/);
+  assert.equal(result.analysis.join.rowsMatched, 5);
+});
+
+test("data.encoding reads a Big5 table, joins every Taiwan county and raises no encoding finding", async () => {
+  const spec = base({
+    region: "tw-counties",
+    data: { file: "tw-counties-big5.csv", encoding: "big5", key: "county", value: "population", kind: "count" },
+  });
+  const result = await build(spec, { readText: readDecoded });
+  assert.ok(!ids(result).includes("table-encoding"));
+  assert.equal(result.analysis.join.rowsMatched, 6);
+  assert.equal(result.analysis.join.unmatched.length, 0);
+});
+
+test("without data.encoding the same Big5 table is guessed wrong and fails to join", async () => {
+  const spec = base({
+    region: "tw-counties",
+    data: { file: "tw-counties-big5.csv", key: "county", value: "population", kind: "count" },
+  });
+  const result = await build(spec, { readText: readDecoded });
+  assert.ok(ids(result).includes("table-encoding"));
+  assert.ok(ids(result).includes("join-failed"));
+});
+
+test("data.encoding must be an encoding name", async () => {
+  const spec = base({ data: { rows: [{ iso3: "FRA", v: 1 }], key: "iso3", value: "v", encoding: "klingon" } });
+  const result = await build(spec);
+  assert.ok(result.findings.some((f) => f.id === "spec" && f.message.includes("data.encoding")));
+});
+
+test("a blank key cell does not stop the key column from being found", async () => {
+  const spec = base({
+    data: {
+      rows: [
+        { c: "France", v: 5.1 },
+        { c: "Japan", v: 6.2 },
+        { c: "", v: 7.3 },
+      ],
+      value: "v",
+      kind: "rate",
+      label: "Units",
+    },
+  });
+  const result = await build(spec);
+  assert.ok(!errors(result).includes("spec"), errors(result).join());
+  assert.equal(result.analysis.join.column, "c");
+  assert.ok(ids(result).includes("join-blank"));
 });

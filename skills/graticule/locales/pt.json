@@ -169,6 +169,10 @@
       "message_one": "{count} linha tem um número de células diferente do cabeçalho.",
       "reason": "Em uma linha curta ou longa as células podem ficar sob a coluna errada. Confira as aspas e o delimitador do arquivo."
     },
+    "table-encoding": {
+      "message": "{file} não é UTF-8 válido, por isso foi lido como {encoding}. Se os nomes parecerem errados, defina data.encoding (por exemplo big5, shift_jis, euc-kr ou gbk) ou salve o arquivo como UTF-8.",
+      "reason": "Planilhas no Windows costumam salvar o CSV na página de código do sistema. Lido com outra, um nome vira outros caracteres e sua linha não corresponde a nenhuma área."
+    },
     "join-blank": {
       "message": "{count} linhas têm o nome vazio na coluna-chave e não são desenhadas.",
       "message_one": "{count} linha tem o nome vazio na coluna-chave e não é desenhada.",
@@ -214,6 +218,8 @@
       "examples": "Ou comece por um exemplo",
       "loaded": "{rows} linhas, {cols} colunas",
       "loaded_one": "{rows} linha, {cols} colunas",
+      "encodingNote": "Este arquivo não é UTF-8, por isso foi lido como {encoding}. Se os nomes parecerem errados, escolha a codificação correta.",
+      "encoding": "Codificação do arquivo",
       "error": "Não foi possível ler: {detail}",
       "empty": "Adicione uma tabela e o mapa aparece aqui."
     },

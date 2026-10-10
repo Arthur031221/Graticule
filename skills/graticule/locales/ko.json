@@ -158,6 +158,10 @@
       "message": "{count}개 행의 셀 수가 머리글과 다릅니다.",
       "reason": "짧거나 긴 행에서는 셀이 엉뚱한 열 아래에 있을 수 있습니다. 파일의 따옴표와 구분 기호를 확인하세요."
     },
+    "table-encoding": {
+      "message": "{file}은(는) 올바른 UTF-8이 아니어서 {encoding}(으)로 읽었습니다. 이름이 이상하게 보이면 data.encoding(예: big5, shift_jis, euc-kr, gbk)을 지정하거나 파일을 UTF-8로 다시 저장하세요.",
+      "reason": "Windows의 스프레드시트는 CSV를 시스템 코드 페이지로 저장하는 경우가 많습니다. 다른 인코딩으로 읽으면 이름이 다른 글자로 바뀌어 그 행이 어느 지역과도 맞지 않습니다."
+    },
     "join-blank": {
       "message": "{count}개 행은 지역 이름 열이 비어 있어 그려지지 않았습니다.",
       "reason": "이름이 없는 행은 위치를 정할 수 없습니다. 빈 칸은 대개 합계 행이나 표 끝의 메모입니다."
@@ -200,6 +204,8 @@
       "pastePlaceholder": "country,value\nFrance,12.5\nJapan,8.1",
       "examples": "또는 예시로 시작",
       "loaded": "{rows}행, {cols}열",
+      "encodingNote": "이 파일은 UTF-8이 아니어서 {encoding}(으)로 읽었습니다. 이름이 이상하게 보이면 알맞은 인코딩을 고르세요.",
+      "encoding": "파일 인코딩",
       "error": "읽을 수 없습니다: {detail}",
       "empty": "표를 추가하면 지도가 여기에 나타납니다."
     },

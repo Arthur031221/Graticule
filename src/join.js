@@ -90,6 +90,11 @@ export function lookup(index, kind, raw) {
   return { entries: [], padded: false };
 }
 
+/** Distinct values of a column that name exactly one area under a key kind. */
+function hitsFor(distinct, index, kind) {
+  return distinct.filter((v) => lookup(index, kind, v).entries.length === 1).length;
+}
+
 /**
  * Chooses the key kind that matches the most distinct values of a column.
  * @param {string[]} values
@@ -100,14 +105,17 @@ export function detectKind(values, index, order) {
   const distinct = [...new Set(values.filter((v) => v !== ""))];
   let best = { kind: order[0], hits: -1 };
   for (const kind of order.filter((k) => index.kinds[k])) {
-    const hits = distinct.filter((v) => lookup(index, kind, v).entries.length === 1).length;
+    const hits = hitsFor(distinct, index, kind);
     if (hits > best.hits) best = { kind, hits };
   }
-  return {
-    kind: best.kind,
-    rate: distinct.length ? Math.max(0, best.hits) / distinct.length : 0,
-    hits: Math.max(0, best.hits),
-  };
+  const hits = Math.max(0, best.hits);
+  return { kind: best.kind, rate: distinct.length ? hits / distinct.length : 0, hits };
+}
+
+/** The match of a column when the key kind is given instead of guessed. */
+function forcedKind(distinct, index, kind) {
+  const hits = hitsFor(distinct, index, kind);
+  return { kind, rate: hits / distinct.length, hits };
 }
 
 /** A column of plain numbers, as opposed to text or zero-padded codes such as "06037". */
@@ -119,25 +127,33 @@ function isPlainNumbers(cells) {
 /**
  * Ranks the columns of a table by how well they name the areas of a region.
  * Small whole numbers join codes by accident, so a plain number column ranks
- * below any text column that joins at least half of its distinct values.
+ * below any text column that joins at least half of its distinct values. Among
+ * those text columns the one that names the most areas comes first, which keeps
+ * a flag column with two values out of the way.
  * @param {string[]} columns
  * @param {Record<string, string>[]} rows
  * @param {Index} index
  * @param {string[]} order key kinds of the region
- * @param {string[]} [exclude] columns that hold values, never keys
+ * @param {{ exclude?: string[], kind?: string }} [options] `exclude`: columns that hold values, never keys; `kind`: read every column as this key kind
  * @returns {{ column: string, kind: string, rate: number, hits: number, strong: boolean }[]}
  */
-export function rankKeyColumns(columns, rows, index, order, exclude = []) {
+export function rankKeyColumns(columns, rows, index, order, { exclude = [], kind: wanted } = {}) {
   const ranked = [];
   for (const column of columns) {
     if (exclude.includes(column)) continue;
     const cells = rows.map((r) => (r[column] ?? "").trim());
-    if (new Set(cells.filter((c) => c !== "")).size < Math.min(3, cells.length)) continue;
-    const { kind, rate, hits } = detectKind(cells, index, order);
+    const distinct = [...new Set(cells.filter((c) => c !== ""))];
+    if (!distinct.length) continue;
+    const found = wanted ? forcedKind(distinct, index, wanted) : detectKind(cells, index, order);
+    const { kind, rate, hits } = found;
     ranked.push({ column, kind, rate, hits, strong: !isPlainNumbers(cells) && rate >= 0.5 });
   }
   // Array.prototype.sort is stable, so columns that tie keep the order of the table.
-  return ranked.sort((p, q) => Number(q.strong) - Number(p.strong) || q.rate - p.rate || q.hits - p.hits);
+  return ranked.sort(
+    (p, q) =>
+      Number(q.strong) - Number(p.strong) ||
+      (p.strong && q.strong ? q.hits - p.hits || q.rate - p.rate : q.rate - p.rate || q.hits - p.hits),
+  );
 }
 
 /**

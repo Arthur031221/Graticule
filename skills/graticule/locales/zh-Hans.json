@@ -153,6 +153,10 @@
       "message": "有 {count} 行的单元格数量和表头不同。",
       "reason": "太短或太长的行，单元格可能落在错的列下面。请检查文件的引号和分隔符。"
     },
+    "table-encoding": {
+      "message": "{file} 不是有效的 UTF-8，已改用 {encoding} 读取。如果名称看起来不对，请设置 data.encoding（例如 big5、shift_jis、euc-kr 或 gbk），或把文件另存为 UTF-8。",
+      "reason": "Windows 上的电子表格常以系统代码页保存 CSV。用错编码读取时，名称会变成别的字符，该行就匹配不到任何区域。"
+    },
     "join-blank": {
       "message": "有 {count} 行的地区名称列是空的，没有画出来。",
       "reason": "没有名称的数据行无法定位。空白通常是合计行或表尾的备注。"
@@ -195,6 +199,8 @@
       "pastePlaceholder": "country,value\nFrance,12.5\nJapan,8.1",
       "examples": "或从示例开始",
       "loaded": "{rows} 行，{cols} 列",
+      "encodingNote": "这个文件不是 UTF-8，已用 {encoding} 读取。如果名称看起来不对，请选择正确的编码。",
+      "encoding": "文件编码",
       "error": "无法读取：{detail}",
       "empty": "添加数据表，地图就会出现在这里。"
     },

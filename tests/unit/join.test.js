@@ -136,7 +136,7 @@ test("a value column is never offered as the key", async () => {
     ],
   );
   assert.deepEqual(
-    rankKeyColumns(columns, rows, us.index, us.order, ["name"]).map((r) => r.column),
+    rankKeyColumns(columns, rows, us.index, us.order, { exclude: ["name"] }).map((r) => r.column),
     ["votes"],
   );
 });
@@ -171,4 +171,46 @@ test("zero-padded codes count as codes, not as numbers", async () => {
   const best = rankKeyColumns(columns, rows, us.index, us.order)[0];
   assert.equal(best.column, "fips");
   assert.equal(best.kind, "fips");
+});
+
+test("a key column with few distinct areas and many rows still ranks first", async () => {
+  const { columns, rows } = table(
+    ["year", "country", "value"],
+    [
+      [2023, "France", 5],
+      [2024, "France", 6],
+      [2023, "Japan", 7],
+      [2024, "Japan", 8],
+    ],
+  );
+  const ranked = rankKeyColumns(columns, rows, world.index, world.order);
+  assert.equal(ranked[0].column, "country");
+});
+
+test("a flag column that happens to hold a postal code does not outrank the real key", async () => {
+  const us = await indexFor("us-states");
+  const { columns, rows } = table(
+    ["status", "state", "value"],
+    [
+      ["OK", "Texas", 1],
+      ["OK", "Ohio", 2],
+      ["OK", "Maine", 3],
+      ["OK", "Utah", 4],
+    ],
+  );
+  assert.equal(rankKeyColumns(columns, rows, us.index, us.order)[0].column, "state");
+});
+
+test("a requested key kind decides which column is the key", () => {
+  const { columns, rows } = table(
+    ["iso3", "iso2", "value"],
+    [
+      ["FRA", "FR", 5],
+      ["JPN", "JP", 6],
+      ["BRA", "BR", 7],
+    ],
+  );
+  assert.equal(rankKeyColumns(columns, rows, world.index, world.order)[0].column, "iso3");
+  const forced = rankKeyColumns(columns, rows, world.index, world.order, { kind: "iso2" })[0];
+  assert.deepEqual([forced.column, forced.kind], ["iso2", "iso2"]);
 });

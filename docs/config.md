@@ -37,6 +37,7 @@ Give exactly one of `file`, `csv` (the text itself) or `rows` (a list of objects
 | --- | --- |
 | `key` | Column that names the areas. Found automatically when omitted. |
 | `keyType` | `auto` (default) or one of the region's key types: iso3, iso2, isonum, name for countries, fips, postal, name for US states, fips for counties, code and name for Taiwan, iso, jis, name for Japan, iso and name for Korea. |
+| `encoding` | How `file` is read when it is not UTF-8, for example `big5`, `shift_jis`, `euc-kr`, `gbk` or `windows-1252`. Without it a file must be valid UTF-8 (a byte order mark is honoured, UTF-16 too); one that is not is read as Windows-1252 and the report carries `table-encoding`. |
 | `value` | Column to map. A list of columns for small multiples. |
 | `kind` | `count`, `rate`, `share`, `index` or `other`. Counts are refused on choropleths. |
 | `label` | Legend title, normally the unit. |

@@ -2,7 +2,7 @@ import { mkdir, readFile, realpath, stat, writeFile } from "node:fs/promises";
 import { basename, dirname, extname, join, relative, resolve, sep } from "node:path";
 import { buildMap } from "./build.js";
 import { RULES, THRESHOLDS } from "./checks.js";
-import { parseTable } from "./csv.js";
+import { decodeBytes, parseTable } from "./csv.js";
 import { exportMap, FORMATS } from "./export.js";
 import { createTranslator } from "./i18n.js";
 import { loadAreas } from "./geo.js";
@@ -20,8 +20,8 @@ const USAGE = `graticule ${VERSION}: maps that pass a checklist, from a small JS
 Usage
   graticule render <spec.json> [-o base] [-f svg,png,pdf,html] [--fix] [--lang xx] [--dpi 300] [--json]
   graticule check  <spec.json> [--fix] [--write] [--lang xx] [--json]
-  graticule join   <table.csv> --region <id> [--key column] [--key-type kind] [--json]
-  graticule init   <table.csv> --region <id> [--value column] [-o spec.json]
+  graticule join   <table.csv> --region <id> [--key column] [--key-type kind] [--encoding name] [--json]
+  graticule init   <table.csv> --region <id> [--value column] [--encoding name] [-o spec.json]
   graticule regions | projections | palettes | rules [--lang xx]
 
 Options
@@ -32,6 +32,7 @@ Options
   --lang          map label language and message language (en, zh-TW, zh-CN, ja, ko, es, fr, de, pt-BR)
   --dpi           PNG resolution, 96 is screen size, 300 is print (default 96)
   --json          print the report as JSON
+  --encoding      how a table that is not UTF-8 is read: big5, shift_jis, euc-kr, gbk, windows-1252 (join, init)
   --data-root     also allow data files from this folder (by default only the spec's own folder)
 Exit codes: 0 done, 1 usage or file error, 2 blocked by a rule.`;
 
@@ -107,14 +108,34 @@ async function translator(assets, lang) {
  * people, so a file outside the spec's folder (or --data-root) is refused,
  * symbolic links included.
  */
-async function readInsideRoots(full, name, roots) {
+async function readInsideRoots(full, name, roots, encoding) {
   const real = await realpath(full);
   if (!roots.some((root) => real === root || real.startsWith(root + sep))) {
     throw new Error(
       `${name} is outside the folder of the spec. Move the file next to the spec or pass --data-root <folder>`,
     );
   }
-  return readFile(real, "utf8");
+  return decode(await readFile(real), encoding, name);
+}
+
+/** Decodes a data file, naming the file in the error when --encoding or data.encoding is not an encoding. */
+function decode(bytes, encoding, name) {
+  try {
+    return decodeBytes(bytes, encoding);
+  } catch (error) {
+    if (error instanceof RangeError) throw new UsageError(`${name}: "${encoding}" is not an encoding name`);
+    throw error;
+  }
+}
+
+/** Reads the table of the join and init commands. A guessed encoding is said on stderr, once. */
+async function readTable(path, encoding) {
+  const { text, encoding: used, guessed } = decode(await readFile(path), encoding, path);
+  if (guessed)
+    console.error(
+      `${path} is not valid UTF-8, so it was read as ${used}. If names look wrong, pass --encoding (big5, shift_jis, euc-kr, gbk) or save the file as UTF-8.`,
+    );
+  return parseTable(text);
 }
 
 /** Builds the map for the render and check commands. */
@@ -127,7 +148,7 @@ async function build(specPath, flags, assets) {
   );
   const result = await buildMap(spec, {
     assets,
-    readText: (path) => readInsideRoots(resolve(base, path), path, roots),
+    readText: (path, encoding) => readInsideRoots(resolve(base, path), path, roots, encoding),
     fix: Boolean(flags.fix),
     allow: flags.allow
       ? String(flags.allow)
@@ -187,11 +208,13 @@ async function commandJoin(args, assets) {
   if (!tablePath) throw new UsageError("give the table: graticule join <table.csv> --region world");
   const region = REGIONS[regionId];
   if (!region) throw new UsageError(`unknown region "${regionId}". Run: graticule regions`);
-  const table = parseTable(await readFile(tablePath, "utf8"));
+  const table = await readTable(tablePath, args.flags.encoding && String(args.flags.encoding));
   const { areas } = await loadAreas(regionId, assets);
   const aliases = region.level === "country" ? (await assets.json("data/aliases.json")).country : {};
   const index = buildIndex(areas, aliases);
-  const ranked = rankKeyColumns(table.columns, table.rows, index, region.keys);
+  const ranked = rankKeyColumns(table.columns, table.rows, index, region.keys, {
+    kind: args.flags["key-type"] && String(args.flags["key-type"]),
+  });
   const column = args.flags.key ? String(args.flags.key) : (ranked[0]?.column ?? table.columns[0]);
   if (column === undefined) throw new UsageError("the table has no columns");
   if (!table.columns.includes(column))
@@ -234,17 +257,13 @@ async function commandInit(args, assets) {
   if (!tablePath) throw new UsageError("give the table: graticule init <table.csv> --region world");
   const region = REGIONS[regionId];
   if (!region) throw new UsageError(`unknown region "${regionId}". Run: graticule regions`);
-  const table = parseTable(await readFile(tablePath, "utf8"));
+  const table = await readTable(tablePath, args.flags.encoding && String(args.flags.encoding));
   const { areas } = await loadAreas(regionId, assets);
   const aliases = region.level === "country" ? (await assets.json("data/aliases.json")).country : {};
   const index = buildIndex(areas, aliases);
-  const ranked = rankKeyColumns(
-    table.columns,
-    table.rows,
-    index,
-    region.keys,
-    args.flags.value ? [String(args.flags.value)] : [],
-  );
+  const ranked = rankKeyColumns(table.columns, table.rows, index, region.keys, {
+    exclude: args.flags.value ? [String(args.flags.value)] : [],
+  });
   const key = ranked[0]?.rate >= 0.5 ? ranked[0] : null;
   if (!key)
     throw new UsageError(
@@ -266,7 +285,14 @@ async function commandInit(args, assets) {
     source: "",
     region: regionId,
     type: "choropleth",
-    data: { file, key: key.column, keyType: key.kind, value, label: value },
+    data: {
+      file,
+      key: key.column,
+      keyType: key.kind,
+      ...(args.flags.encoding ? { encoding: String(args.flags.encoding) } : {}),
+      value,
+      label: value,
+    },
     classes: { method: "quantile", count: 5 },
   };
   const text = JSON.stringify(spec, null, 2) + "\n";

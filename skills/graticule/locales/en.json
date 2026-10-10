@@ -159,6 +159,10 @@
       "message_one": "{count} row has a different number of cells than the header.",
       "reason": "Cells in a short or long row may sit under the wrong column. Check the quoting and the delimiter of the file."
     },
+    "table-encoding": {
+      "message": "{file} is not valid UTF-8, so it was read as {encoding}. If names look wrong, set data.encoding (for example big5, shift_jis, euc-kr or gbk) or save the file as UTF-8.",
+      "reason": "Spreadsheets on Windows often save CSV in the system code page. Read with the wrong one, a name turns into other characters and its row matches no area."
+    },
     "join-blank": {
       "message": "{count} rows have an empty name in the key column and are not drawn.",
       "message_one": "{count} row has an empty name in the key column and is not drawn.",
@@ -209,6 +213,8 @@
       "examples": "Or start from an example",
       "loaded": "{rows} rows, {cols} columns",
       "loaded_one": "{rows} row, {cols} columns",
+      "encodingNote": "This file is not UTF-8, so it was read as {encoding}. If the names look wrong, pick the right encoding.",
+      "encoding": "File encoding",
       "error": "Could not read that: {detail}",
       "empty": "Add a table and the map appears here."
     },

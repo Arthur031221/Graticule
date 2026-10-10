@@ -158,6 +158,10 @@
       "message": "{count} 行のセル数が見出し行と異なります。",
       "reason": "短い行や長い行では、セルが違う列の下に入っている可能性があります。ファイルの引用符と区切り文字を確認してください。"
     },
+    "table-encoding": {
+      "message": "{file} は有効な UTF-8 ではないため、{encoding} として読み込みました。名前がおかしい場合は data.encoding（例: big5、shift_jis、euc-kr、gbk）を指定するか、ファイルを UTF-8 で保存し直してください。",
+      "reason": "Windows の表計算ソフトは CSV をシステムのコードページで保存することがよくあります。違う文字コードで読むと名前が別の文字になり、その行はどの地域にも一致しません。"
+    },
     "join-blank": {
       "message": "{count} 行は地域名の列が空で、描画されません。",
       "reason": "名前のない行は配置できません。空欄は合計行や末尾の注記であることが多いです。"
@@ -200,6 +204,8 @@
       "pastePlaceholder": "country,value\nFrance,12.5\nJapan,8.1",
       "examples": "または例から始める",
       "loaded": "{rows} 行、{cols} 列",
+      "encodingNote": "このファイルは UTF-8 ではないため、{encoding} として読み込みました。名前がおかしい場合は、正しい文字コードを選んでください。",
+      "encoding": "ファイルの文字コード",
       "error": "読み込めませんでした：{detail}",
       "empty": "表を追加すると、ここに地図が表示されます。"
     },

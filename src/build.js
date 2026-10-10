@@ -14,7 +14,7 @@ const MAX_PASSES = 4;
  * and draws a scene when no blocking finding is left.
  *
  * @param {any} input the spec as parsed JSON
- * @param {{ assets: any, readText?: (path: string) => Promise<string>, fix?: boolean, allow?: string[], locale?: string, force?: boolean }} ctx
+ * @param {{ assets: any, readText?: (path: string, encoding?: string) => Promise<string | { text: string, encoding: string, guessed: boolean }>, fix?: boolean, allow?: string[], locale?: string, force?: boolean }} ctx
  */
 export async function buildMap(input, ctx) {
   const readText =

@@ -47,7 +47,20 @@ const KEYS = {
     "attribution",
     "checks",
   ],
-  data: ["file", "csv", "rows", "key", "keyType", "value", "kind", "label", "normalize", "aggregate", "filter"],
+  data: [
+    "file",
+    "csv",
+    "rows",
+    "key",
+    "keyType",
+    "encoding",
+    "value",
+    "kind",
+    "label",
+    "normalize",
+    "aggregate",
+    "filter",
+  ],
   classes: ["method", "count", "breaks"],
 };
 
@@ -121,6 +134,13 @@ export function normalizeSpec(input) {
   if (type === "categorical" && data.aggregate !== undefined && !["first", "last"].includes(data.aggregate))
     bad("data.aggregate", "categories can only use first or last");
   if (data.kind !== undefined && !KINDS.includes(data.kind)) bad("data.kind", `must be one of: ${KINDS.join(", ")}`);
+  if (data.encoding !== undefined) {
+    try {
+      new TextDecoder(String(data.encoding));
+    } catch {
+      bad("data.encoding", "must be an encoding name such as utf-8, windows-1252, big5, shift_jis, euc-kr or gbk");
+    }
+  }
   const sources = ["file", "csv", "rows"].filter((k) => data[k] !== undefined);
   if (input.data && type !== "locator" && sources.length !== 1)
     bad("data", `give exactly one of file, csv or rows (found ${sources.length})`);

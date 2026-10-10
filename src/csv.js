@@ -1,5 +1,33 @@
 /** A small CSV reader for the tables people paste into maps. */
 
+/**
+ * Decodes the bytes of a table file. A byte order mark settles UTF-8 or UTF-16.
+ * Without one the bytes must be valid UTF-8; if they are not, the file is read
+ * as Windows-1252 and `guessed` says so, because a spreadsheet on Windows saves
+ * CSV in the system code page and no bytes can prove which one it was.
+ * @param {ArrayBuffer | Uint8Array} bytes
+ * @param {string} [label] an encoding name such as "big5" or "shift_jis", used as given
+ * @returns {{ text: string, encoding: string, guessed: boolean }}
+ * @throws {RangeError} when `label` is not an encoding name
+ */
+export function decodeBytes(bytes, label) {
+  const data = bytes instanceof Uint8Array ? bytes : new Uint8Array(bytes);
+  if (label) {
+    const decoder = new TextDecoder(label);
+    return { text: decoder.decode(data), encoding: decoder.encoding, guessed: false };
+  }
+  const mark = data.length > 1 ? `${data[0]},${data[1]}` : "";
+  if (mark === "255,254")
+    return { text: new TextDecoder("utf-16le").decode(data), encoding: "utf-16le", guessed: false };
+  if (mark === "254,255")
+    return { text: new TextDecoder("utf-16be").decode(data), encoding: "utf-16be", guessed: false };
+  try {
+    return { text: new TextDecoder("utf-8", { fatal: true }).decode(data), encoding: "utf-8", guessed: false };
+  } catch {
+    return { text: new TextDecoder("windows-1252").decode(data), encoding: "windows-1252", guessed: true };
+  }
+}
+
 const NULLS = new Set(["", "na", "n/a", "nan", "null", "none", "..", "-", "--", "\u2014", "#n/a"]);
 
 /**

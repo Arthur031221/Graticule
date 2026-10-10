@@ -21,9 +21,10 @@ const AGGREGATE = {
  */
 
 /**
- * Reads the table a spec points at.
+ * Reads the table a spec points at. `readText` may return the text alone or,
+ * for a file that was decoded, `{ text, encoding, guessed }`.
  * @param {any} data spec.data
- * @param {(path: string) => Promise<string>} readText
+ * @param {(path: string, encoding?: string) => Promise<string | { text: string, encoding: string, guessed: boolean }>} readText
  */
 export async function loadTable(data, readText) {
   if (data.rows) {
@@ -31,10 +32,16 @@ export async function loadTable(data, readText) {
     const rows = data.rows.map((r) =>
       Object.fromEntries(columns.map((c) => [c, r[c] === undefined || r[c] === null ? "" : String(r[c])])),
     );
-    return { columns, rows, problems: { duplicateColumns: [], unterminatedQuote: false, raggedRows: 0 } };
+    return {
+      columns,
+      rows,
+      problems: { duplicateColumns: [], unterminatedQuote: false, raggedRows: 0 },
+      guessedEncoding: "",
+    };
   }
-  const text = data.csv ?? (await readText(data.file));
-  return parseTable(text);
+  const read = data.csv ?? (await readText(data.file, data.encoding));
+  const { text, encoding, guessed } = typeof read === "string" ? { text: read, encoding: "", guessed: false } : read;
+  return { ...parseTable(text), guessedEncoding: guessed ? encoding : "" };
 }
 
 function applyFilter(rows, filter) {
@@ -50,7 +57,7 @@ function applyFilter(rows, filter) {
  * Computes everything a map needs except the drawing: areas, join, values,
  * classes and the findings of the data and spec rules.
  * @param {any} input
- * @param {{ assets: any, readText: (path: string) => Promise<string> }} ctx
+ * @param {{ assets: any, readText: (path: string, encoding?: string) => Promise<string | { text: string, encoding: string, guessed: boolean }> }} ctx
  */
 export async function analyze(input, ctx) {
   const { spec, findings: specFindings } = normalizeSpec(input);
@@ -88,6 +95,12 @@ export async function analyze(input, ctx) {
     return { ...analysis, ok: false };
   }
   analysis.table = table;
+  if (table.guessedEncoding)
+    findings.push({
+      id: "table-encoding",
+      level: "warn",
+      params: { file: spec.data.file, encoding: table.guessedEncoding },
+    });
   const columns = table.columns;
   const { duplicateColumns, unterminatedQuote, raggedRows } = table.problems;
   if (duplicateColumns.length)
@@ -171,7 +184,7 @@ export async function analyze(input, ctx) {
 }
 
 function guessKeyColumn(columns, rows, valueColumns, index, region) {
-  const best = rankKeyColumns(columns, rows, index, region.keys, valueColumns)[0];
+  const best = rankKeyColumns(columns, rows, index, region.keys, { exclude: valueColumns })[0];
   return best && best.rate >= 0.5 ? best.column : "";
 }
 

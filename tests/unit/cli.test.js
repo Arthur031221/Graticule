@@ -113,6 +113,53 @@ test("init takes the column of names as the key, not a column of numbers that lo
   assert.match(join_.stdout, /column "state" matches 3 areas/);
 });
 
+test("join and init read a table that is not UTF-8: a note on stderr, or --encoding", async () => {
+  const fixtures = fileURLToPath(new URL("../fixtures/", import.meta.url));
+  const guessed = await graticule("join", join(fixtures, "countries-latin1.csv"), "--region", "world");
+  assert.equal(guessed.code, 0, guessed.stderr);
+  assert.match(guessed.stderr, /not valid UTF-8, so it was read as windows-1252/);
+  assert.match(guessed.stdout, /matches 5 areas/);
+
+  const big5 = join(fixtures, "tw-counties-big5.csv");
+  const wrong = await graticule("join", big5, "--region", "tw-counties");
+  assert.match(wrong.stderr, /not valid UTF-8/);
+  assert.match(wrong.stdout, /matches 0 areas/);
+  const right = await graticule("join", big5, "--region", "tw-counties", "--encoding", "big5");
+  assert.equal(right.stderr, "");
+  assert.match(right.stdout, /column "county" matches 6 areas of tw-counties as name/);
+
+  const init = await graticule("init", big5, "--region", "tw-counties", "--encoding", "big5");
+  assert.equal(JSON.parse(init.stdout).data.encoding, "big5");
+  const bad = await graticule("join", big5, "--region", "tw-counties", "--encoding", "klingon");
+  assert.equal(bad.code, 1);
+  assert.match(bad.stderr, /"klingon" is not an encoding name/);
+});
+
+test("a spec with data.encoding renders a Big5 file", async () => {
+  const fixtures = fileURLToPath(new URL("../fixtures/", import.meta.url));
+  const out = await mkdtemp(join(tmpdir(), "graticule-"));
+  await writeFile(join(out, "counties.csv"), await readFile(join(fixtures, "tw-counties-big5.csv")));
+  const spec = {
+    title: "People per county",
+    source: "Made up",
+    region: "tw-counties",
+    data: {
+      file: "counties.csv",
+      encoding: "big5",
+      key: "county",
+      value: "population",
+      kind: "count",
+      label: "People",
+    },
+    classes: { method: "quantile", count: 3 },
+    checks: { allow: ["raw-counts"] },
+  };
+  await writeFile(join(out, "tw.json"), JSON.stringify(spec));
+  const result = await graticule("render", join(out, "tw.json"), "-f", "svg");
+  assert.equal(result.code, 0, result.stdout + result.stderr);
+  assert.doesNotMatch(result.stdout, /table-encoding/);
+});
+
 test("init writes the table's path relative to where the spec will be saved", async () => {
   const out = await mkdtemp(join(tmpdir(), "graticule-"));
   await writeFile(join(out, "data.csv"), await readFile(join(gallery, "life-expectancy/data.csv"), "utf8"));

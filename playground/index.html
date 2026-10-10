@@ -107,6 +107,10 @@
           <p class="muted small" data-i18n="data.examples">Or start from an example</p>
           <div class="chips" id="examples"></div>
           <p class="status" id="data-status" role="status"></p>
+          <label class="field" id="field-encoding" hidden
+            ><span data-i18n="data.encoding">File encoding</span
+            ><select id="encoding"></select
+          ></label>
         </section>
 
         <section class="card" id="step-map" aria-labelledby="h-map">
@@ -212,7 +216,7 @@
 
         <section class="card" id="step-checks" aria-labelledby="h-checks">
           <h2 id="h-checks"><span class="n">4</span><span data-i18n="step.checks">Checks</span></h2>
-          <div class="summary" id="check-summary" role="status" aria-live="polite"></div>
+          <div class="summary" id="check-summary" role="status" aria-live="polite" tabindex="-1"></div>
           <button class="btn primary" id="fix-all" type="button" hidden data-i18n="checks.fixAll">Fix them</button>
           <ul class="findings" id="findings"></ul>
         </section>

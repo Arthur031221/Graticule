@@ -12,7 +12,7 @@ The program is `scripts/graticule.mjs` in this skill folder. It needs Node 20 or
 ## Workflow
 
 1. **Find the data and the geography.** Ask for the table if it is missing. Pick a region with `graticule regions` (world, europe, asia, africa, north-america, south-america, oceania, us-states, us-counties, tw-counties, tw-towns, jp-prefectures, kr-provinces).
-2. **Look at the join first.** Run `graticule join table.csv --region world`. It names the key column it found, shows how many rows matched and lists every row that did not, with the closest names. Fix the table or choose another key before drawing anything.
+2. **Look at the join first.** Run `graticule join table.csv --region world`. It names the key column it found, shows how many rows matched and lists every row that did not, with the closest names. Fix the table or choose another key before drawing anything. If it says the file is not valid UTF-8 and the names look garbled, rerun with `--encoding big5`, `shift_jis`, `euc-kr` or `gbk` (the file came from a spreadsheet on Windows) and keep that value in `data.encoding`.
 3. **Write a spec.** Run `graticule init table.csv --region world --value <column> -o map.json` for a start, then fill in `title`, `subtitle`, `source`, `data.kind` and `data.label`. Field reference: `references/spec.md`.
 4. **Check.** Run `graticule check map.json`. Read every error and warning. Each one carries a reason in one sentence.
 5. **Render.** Run `graticule render map.json --fix -f svg,png`. `--fix` makes the smallest change that satisfies each failed error rule (normalize counts by population, replace Mercator, cap classes at 7, extend manual breaks, swap an unsafe palette) and writes the spec it used to `map.spec.json`.

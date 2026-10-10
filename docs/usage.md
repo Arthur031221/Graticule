@@ -20,7 +20,7 @@ not matched: Gibraltar
 
 ## 2. Write a spec and check it
 
-`graticule init deaths.csv --region world --value deaths -o covid.json` writes a starting point. Fill in `title`, `source` and `data.kind`, then check it. Data files are read only from the folder of the spec (`--data-root <folder>` allows another one), because specs can come from other people. This spec is the map an unguarded script would draw: raw counts, Mercator, nine classes and a rainbow.
+`graticule init deaths.csv --region world --value deaths -o covid.json` writes a starting point. Fill in `title`, `source` and `data.kind`, then check it. A table that is not UTF-8 is read as Windows-1252 with a warning. Pass `--encoding big5` (or `shift_jis`, `euc-kr`, `gbk`) to `join` and `init`, or set `data.encoding`, when the names look garbled. Data files are read only from the folder of the spec (`--data-root <folder>` allows another one), because specs can come from other people. This spec is the map an unguarded script would draw: raw counts, Mercator, nine classes and a rainbow.
 
 ```
 $ graticule check covid.json

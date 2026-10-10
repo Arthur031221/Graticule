@@ -217,3 +217,80 @@ for (const theme of ["light", "dark"]) {
     ).toEqual([]);
   });
 }
+
+test("a file that is not UTF-8 can be read again with the encoding it has", async ({ page }) => {
+  await page.goto("/");
+  await page.locator("#file").setInputFiles("tests/fixtures/tw-counties-big5.csv");
+  await expect(page.locator("#field-encoding")).toBeVisible();
+  await expect(page.locator("#data-status")).toContainText("not UTF-8");
+  await expect(page.locator("#encoding")).toHaveValue("windows-1252");
+  await page.selectOption("#encoding", "big5");
+  await expect(page.locator("#region")).toHaveValue("tw-counties");
+  await expect(page.locator("#join-summary")).toContainText("6 of 6 rows matched 6 areas");
+  await expect(page.locator("#data-status")).not.toContainText("not UTF-8");
+  await page.locator("#file").setInputFiles("tests/fixtures/countries-latin1.csv");
+  await expect(page.locator("#join-summary")).toContainText("5 of 5 rows matched 5 areas");
+  await page.getByRole("button", { name: "Life expectancy" }).click();
+  await expect(page.locator("#field-encoding")).toBeHidden();
+});
+
+test("a slow region lookup for an uploaded table cannot change an example loaded after it", async ({ page }) => {
+  let release;
+  const gate = new Promise((resolve) => (release = resolve));
+  await page.route("**/data/us-states.json", async (route) => {
+    await gate;
+    await route.continue();
+  });
+  await page.goto("/?example=life-expectancy");
+  await expect(svg(page)).toBeVisible();
+  const csv = ["state,score", "California,5", "Texas,4", "New York,3"].join("\n");
+  await page.locator("#file").setInputFiles({ name: "states.csv", mimeType: "text/csv", buffer: Buffer.from(csv) });
+  await page.getByRole("button", { name: "Europe GDP" }).click();
+  await expect(svg(page)).toBeVisible();
+  release();
+  await page.waitForTimeout(1500);
+  await expect(page.locator("#region")).toHaveValue("europe");
+  await expect(page.locator("#value")).toHaveValue("gdp_per_person");
+});
+
+test("Fix leaves focus on the remaining error while the map is still blocked", async ({ page }) => {
+  await page.goto("/?example=covid-raw");
+  await page.fill("#source", "");
+  await expect(page.locator("#stage-note")).toContainText("source-required");
+  await page.locator("#stage-note .btn.primary").click();
+  await expect(page.locator("#stage-note")).toContainText("source-required");
+  await expect(page.locator("#sheet")).not.toBeFocused();
+  await expect(page.locator("#stage-note button").first()).toBeFocused();
+});
+
+test("with small multiples a value error still leads to a visible field", async ({ page }) => {
+  await page.goto("/");
+  const csv = [
+    "country,description,rate",
+    "France,high,5.1",
+    "Japan,low,6.2",
+    "Brazil,medium,7.3",
+    "Kenya,low,2.2",
+  ].join("\n");
+  await page.locator("#file").setInputFiles({ name: "d.csv", mimeType: "text/csv", buffer: Buffer.from(csv) });
+  await page.locator('#type [value="small-multiples"], #type button:has-text("Small multiples")').first().click();
+  await page.locator('#values input[value="rate"]').uncheck();
+  await page.locator('#values input[value="description"]').check();
+  await expect(page.locator("#findings")).toContainText("value-not-numeric");
+  const go = page.locator("#findings .finding:has-text('value-not-numeric') .goto");
+  await expect(go).toBeVisible();
+  await go.click();
+  await expect(page.locator(`#values input[value="description"]`)).toBeFocused();
+});
+
+test("on a phone the blocked list is one column and the form controls keep their padding", async ({ page }) => {
+  await page.setViewportSize({ width: 375, height: 700 });
+  await page.goto("/?example=covid-raw");
+  const columns = await page
+    .locator(".stage-errors li")
+    .first()
+    .evaluate((li) => getComputedStyle(li).gridTemplateColumns.split(" ").length);
+  expect(columns).toBe(1);
+  const padding = await page.locator("#stage-note").evaluate((n) => getComputedStyle(n).paddingLeft);
+  expect(padding).toBe("16px");
+});

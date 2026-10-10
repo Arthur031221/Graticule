@@ -169,6 +169,10 @@
       "message_one": "{count} ligne n'a pas le même nombre de cellules que l'en-tête.",
       "reason": "Dans une ligne trop courte ou trop longue, des cellules peuvent se retrouver sous la mauvaise colonne. Vérifiez les guillemets et le séparateur du fichier."
     },
+    "table-encoding": {
+      "message": "{file} n'est pas de l'UTF-8 valide, il a donc été lu comme {encoding}. Si les noms semblent faux, indiquez data.encoding (par exemple big5, shift_jis, euc-kr ou gbk) ou enregistrez le fichier en UTF-8.",
+      "reason": "Les tableurs sous Windows enregistrent souvent le CSV avec la page de codes du système. Lu avec une autre, un nom devient d'autres caractères et sa ligne ne correspond à aucune zone."
+    },
     "join-blank": {
       "message": "{count} lignes ont un nom vide dans la colonne clé et ne sont pas dessinées.",
       "message_one": "{count} ligne a un nom vide dans la colonne clé et n'est pas dessinée.",
@@ -214,6 +218,8 @@
       "examples": "Ou partez d'un exemple",
       "loaded": "{rows} lignes, {cols} colonnes",
       "loaded_one": "{rows} ligne, {cols} colonnes",
+      "encodingNote": "Ce fichier n'est pas en UTF-8, il a donc été lu comme {encoding}. Si les noms semblent faux, choisissez le bon encodage.",
+      "encoding": "Encodage du fichier",
       "error": "Lecture impossible : {detail}",
       "empty": "Ajoutez un tableau et la carte apparaîtra ici."
     },

@@ -1,5 +1,5 @@
 import { buildMap } from "../src/build.js";
-import { parseNumber, parseTable } from "../src/csv.js";
+import { decodeBytes, parseNumber, parseTable } from "../src/csv.js";
 import { exportMap } from "../src/export.js";
 import { createFontStore } from "../src/fonts.js";
 import { interactions } from "../src/html.js";
@@ -30,6 +30,14 @@ const EXAMPLES = [
   "population-symbols",
   "taiwan-township-area",
   "japan-regions",
+];
+const ENCODINGS = [
+  ["windows-1252", "Windows-1252"],
+  ["big5", "Big5"],
+  ["shift_jis", "Shift_JIS"],
+  ["euc-kr", "EUC-KR"],
+  ["gbk", "GBK"],
+  ["utf-8", "UTF-8"],
 ];
 const TYPES = ["choropleth", "symbols", "categorical", "locator", "small-multiples"];
 const KINDS = ["", "count", "rate", "share", "index", "other"];
@@ -103,7 +111,11 @@ const state = {
   example: "",
   signature: "",
   refocus: "",
+  bytes: null,
 };
+
+/** Counts the tables loaded, so a slow region lookup for an older table cannot change a newer one. */
+let tableRun = 0;
 
 /* Language ------------------------------------------------------------- */
 
@@ -433,6 +445,9 @@ function fromSpec(spec) {
 
 /** A new table starts a new map: nothing from the previous one carries over except the language and theme. */
 function resetForNewData() {
+  tableRun++;
+  state.bytes = null;
+  $("field-encoding").hidden = true;
   state.example = "";
   state.fixes = [];
   state.allow = new Set();
@@ -444,14 +459,28 @@ function resetForNewData() {
   buildPalettes();
 }
 
+/**
+ * Loads a table file. A file that is not UTF-8 keeps its bytes, so the reader can
+ * read it again with the encoding it really has.
+ */
+async function loadBytes(bytes, label) {
+  const decoded = decodeBytes(bytes, label);
+  state.bytes = decoded.guessed || label ? bytes : null;
+  $("field-encoding").hidden = !state.bytes;
+  if (state.bytes) {
+    const known = ENCODINGS.some(([value]) => value === decoded.encoding);
+    options($("encoding"), ENCODINGS, known ? decoded.encoding : "windows-1252");
+  }
+  await setTable(decoded.text);
+  if (decoded.guessed) $("data-status").textContent += ` ${ui("data.encodingNote", { encoding: decoded.encoding })}`;
+}
+
 function setStatus(text, error = false) {
   $("data-status").textContent = text;
   $("data-status").classList.toggle("error", error);
 }
 
 const REGION_ORDER = ["world", "us-states", "us-counties", "jp-prefectures", "kr-provinces", "tw-counties", "tw-towns"];
-let tableRun = 0;
-
 async function setTable(text, { keepSpec = false } = {}) {
   const run = ++tableRun;
   let table;
@@ -524,6 +553,9 @@ async function loadExample(id) {
     fetch(new URL("spec.json", dir)).then((r) => r.json()),
     fetch(new URL("data.csv", dir)).then((r) => r.text()),
   ]);
+  tableRun++;
+  state.bytes = null;
+  $("field-encoding").hidden = true;
   state.example = id;
   state.allow = new Set();
   state.fixes = [];
@@ -661,7 +693,13 @@ const FIELD = {
 
 const fieldFor = (id) => {
   const node = FIELD[id] && $(FIELD[id]);
-  const target = node?.id === "palettes" ? (node.querySelector("input:checked") ?? node.querySelector("input")) : node;
+  if (!node) return null;
+  const target =
+    node.id === "palettes"
+      ? (node.querySelector("input:checked") ?? node.querySelector("input"))
+      : node.id === "value" && !node.offsetParent
+        ? ($("values").querySelector("input:checked") ?? $("values").querySelector("input"))
+        : node;
   return target?.offsetParent ? target : null;
 };
 
@@ -808,7 +846,10 @@ async function fixAll() {
     buildPalettes();
     syncControls();
     await render();
-    $("sheet").focus({ preventScroll: true });
+    const drawn = state.last && !state.last.blocked;
+    (drawn ? $("sheet") : ($("stage-note").querySelector("button") ?? $("check-summary"))).focus({
+      preventScroll: true,
+    });
   } finally {
     button.disabled = false;
   }
@@ -891,11 +932,16 @@ function wire() {
     if (!f) return;
     if (f.size > 25 * 1024 * 1024) return setStatus(ui("data.error", { detail: "25 MB" }), true);
     resetForNewData();
-    await setTable(await f.text());
+    await loadBytes(new Uint8Array(await f.arrayBuffer()));
   };
   drop.addEventListener("click", () => file.click());
   drop.addEventListener("keydown", (e) => (e.key === "Enter" || e.key === " ") && (e.preventDefault(), file.click()));
   file.addEventListener("change", () => readFile(file.files[0]));
+  $("encoding").addEventListener("change", async () => {
+    const bytes = state.bytes;
+    resetForNewData();
+    await loadBytes(bytes, $("encoding").value);
+  });
   for (const type of ["dragenter", "dragover"])
     drop.addEventListener(type, (e) => (e.preventDefault(), drop.classList.add("over")));
   for (const type of ["dragleave", "drop"])
@@ -917,7 +963,7 @@ function wire() {
 
   const panel = $("panel");
   panel.addEventListener("input", (e) => {
-    if (["paste", "file"].includes(e.target.id)) return;
+    if (["paste", "file", "encoding"].includes(e.target.id)) return;
     readControls();
     if (e.target.id === "region") state.regionTouched = true;
     if (e.target.id === "map-lang") {

@@ -153,6 +153,10 @@
       "message": "有 {count} 列的儲存格數量和標題列不同。",
       "reason": "太短或太長的列，儲存格可能落在錯的欄位底下。請檢查檔案的引號和分隔符號。"
     },
+    "table-encoding": {
+      "message": "{file} 不是有效的 UTF-8，已改用 {encoding} 讀取。若名稱看起來不對，請設定 data.encoding（例如 big5、shift_jis、euc-kr 或 gbk），或把檔案另存為 UTF-8。",
+      "reason": "Windows 上的試算表常以系統碼頁儲存 CSV。用錯編碼讀取時，名稱會變成別的字元，該列就對不到任何區域。"
+    },
     "join-blank": {
       "message": "有 {count} 列的地區名稱欄是空的，沒有畫出來。",
       "reason": "沒有名稱的資料列無法定位。空白通常是合計列或表尾的備註。"
@@ -195,6 +199,8 @@
       "pastePlaceholder": "country,value\nFrance,12.5\nJapan,8.1",
       "examples": "或從範例開始",
       "loaded": "{rows} 列，{cols} 欄",
+      "encodingNote": "這個檔案不是 UTF-8，已用 {encoding} 讀取。若名稱看起來不對，請選擇正確的編碼。",
+      "encoding": "檔案編碼",
       "error": "無法讀取：{detail}",
       "empty": "加入資料表，地圖就會出現在這裡。"
     },
