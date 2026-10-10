@@ -59,6 +59,7 @@
     },
     "join-unmatched": {
       "message": "{count} lignes ne correspondent à aucune zone et ne sont pas dessinées : {list}.",
+      "message_one": "{count} ligne ne correspond à aucune zone et n'est pas dessinée : {list}.",
       "reason": "Des lignes qui disparaissent en silence donnent à une carte un air complet qu'elle n'a pas. Corrigez l'orthographe ou la colonne clé."
     },
     "join-ambiguous": {
@@ -67,6 +68,7 @@
     },
     "duplicate-keys": {
       "message": "{count} zones ont plus d'une ligne (par exemple {example} en a {rows}).",
+      "message_one": "{count} zone a plus d'une ligne (par exemple {example} en a {rows}).",
       "reason": "On ne peut dessiner qu'une valeur par zone, et garder la dernière ligne cache les autres. Définissez data.aggregate, ou data.filter pour choisir une ligne, par exemple une année."
     },
     "raw-counts": {
@@ -116,18 +118,22 @@
     },
     "normalize-missing": {
       "message": "{count} zones n'ont pas de {by} intégrée pour diviser et s'affichent sans données.",
+      "message_one": "{count} zone n'a pas de {by} intégrée pour diviser et s'affiche sans données.",
       "reason": "Sans dénominateur, on ne peut pas calculer un taux. Fournissez-le avec normalize.by column, ou acceptez les trous et dites-le dans la note."
     },
     "values-skipped": {
       "message": "{count} lignes ont atteint une zone mais ont été écartées parce qu'une cellule n'est pas un nombre, ou qu'une valeur a un dénominateur absent ou nul (par exemple {example}).",
+      "message_one": "{count} ligne a atteint une zone mais a été écartée parce qu'une cellule n'est pas un nombre, ou qu'une valeur a un dénominateur absent ou nul (par exemple {example}).",
       "reason": "Une ligne écartée change la valeur de sa zone sans aucun signe sur la carte. Corrigez la cellule, ou acceptez le trou et dites-le dans la note."
     },
     "no-data-share": {
       "message": "{count} zones sur {total} ({percent} %) n'ont pas de valeur.",
+      "message_one": "{count} zone sur {total} ({percent} %) n'a pas de valeur.",
       "reason": "Une carte avec de grandes zones grises peut induire en erreur. Expliquez pourquoi dans la note, ou choisissez une région que les données couvrent."
     },
     "label-overlap": {
       "message": "{count} étiquettes se chevauchent.",
+      "message_one": "{count} étiquette en chevauche une autre.",
       "reason": "Des étiquettes qui se chevauchent ne se lisent pas."
     },
     "highlight-unmatched": {
@@ -136,6 +142,7 @@
     },
     "symbols-negative": {
       "message": "Les symboles proportionnels ne peuvent pas montrer {count} valeurs inférieures ou égales à zéro.",
+      "message_one": "Les symboles proportionnels ne peuvent pas montrer {count} valeur inférieure ou égale à zéro.",
       "reason": "L'aire d'un cercle représente une quantité : une valeur négative n'a pas de taille."
     },
     "fix-applied": {
@@ -144,22 +151,27 @@
     },
     "labels-hidden": {
       "message": "{count} étiquettes ont été omises car elles ne tiennent pas dans leur zone ou en chevaucheraient une autre.",
+      "message_one": "{count} étiquette a été omise car elle ne tient pas dans sa zone ou en chevaucherait une autre.",
       "reason": "Les étiquettes omises sont notées pour qu'une carte plus épurée ne passe pas pour une carte complète."
     },
     "small-areas-marked": {
       "message": "{count} zones sont trop petites pour être vues à cette échelle et sont dessinées en points.",
+      "message_one": "{count} zone est trop petite pour être vue à cette échelle et est dessinée en point.",
       "reason": "Sinon les petits pays et territoires disparaîtraient de la carte."
     },
     "outside-frame": {
       "message": "{count} zones avec des données sont hors du cadre de la carte : {list}.",
+      "message_one": "{count} zone avec des données est hors du cadre de la carte : {list}.",
       "reason": "Elles ne sont pas dessinées. Choisissez une région plus large pour les montrer."
     },
     "table-ragged": {
       "message": "{count} lignes n'ont pas le même nombre de cellules que l'en-tête.",
+      "message_one": "{count} ligne n'a pas le même nombre de cellules que l'en-tête.",
       "reason": "Dans une ligne trop courte ou trop longue, des cellules peuvent se retrouver sous la mauvaise colonne. Vérifiez les guillemets et le séparateur du fichier."
     },
     "join-blank": {
       "message": "{count} lignes ont un nom vide dans la colonne clé et ne sont pas dessinées.",
+      "message_one": "{count} ligne a un nom vide dans la colonne clé et n'est pas dessinée.",
       "reason": "Une ligne sans nom ne peut pas être placée. Un nom vide est souvent une ligne de total ou une note en bas du tableau."
     },
     "glyphs-missing": {
@@ -168,6 +180,7 @@
     },
     "symbols-min-size": {
       "message": "{count} symboles sont plus petits que la taille minimale et ont été dessinés à cette taille.",
+      "message_one": "{count} symbole est plus petit que la taille minimale et a été dessiné à cette taille.",
       "reason": "Ces cercles sont un peu plus grands que leur valeur. Ils sont notés pour que les tailles ne soient pas lues trop précisément."
     }
   },
@@ -200,6 +213,7 @@
       "pastePlaceholder": "country,value\nFrance,12.5\nJapan,8.1",
       "examples": "Ou partez d'un exemple",
       "loaded": "{rows} lignes, {cols} colonnes",
+      "loaded_one": "{rows} ligne, {cols} colonnes",
       "error": "Lecture impossible : {detail}",
       "empty": "Ajoutez un tableau et la carte apparaîtra ici."
     },
@@ -264,12 +278,15 @@
     "checks": {
       "ok": "Aucun problème trouvé.",
       "blocked": "{count} problèmes empêchent de dessiner cette carte.",
+      "blocked_one": "{count} problème empêche de dessiner cette carte.",
       "warnings": "{count} avertissements à lire.",
+      "warnings_one": "{count} avertissement à lire.",
       "fixAll": "Les corriger",
       "fixed": "Corrigé : {list}",
       "allow": "Accepter",
       "allowed": "Accepté",
       "why": "Pourquoi",
+      "goto": "Aller au champ",
       "matched": "{matched} lignes sur {rows} correspondent à {areas} zones",
       "unmatched": "Sans correspondance : {list}",
       "pending": "Contrôle en cours..."

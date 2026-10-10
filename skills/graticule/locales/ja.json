@@ -270,6 +270,7 @@
       "allow": "許可",
       "allowed": "許可済み",
       "why": "理由",
+      "goto": "入力欄へ移動",
       "matched": "{rows} 行のうち {matched} 行が {areas} 地域に一致",
       "unmatched": "一致なし：{list}",
       "pending": "チェック中..."

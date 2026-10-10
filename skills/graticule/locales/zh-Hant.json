@@ -265,6 +265,7 @@
       "allow": "接受",
       "allowed": "已接受",
       "why": "原因",
+      "goto": "前往欄位",
       "matched": "{rows} 列中有 {matched} 列對應到 {areas} 個地區",
       "unmatched": "對不上：{list}",
       "pending": "檢查中..."

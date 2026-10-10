@@ -153710,127 +153710,6 @@ function nameIn(area, lang) {
   return area.names[0] ?? area.id;
 }
 
-// src/join.js
-var CODE_KINDS = /* @__PURE__ */ new Set(["iso3", "iso2", "isonum", "fips", "postal", "code", "iso", "jis"]);
-var PAD = { fips: 0, isonum: 3, jis: 2 };
-function normalizeCode(kind, value) {
-  const text = String(value).trim().toUpperCase();
-  return kind === "isonum" || kind === "jis" ? text.replace(/^0+(?=\d)/, "") : text;
-}
-function buildIndex(areas, aliases = {}) {
-  const index = { kinds: {}, labels: [], byId: new Map(areas.map((a) => [a.id, a])) };
-  const add2 = (kind, key, entry) => {
-    const map = index.kinds[kind] ??= /* @__PURE__ */ new Map();
-    const list2 = map.get(key) ?? [];
-    if (!list2.some((e) => e.area === entry.area)) list2.push(entry);
-    map.set(key, list2);
-  };
-  for (const area of areas) {
-    for (const [kind, values] of Object.entries(area.keys)) {
-      for (const value of values) {
-        if (kind === "name") {
-          add2(kind, normalizeName(value), { area, via: "name" });
-          index.labels.push([normalizeName(value), area.names[0] ?? area.id]);
-        } else add2(kind, normalizeCode(kind, value), { area, via: "code" });
-      }
-    }
-  }
-  const byIso3 = new Map(areas.map((a) => [a.keys.iso3?.[0], a]));
-  for (const [alias, iso3] of Object.entries(aliases)) {
-    const area = byIso3.get(iso3);
-    if (area) add2("name", normalizeName(alias), { area, via: "alias" });
-  }
-  return index;
-}
-function kindsOf(index) {
-  return Object.keys(index.kinds);
-}
-function lookup(index, kind, raw) {
-  const map = index.kinds[kind];
-  if (!map) return { entries: [], padded: false };
-  if (!CODE_KINDS.has(kind)) {
-    const damaged = damagedNamePattern(raw);
-    if (damaged) {
-      const hits = [...map].filter(([key2]) => damaged.test(key2)).map(([, list2]) => list2);
-      return { entries: new Set(hits.flat().map((e) => e.area)).size === 1 ? hits[0] : [], padded: false };
-    }
-    const exact = map.get(normalizeName(raw));
-    if (exact) return { entries: exact, padded: false };
-    for (const short of formalVariants(raw)) {
-      const hit = map.get(normalizeName(short));
-      if (hit?.length === 1) return { entries: hit, padded: false };
-    }
-    return { entries: [], padded: false };
-  }
-  const key = normalizeCode(kind, raw);
-  const direct = map.get(key);
-  if (direct) return { entries: direct, padded: false };
-  const width = PAD[kind] === 0 ? [...map.keys()][0]?.length : PAD[kind];
-  if (width && /^\d+$/.test(key) && key.length < width) {
-    const padded = map.get(key.padStart(width, "0"));
-    if (padded) return { entries: padded, padded: true };
-  }
-  return { entries: [], padded: false };
-}
-function detectKind(values, index, order) {
-  const distinct = [...new Set(values.filter((v) => v !== ""))];
-  let best = { kind: order[0], hits: -1 };
-  for (const kind of order.filter((k) => index.kinds[k])) {
-    const hits = distinct.filter((v) => lookup(index, kind, v).entries.length === 1).length;
-    if (hits > best.hits) best = { kind, hits };
-  }
-  return { kind: best.kind, rate: distinct.length ? Math.max(0, best.hits) / distinct.length : 0 };
-}
-function joinKeys(values, index, kind) {
-  const rowsByArea = /* @__PURE__ */ new Map();
-  const unmatched = /* @__PURE__ */ new Map();
-  const ambiguous = /* @__PURE__ */ new Map();
-  const via = { code: 0, name: 0, alias: 0, padded: 0 };
-  const seen = /* @__PURE__ */ new Map();
-  let blank = 0;
-  values.forEach((raw, row) => {
-    if (raw === "") {
-      blank++;
-      return;
-    }
-    let result = seen.get(raw);
-    if (!result) {
-      result = resolve(index, kind, raw);
-      seen.set(raw, result);
-    }
-    if (result.area) {
-      const rows = rowsByArea.get(result.area.id) ?? [];
-      rows.push(row);
-      rowsByArea.set(result.area.id, rows);
-    } else {
-      const bucket = result.candidates ? ambiguous : unmatched;
-      const item = bucket.get(raw) ?? { value: raw, rows: [], candidates: result.candidates };
-      item.rows.push(row);
-      bucket.set(raw, item);
-    }
-  });
-  for (const [raw, result] of seen) {
-    if (!result.area) continue;
-    const count = values.filter((v) => v === raw).length;
-    via[result.padded ? "padded" : result.via] += count;
-  }
-  const missing = [...unmatched.values()].map((u) => ({
-    ...u,
-    suggestions: kind === "name" ? suggest(u.value, index.labels) : []
-  }));
-  return { kind, rowsByArea, unmatched: missing, ambiguous: [...ambiguous.values()], via, blank };
-}
-function resolve(index, kind, raw) {
-  let { entries, padded } = lookup(index, kind, raw);
-  if (!entries.length && kind !== "name" && index.kinds.name) {
-    const byName = lookup(index, "name", raw);
-    if (byName.entries.length) entries = byName.entries;
-  }
-  if (entries.length === 1) return { area: entries[0].area, via: entries[0].via, padded };
-  if (entries.length > 1) return { candidates: entries.map((e) => e.area.names[0] ?? e.area.id) };
-  return {};
-}
-
 // src/csv.js
 var NULLS = /* @__PURE__ */ new Set(["", "na", "n/a", "nan", "null", "none", "..", "-", "--", "\u2014", "#n/a"]);
 function parseTable(text) {
@@ -153908,6 +153787,146 @@ function parseColumn(cells) {
   const comma = texts.some((t) => COMMA_PROOF.test(t));
   const decimal = point === comma ? null : point ? "." : ",";
   return { values: cells.map((c) => parseNumber(c, decimal ?? void 0)), decimal };
+}
+
+// src/join.js
+var CODE_KINDS = /* @__PURE__ */ new Set(["iso3", "iso2", "isonum", "fips", "postal", "code", "iso", "jis"]);
+var PAD = { fips: 0, isonum: 3, jis: 2 };
+function normalizeCode(kind, value) {
+  const text = String(value).trim().toUpperCase();
+  return kind === "isonum" || kind === "jis" ? text.replace(/^0+(?=\d)/, "") : text;
+}
+function buildIndex(areas, aliases = {}) {
+  const index = { kinds: {}, labels: [], byId: new Map(areas.map((a) => [a.id, a])) };
+  const add2 = (kind, key, entry) => {
+    const map = index.kinds[kind] ??= /* @__PURE__ */ new Map();
+    const list2 = map.get(key) ?? [];
+    if (!list2.some((e) => e.area === entry.area)) list2.push(entry);
+    map.set(key, list2);
+  };
+  for (const area of areas) {
+    for (const [kind, values] of Object.entries(area.keys)) {
+      for (const value of values) {
+        if (kind === "name") {
+          add2(kind, normalizeName(value), { area, via: "name" });
+          index.labels.push([normalizeName(value), area.names[0] ?? area.id]);
+        } else add2(kind, normalizeCode(kind, value), { area, via: "code" });
+      }
+    }
+  }
+  const byIso3 = new Map(areas.map((a) => [a.keys.iso3?.[0], a]));
+  for (const [alias, iso3] of Object.entries(aliases)) {
+    const area = byIso3.get(iso3);
+    if (area) add2("name", normalizeName(alias), { area, via: "alias" });
+  }
+  return index;
+}
+function kindsOf(index) {
+  return Object.keys(index.kinds);
+}
+function lookup(index, kind, raw) {
+  const map = index.kinds[kind];
+  if (!map) return { entries: [], padded: false };
+  if (!CODE_KINDS.has(kind)) {
+    const damaged = damagedNamePattern(raw);
+    if (damaged) {
+      const hits = [...map].filter(([key2]) => damaged.test(key2)).map(([, list2]) => list2);
+      return { entries: new Set(hits.flat().map((e) => e.area)).size === 1 ? hits[0] : [], padded: false };
+    }
+    const exact = map.get(normalizeName(raw));
+    if (exact) return { entries: exact, padded: false };
+    for (const short of formalVariants(raw)) {
+      const hit = map.get(normalizeName(short));
+      if (hit?.length === 1) return { entries: hit, padded: false };
+    }
+    return { entries: [], padded: false };
+  }
+  const key = normalizeCode(kind, raw);
+  const direct = map.get(key);
+  if (direct) return { entries: direct, padded: false };
+  const width = PAD[kind] === 0 ? [...map.keys()][0]?.length : PAD[kind];
+  if (width && /^\d+$/.test(key) && key.length < width) {
+    const padded = map.get(key.padStart(width, "0"));
+    if (padded) return { entries: padded, padded: true };
+  }
+  return { entries: [], padded: false };
+}
+function detectKind(values, index, order) {
+  const distinct = [...new Set(values.filter((v) => v !== ""))];
+  let best = { kind: order[0], hits: -1 };
+  for (const kind of order.filter((k) => index.kinds[k])) {
+    const hits = distinct.filter((v) => lookup(index, kind, v).entries.length === 1).length;
+    if (hits > best.hits) best = { kind, hits };
+  }
+  return {
+    kind: best.kind,
+    rate: distinct.length ? Math.max(0, best.hits) / distinct.length : 0,
+    hits: Math.max(0, best.hits)
+  };
+}
+function isPlainNumbers(cells) {
+  const filled = cells.filter((c) => c !== "");
+  return filled.length > 0 && filled.every((c) => parseNumber(c) !== null && !/^0\d/.test(c));
+}
+function rankKeyColumns(columns, rows, index, order, exclude = []) {
+  const ranked = [];
+  for (const column of columns) {
+    if (exclude.includes(column)) continue;
+    const cells = rows.map((r) => (r[column] ?? "").trim());
+    if (new Set(cells.filter((c) => c !== "")).size < Math.min(3, cells.length)) continue;
+    const { kind, rate, hits } = detectKind(cells, index, order);
+    ranked.push({ column, kind, rate, hits, strong: !isPlainNumbers(cells) && rate >= 0.5 });
+  }
+  return ranked.sort((p, q) => Number(q.strong) - Number(p.strong) || q.rate - p.rate || q.hits - p.hits);
+}
+function joinKeys(values, index, kind) {
+  const rowsByArea = /* @__PURE__ */ new Map();
+  const unmatched = /* @__PURE__ */ new Map();
+  const ambiguous = /* @__PURE__ */ new Map();
+  const via = { code: 0, name: 0, alias: 0, padded: 0 };
+  const seen = /* @__PURE__ */ new Map();
+  let blank = 0;
+  values.forEach((raw, row) => {
+    if (raw === "") {
+      blank++;
+      return;
+    }
+    let result = seen.get(raw);
+    if (!result) {
+      result = resolve(index, kind, raw);
+      seen.set(raw, result);
+    }
+    if (result.area) {
+      const rows = rowsByArea.get(result.area.id) ?? [];
+      rows.push(row);
+      rowsByArea.set(result.area.id, rows);
+    } else {
+      const bucket = result.candidates ? ambiguous : unmatched;
+      const item = bucket.get(raw) ?? { value: raw, rows: [], candidates: result.candidates };
+      item.rows.push(row);
+      bucket.set(raw, item);
+    }
+  });
+  for (const [raw, result] of seen) {
+    if (!result.area) continue;
+    const count = values.filter((v) => v === raw).length;
+    via[result.padded ? "padded" : result.via] += count;
+  }
+  const missing = [...unmatched.values()].map((u) => ({
+    ...u,
+    suggestions: kind === "name" ? suggest(u.value, index.labels) : []
+  }));
+  return { kind, rowsByArea, unmatched: missing, ambiguous: [...ambiguous.values()], via, blank };
+}
+function resolve(index, kind, raw) {
+  let { entries, padded } = lookup(index, kind, raw);
+  if (!entries.length && kind !== "name" && index.kinds.name) {
+    const byName = lookup(index, "name", raw);
+    if (byName.entries.length) entries = byName.entries;
+  }
+  if (entries.length === 1) return { area: entries[0].area, via: entries[0].via, padded };
+  if (entries.length > 1) return { candidates: entries.map((e) => e.area.names[0] ?? e.area.id) };
+  return {};
 }
 
 // src/classify.js
@@ -155168,14 +155187,8 @@ async function analyze(input, ctx) {
   return analysis;
 }
 function guessKeyColumn(columns, rows, valueColumns, index, region) {
-  let best = { column: "", rate: 0 };
-  for (const column of columns.filter((c) => !valueColumns.includes(c))) {
-    const values = rows.map((r) => (r[column] ?? "").trim());
-    if (new Set(values).size < Math.min(3, values.length)) continue;
-    const { rate } = detectKind(values, index, region.keys);
-    if (rate > best.rate) best = { column, rate };
-  }
-  return best.rate >= 0.5 ? best.column : "";
+  const best = rankKeyColumns(columns, rows, index, region.keys, valueColumns)[0];
+  return best && best.rate >= 0.5 ? best.column : "";
 }
 function areaValue(rowIdx, nums, dens, aggregate, per) {
   const usable = rowIdx.filter((i2) => nums[i2] !== null && (!dens || dens[i2] !== null && dens[i2] > 0));
@@ -156235,12 +156248,17 @@ function symbolLegend(o) {
 }
 
 // src/i18n.js
+var PLURAL_TAGS = { "zh-Hant": "zh-TW", "zh-Hans": "zh-CN", pt: "pt-BR" };
 function dig(tree, path) {
   return path.split(".").reduce((node, part) => node && typeof node === "object" ? node[part] : void 0, tree);
 }
-function createTranslator(messages, fallback = messages) {
+function createTranslator(messages, fallback = messages, lang = "en") {
+  const own = new Intl.PluralRules(PLURAL_TAGS[lang] ?? lang);
+  const english = new Intl.PluralRules("en");
+  const pick = (tree, key, category) => (category === "other" ? void 0 : dig(tree, `${key}_${category}`)) ?? dig(tree, key);
   return (key, params = {}) => {
-    const template = dig(messages, key) ?? dig(fallback, key) ?? key;
+    const count = typeof params.count === "number" ? params.count : null;
+    const template = pick(messages, key, count === null ? "other" : own.select(count)) ?? pick(fallback, key, count === null ? "other" : english.select(count)) ?? key;
     return String(template).replace(/\{(\w+)\}/g, (_, name) => name in params ? String(params[name]) : `{${name}}`);
   };
 }
@@ -157115,7 +157133,8 @@ async function buildMap(input, ctx) {
   const wanted = normalizeLang(ctx.locale ?? input?.language ?? "en") || "en";
   const t = createTranslator(
     wanted === "en" ? english : await ctx.assets.json(`locales/${wanted}.json`).catch(() => english),
-    english
+    english,
+    wanted
   );
   let spec = structuredClone(input);
   const fixes = [];
@@ -157237,8 +157256,19 @@ function interactions(svg, tip) {
     el.setAttribute("data-tip", text);
     el.setAttribute("aria-label", text);
     el.setAttribute("role", "graphics-symbol");
-    if (keyboard) el.setAttribute("tabindex", "0");
   });
+  var current = null;
+  function rove(el) {
+    if (current) current.setAttribute("tabindex", "-1");
+    current = el;
+    el.setAttribute("tabindex", "0");
+  }
+  if (keyboard) {
+    areas.forEach(function(el) {
+      el.setAttribute("tabindex", "-1");
+    });
+    if (areas.length) rove(areas[0]);
+  }
   function show(el, x2, y) {
     tip.textContent = el.getAttribute("data-tip");
     tip.hidden = false;
@@ -157270,8 +157300,40 @@ function interactions(svg, tip) {
       e.target.closest("[data-tip]")
     );
     if (!el) return;
+    if (keyboard) rove(el);
     var box = el.getBoundingClientRect();
     show(el, box.left + box.width / 2, box.top);
+  });
+  svg.addEventListener("keydown", function(e) {
+    var from = (
+      /** @type {Element} */
+      e.target.closest("[data-tip]")
+    );
+    var steps = { ArrowRight: [1, 0], ArrowLeft: [-1, 0], ArrowDown: [0, 1], ArrowUp: [0, -1] };
+    var dir = steps[e.key];
+    if (!keyboard || !from || !dir || e.altKey || e.ctrlKey || e.metaKey) return;
+    var a = from.getBoundingClientRect();
+    var ax = a.left + a.width / 2;
+    var ay = a.top + a.height / 2;
+    var best = null;
+    var bestScore = Infinity;
+    areas.forEach(function(el) {
+      if (el === from) return;
+      var b = el.getBoundingClientRect();
+      var dx = b.left + b.width / 2 - ax;
+      var dy = b.top + b.height / 2 - ay;
+      var along = dx * dir[0] + dy * dir[1];
+      if (along <= 0) return;
+      var score = along + 2 * Math.abs(dx * dir[1] - dy * dir[0]);
+      if (score < bestScore) {
+        best = el;
+        bestScore = score;
+      }
+    });
+    if (!best) return;
+    e.preventDefault();
+    rove(best);
+    best.focus();
   });
   svg.addEventListener("focusout", hide);
   function focusClass(index) {
@@ -158126,7 +158188,8 @@ async function translator(assets, lang) {
   const code = normalizeLang(lang ?? "en") || "en";
   return createTranslator(
     code === "en" ? english : await assets.json(`locales/${code}.json`).catch(() => english),
-    english
+    english,
+    code
   );
 }
 async function readInsideRoots(full, name, roots) {
@@ -158203,15 +158266,14 @@ async function commandJoin(args, assets) {
   const { areas } = await loadAreas(regionId, assets);
   const aliases = region.level === "country" ? (await assets.json("data/aliases.json")).country : {};
   const index = buildIndex(areas, aliases);
-  const columns = args.flags.key ? [String(args.flags.key)] : table.columns;
-  const candidates = columns.map((column) => {
-    const cells = table.rows.map((r) => r[column] ?? "");
-    const detected = args.flags["key-type"] ? { kind: String(args.flags["key-type"]) } : detectKind(cells, index, region.keys);
-    return { column, ...joinKeys(cells, index, detected.kind) };
-  });
-  const rate = (c) => c.rowsByArea.size;
-  const best = candidates.sort((p, q) => rate(q) - rate(p))[0];
-  if (!best) throw new UsageError("the table has no columns");
+  const ranked = rankKeyColumns(table.columns, table.rows, index, region.keys);
+  const column = args.flags.key ? String(args.flags.key) : ranked[0]?.column ?? table.columns[0];
+  if (column === void 0) throw new UsageError("the table has no columns");
+  if (!table.columns.includes(column))
+    throw new UsageError(`no column "${column}" in ${tablePath}. Columns: ${table.columns.join(", ")}`);
+  const cells = table.rows.map((r) => r[column] ?? "");
+  const kind = String(args.flags["key-type"] ?? detectKind(cells, index, region.keys).kind);
+  const best = { column, ...joinKeys(cells, index, kind) };
   const out = {
     column: best.column,
     keyType: best.kind,
@@ -158245,14 +158307,13 @@ async function commandInit(args, assets) {
   const { areas } = await loadAreas(regionId, assets);
   const aliases = region.level === "country" ? (await assets.json("data/aliases.json")).country : {};
   const index = buildIndex(areas, aliases);
-  const ranked = table.columns.map((column) => ({
-    column,
-    ...detectKind(
-      table.rows.map((r) => r[column] ?? ""),
-      index,
-      region.keys
-    )
-  })).sort((p, q) => q.rate - p.rate);
+  const ranked = rankKeyColumns(
+    table.columns,
+    table.rows,
+    index,
+    region.keys,
+    args.flags.value ? [String(args.flags.value)] : []
+  );
   const key = ranked[0]?.rate >= 0.5 ? ranked[0] : null;
   if (!key)
     throw new UsageError(

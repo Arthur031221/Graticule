@@ -59,6 +59,7 @@
     },
     "join-unmatched": {
       "message": "{count} filas no coinciden con ninguna zona y no se dibujan: {list}.",
+      "message_one": "{count} fila no coincide con ninguna zona y no se dibuja: {list}.",
       "reason": "Las filas que desaparecen en silencio hacen que un mapa parezca completo sin serlo. Corrige la ortografía o la columna clave."
     },
     "join-ambiguous": {
@@ -67,6 +68,7 @@
     },
     "duplicate-keys": {
       "message": "{count} zonas tienen más de una fila (por ejemplo {example} tiene {rows}).",
+      "message_one": "{count} zona tiene más de una fila (por ejemplo {example} tiene {rows}).",
       "reason": "Solo se puede dibujar un valor por zona, y quedarse con la última fila oculta las demás. Define data.aggregate o usa data.filter para elegir una fila, por ejemplo un año."
     },
     "raw-counts": {
@@ -116,18 +118,22 @@
     },
     "normalize-missing": {
       "message": "{count} zonas no tienen {by} incorporada para dividir y se muestran sin datos.",
+      "message_one": "{count} zona no tiene {by} incorporada para dividir y se muestra sin datos.",
       "reason": "Sin denominador no se puede calcular una tasa. Apórtalo con normalize.by column o acepta los huecos y acláralo en la nota."
     },
     "values-skipped": {
       "message": "{count} filas llegaron a un área pero se dejaron fuera porque una celda no es un número, o un valor tiene el denominador ausente o en cero (por ejemplo {example}).",
+      "message_one": "{count} fila llegó a un área pero se dejó fuera porque una celda no es un número, o un valor tiene el denominador ausente o en cero (por ejemplo {example}).",
       "reason": "Una fila omitida cambia el valor de su área sin ninguna señal en el mapa. Corrige la celda, o acepta el hueco y dilo en la nota."
     },
     "no-data-share": {
       "message": "{count} de {total} zonas ({percent}%) no tienen valor.",
+      "message_one": "{count} de {total} zonas ({percent}%) no tiene valor.",
       "reason": "Un mapa con grandes zonas grises puede engañar. Explica el motivo en la nota o elige una región que los datos cubran."
     },
     "label-overlap": {
       "message": "{count} etiquetas se superponen.",
+      "message_one": "{count} etiqueta se superpone con otra.",
       "reason": "Las etiquetas superpuestas no se pueden leer."
     },
     "highlight-unmatched": {
@@ -136,6 +142,7 @@
     },
     "symbols-negative": {
       "message": "Los símbolos proporcionales no pueden mostrar {count} valores iguales o menores que cero.",
+      "message_one": "Los símbolos proporcionales no pueden mostrar {count} valor igual o menor que cero.",
       "reason": "El área de un círculo representa una cantidad, así que un valor negativo no tiene tamaño."
     },
     "fix-applied": {
@@ -144,22 +151,27 @@
     },
     "labels-hidden": {
       "message": "Se omitieron {count} etiquetas porque no caben en su zona o se superpondrían con otra.",
+      "message_one": "Se omitió {count} etiqueta porque no cabe en su zona o se superpondría con otra.",
       "reason": "Las etiquetas ocultas se anotan para que un mapa más limpio no se confunda con uno completo."
     },
     "small-areas-marked": {
       "message": "{count} zonas son demasiado pequeñas para verse a esta escala y se dibujan como puntos.",
+      "message_one": "{count} zona es demasiado pequeña para verse a esta escala y se dibuja como punto.",
       "reason": "De lo contrario, los países y territorios pequeños desaparecerían del mapa."
     },
     "outside-frame": {
       "message": "{count} zonas con datos quedan fuera del marco del mapa: {list}.",
+      "message_one": "{count} zona con datos queda fuera del marco del mapa: {list}.",
       "reason": "No se dibujan. Elige una región más amplia para mostrarlas."
     },
     "table-ragged": {
       "message": "{count} filas tienen un número de celdas distinto al del encabezado.",
+      "message_one": "{count} fila tiene un número de celdas distinto al del encabezado.",
       "reason": "En una fila corta o larga las celdas pueden quedar bajo la columna equivocada. Revisa las comillas y el delimitador del archivo."
     },
     "join-blank": {
       "message": "{count} filas tienen vacía la columna que nombra la zona y no se dibujan.",
+      "message_one": "{count} fila tiene vacía la columna que nombra la zona y no se dibuja.",
       "reason": "Una fila sin nombre no se puede colocar. Un campo vacío suele ser una fila de totales o una nota al final de la tabla."
     },
     "glyphs-missing": {
@@ -168,6 +180,7 @@
     },
     "symbols-min-size": {
       "message": "{count} símbolos son menores que el tamaño mínimo y se dibujaron con ese mínimo.",
+      "message_one": "{count} símbolo es menor que el tamaño mínimo y se dibujó con ese mínimo.",
       "reason": "Esos círculos son algo mayores de lo que dice su valor. Se anotan para que los tamaños no se lean con demasiada precisión."
     }
   },
@@ -200,6 +213,7 @@
       "pastePlaceholder": "country,value\nFrance,12.5\nJapan,8.1",
       "examples": "O empieza con un ejemplo",
       "loaded": "{rows} filas, {cols} columnas",
+      "loaded_one": "{rows} fila, {cols} columnas",
       "error": "No se pudo leer: {detail}",
       "empty": "Añade una tabla y el mapa aparecerá aquí."
     },
@@ -264,12 +278,15 @@
     "checks": {
       "ok": "No se encontraron problemas.",
       "blocked": "{count} problemas impiden dibujar este mapa.",
+      "blocked_one": "{count} problema impide dibujar este mapa.",
       "warnings": "{count} avisos que leer.",
+      "warnings_one": "{count} aviso que leer.",
       "fixAll": "Corregirlos",
       "fixed": "Corregido: {list}",
       "allow": "Aceptar",
       "allowed": "Aceptado",
       "why": "Por qué",
+      "goto": "Ir al campo",
       "matched": "{matched} de {rows} filas coinciden con {areas} zonas",
       "unmatched": "Sin coincidencia: {list}",
       "pending": "Comprobando..."

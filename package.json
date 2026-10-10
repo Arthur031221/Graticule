@@ -50,6 +50,7 @@
     "dev": "node scripts/serve.mjs"
   },
   "devDependencies": {
+    "@axe-core/playwright": "^4.13.0",
     "@playwright/test": "^1.64.0",
     "@resvg/resvg-wasm": "^2.6.2",
     "@types/d3-geo": "^3.1.1",

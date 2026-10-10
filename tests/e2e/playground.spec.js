@@ -1,3 +1,4 @@
+import AxeBuilder from "@axe-core/playwright";
 import { expect, test } from "@playwright/test";
 import { readFile } from "node:fs/promises";
 
@@ -118,7 +119,7 @@ test("accepting a rule lets a blocked map through and keeps it in the list", asy
   await expect(svg(page)).toBeVisible();
   await page.fill("#source", "");
   await expect(page.locator("#stage-note")).toContainText("problem");
-  await page.locator('.finding:has-text("source-required") button').click();
+  await page.locator('.finding:has-text("source-required") [data-allow]').click();
   await expect(svg(page)).toBeVisible();
   await expect(page.locator('.finding:has-text("source-required")')).toContainText("Accepted");
 });
@@ -145,3 +146,74 @@ test("no request leaves the origin", async ({ page }) => {
   await expect(svg(page)).toBeVisible();
   expect(external).toEqual([]);
 });
+
+test("on a phone the Fix button stays inside the blocked note", async ({ page }) => {
+  await page.setViewportSize({ width: 375, height: 700 });
+  await page.goto("/?example=covid-raw");
+  const button = page.locator("#stage-note .btn.primary");
+  await expect(button).toBeVisible();
+  const [note, box] = await Promise.all([page.locator(".sheet-wrap").boundingBox(), button.boundingBox()]);
+  expect(box.y + box.height).toBeLessThanOrEqual(note.y + note.height + 0.5);
+  expect(box.x).toBeGreaterThanOrEqual(0);
+  expect(box.x + box.width).toBeLessThanOrEqual(375);
+});
+
+test("a single problem is written in the singular", async ({ page }) => {
+  await page.goto("/?example=life-expectancy");
+  await expect(svg(page)).toBeVisible();
+  await page.fill("#source", "");
+  await expect(page.locator("#stage-note")).toContainText("1 problem stops this map.");
+  await page.selectOption("#ui-lang", "fr");
+  await expect(page.locator("#stage-note")).toContainText("1 problème empêche");
+});
+
+test("a finding with no mechanical repair leads to its field, and Fix puts focus on the map", async ({ page }) => {
+  await page.goto("/");
+  const csv = ["country,rate", "France,12", "Japan,8", "Brazil,5", "Kenya,4"].join("\n");
+  await page.locator("#file").setInputFiles({ name: "rates.csv", mimeType: "text/csv", buffer: Buffer.from(csv) });
+  await page.fill("#title", "Rates");
+  await expect(page.locator("#stage-note")).toContainText("source-required");
+  await page.locator("#stage-note .goto").first().click();
+  await expect(page.locator("#source")).toBeFocused();
+  await page.fill("#source", "Made up");
+  await expect(svg(page)).toBeVisible();
+
+  await page.goto("/?example=covid-raw");
+  await page.locator("#stage-note .btn.primary").click();
+  await expect(svg(page)).toBeVisible();
+  await expect(page.locator("#sheet")).toBeFocused();
+});
+
+test("the map is one tab stop and the arrow keys move between areas", async ({ page }) => {
+  await page.goto("/?example=europe-gdp-per-capita");
+  await expect(svg(page)).toBeVisible();
+  await expect(page.locator('#sheet [data-id][tabindex="0"]')).toHaveCount(1);
+  const first = page.locator('#sheet [data-id][tabindex="0"]');
+  await first.focus();
+  const before = await first.getAttribute("data-id");
+  await page.keyboard.press("ArrowRight");
+  await expect(page.locator("#tip")).toBeVisible();
+  const after = await page.evaluate(() => document.activeElement.getAttribute("data-id"));
+  expect(after).not.toBe(before);
+  await expect(page.locator('#sheet [data-id][tabindex="0"]')).toHaveCount(1);
+});
+
+for (const theme of ["light", "dark"]) {
+  test(`the playground has no serious accessibility violations in the ${theme} theme`, async ({ page }) => {
+    await page.emulateMedia({ colorScheme: theme });
+    await page.goto("/?example=life-expectancy");
+    await expect(svg(page)).toBeVisible();
+    await expect(page.locator("html")).toHaveAttribute("data-theme", theme);
+    const { violations } = await new AxeBuilder({ page }).disableRules(["svg-img-alt"]).analyze();
+    const serious = violations.filter((v) => ["serious", "critical"].includes(v.impact));
+    expect(
+      serious.map(
+        (v) =>
+          `${v.id}: ${v.nodes
+            .map((n) => n.target.join(" "))
+            .slice(0, 3)
+            .join(" | ")}`,
+      ),
+    ).toEqual([]);
+  });
+}

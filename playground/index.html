@@ -8,12 +8,17 @@
       name="description"
       content="Make a map from a spreadsheet. Graticule checks it against cartography rules and exports SVG, PNG, PDF or interactive HTML. Everything runs in your browser."
     />
+    <meta name="theme-color" content="#f4f1ea" media="(prefers-color-scheme: light)" />
+    <meta name="theme-color" content="#0f1216" media="(prefers-color-scheme: dark)" />
+    <meta property="og:type" content="website" />
+    <meta property="og:url" content="https://arthur031221.github.io/Graticule/" />
     <meta property="og:title" content="Graticule" />
     <meta
       property="og:description"
       content="Make a map from a spreadsheet. Checked against cartography rules, exported offline."
     />
     <meta property="og:image" content="https://arthur031221.github.io/Graticule/social-card.png" />
+    <meta property="og:image:alt" content="Graticule: maps that pass a checklist" />
     <meta name="twitter:card" content="summary_large_image" />
     <link rel="icon" href="logo.svg" type="image/svg+xml" />
     <link rel="stylesheet" href="style.css" />
@@ -33,18 +38,13 @@
     <a class="skip" href="#sheet" data-i18n="skip">Skip to the map</a>
 
     <header class="top">
-      <a class="brand" href="./" aria-label="Graticule">
+      <a class="brand" href="./">
         <img src="logo.svg" alt="" width="34" height="34" />
-        <span class="brand-name">Graticule</span>
+        <h1 class="brand-name">Graticule</h1>
         <span class="brand-tag" data-i18n="tagline">Maps that pass a checklist</span>
       </a>
       <nav class="tools" aria-label="Site">
-        <a
-          class="link"
-          href="https://github.com/Arthur031221/Graticule/blob/main/docs/gallery.md"
-          data-i18n="nav.gallery"
-          >Gallery</a
-        >
+        <a class="link" href="gallery/" data-i18n="nav.gallery">Gallery</a>
         <a class="link" href="https://github.com/Arthur031221/Graticule" data-i18n="nav.github">GitHub</a>
         <label class="select-chip">
           <span class="sr" data-i18n="nav.language">Language</span>
@@ -226,8 +226,8 @@
 
       <section class="stage" aria-label="Map">
         <div class="sheet-wrap">
-          <div class="sheet" id="sheet" aria-live="polite"></div>
-          <div class="stage-note" id="stage-note"></div>
+          <div class="sheet" id="sheet" tabindex="-1"></div>
+          <div class="stage-note" id="stage-note" role="status"></div>
         </div>
         <div class="join" id="join-summary"></div>
       </section>
@@ -237,6 +237,8 @@
       <span data-i18n="footer.note"
         >Open source, MIT license. Everything runs in your browser and nothing is uploaded.</span
       >
+      <a href="gallery/" data-i18n="nav.gallery">Gallery</a>
+      <a href="https://github.com/Arthur031221/Graticule" data-i18n="nav.github">GitHub</a>
     </footer>
     <div class="toast" id="toast" role="status" aria-live="polite" hidden></div>
     <script type="module" src="app.js"></script>

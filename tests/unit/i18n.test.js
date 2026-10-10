@@ -11,12 +11,16 @@ const flat = (object, prefix = "") =>
 const placeholders = (text) => [...String(text).matchAll(/\{(\w+)\}/g)].map((m) => m[1]).sort();
 
 const english = new Map(flat(await assets.json("locales/en.json")));
+const ONE_FORM = new Set(["en", "es", "fr", "de", "pt"]);
+const isOne = (key) => key.endsWith("_one");
 
 for (const lang of LANGS.filter((l) => l !== "en")) {
   test(`${lang} translates every message with the same placeholders`, async () => {
     const messages = new Map(flat(await assets.json(`locales/${lang}.json`)));
-    const missing = [...english.keys()].filter((key) => !messages.has(key));
-    const extra = [...messages.keys()].filter((key) => !english.has(key));
+    // Languages that use one form for every count carry no "_one" messages.
+    const wanted = [...english.keys()].filter((key) => ONE_FORM.has(lang) || !isOne(key));
+    const missing = wanted.filter((key) => !messages.has(key));
+    const extra = [...messages.keys()].filter((key) => !wanted.includes(key));
     assert.deepEqual(missing, [], `missing in ${lang}`);
     assert.deepEqual(extra, [], `unknown in ${lang}`);
     for (const [key, text] of messages) {
@@ -25,6 +29,21 @@ for (const lang of LANGS.filter((l) => l !== "en")) {
     }
   });
 }
+
+test("every singular message belongs to a message that exists", () => {
+  for (const key of english.keys()) if (isOne(key)) assert.ok(english.has(key.slice(0, -4)), key);
+});
+
+test("a count of one picks the singular form of the language", () => {
+  const en = { n: "{count} rows", n_one: "{count} row" };
+  const fr = { n: "{count} lignes", n_one: "{count} ligne" };
+  const ja = { n: "{count} 行" };
+  assert.equal(createTranslator(en)("n", { count: 1 }), "1 row");
+  assert.equal(createTranslator(en)("n", { count: 2 }), "2 rows");
+  assert.equal(createTranslator(fr, en, "fr")("n", { count: 0 }), "0 ligne");
+  assert.equal(createTranslator(ja, en, "ja")("n", { count: 1 }), "1 行");
+  assert.equal(createTranslator(en)("n"), "{count} rows");
+});
 
 test("a missing key falls back to English and then to the key", () => {
   const t = createTranslator({ a: "x" }, { a: "y", b: "hello {name}" });

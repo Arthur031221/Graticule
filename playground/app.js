@@ -101,6 +101,8 @@ const state = {
   token: 0,
   fixes: [],
   example: "",
+  signature: "",
+  refocus: "",
 };
 
 /* Language ------------------------------------------------------------- */
@@ -109,7 +111,7 @@ async function setUiLanguage(code) {
   state.ui = code;
   const [english, messages] = await Promise.all([assets.json("locales/en.json"), assets.json(`locales/${code}.json`)]);
   state.english = english;
-  state.t = createTranslator(messages, english);
+  state.t = createTranslator(messages, english, code);
   document.documentElement.lang = { "zh-Hant": "zh-TW", "zh-Hans": "zh-CN", pt: "pt-BR" }[code] ?? code;
   try {
     localStorage.setItem("graticule.lang", code);
@@ -484,7 +486,7 @@ async function setTable(text, { keepSpec = false } = {}) {
         : (numeric[0] ?? columns.find((c) => c !== found.column) ?? columns[0]);
     state.spec.values = numeric.slice(0, 3);
   }
-  setStatus(ui("data.loaded", { rows: table.rows.length, cols: table.columns.length }));
+  setStatus(ui("data.loaded", { rows: table.rows.length, count: table.rows.length, cols: table.columns.length }));
   fillColumns();
   syncControls();
   schedule();
@@ -533,7 +535,13 @@ async function loadExample(id) {
   buildSelects();
   buildPalettes();
   buildExamples();
-  setStatus(ui("data.loaded", { rows: state.table.rows.length, cols: state.table.columns.length }));
+  setStatus(
+    ui("data.loaded", {
+      rows: state.table.rows.length,
+      count: state.table.rows.length,
+      cols: state.table.columns.length,
+    }),
+  );
   syncControls();
   schedule(0);
 }
@@ -561,6 +569,11 @@ async function render() {
     return;
   }
   wrap.classList.add("loading");
+  if (!$("sheet").firstElementChild && !note.classList.contains("show")) {
+    note.className = "stage-note show";
+    showNote(true);
+    note.replaceChildren(el("div", {}, ui("stage.loading")));
+  }
   try {
     const result = await buildMap(toSpec(), {
       assets,
@@ -576,8 +589,10 @@ async function render() {
     if (result.scene && !result.blocked) {
       const svg = await renderSvg(result.scene, store);
       if (token !== state.token) return;
+      const first = !$("sheet").firstElementChild || $("sheet").classList.contains("stale");
       $("sheet").innerHTML = svg;
       $("sheet").classList.remove("stale");
+      $("sheet").classList.toggle("fresh", first);
       note.className = "stage-note";
       showNote(false);
       const svgEl = $("sheet").querySelector("svg");
@@ -597,7 +612,11 @@ async function render() {
           el(
             "ul",
             { class: "stage-errors" },
-            ...errors.slice(0, 5).map((f) => el("li", {}, el("code", {}, f.id), f.message)),
+            ...errors
+              .slice(0, 5)
+              .map((f) =>
+                el("li", {}, el("code", {}, f.id), el("span", {}, f.message, f.fixable ? null : gotoButton(f))),
+              ),
           ),
           errors.some((f) => f.fixable)
             ? el(
@@ -620,6 +639,44 @@ async function render() {
     if (token === state.token) wrap.classList.remove("loading");
   }
 }
+
+/** The control that fixes each finding by hand, for the findings that have no mechanical repair. */
+const FIELD = {
+  "source-required": "source",
+  "title-required": "title",
+  "legend-title": "unit",
+  "kind-undeclared": "kind",
+  "join-failed": "key",
+  "raw-counts": "normalize",
+  "normalize-missing": "normalize",
+  "max-classes": "count",
+  "skewed-classes": "method",
+  "palette-order": "palettes",
+  "cvd-separation": "palettes",
+  "diverging-center": "center",
+  "label-overlap": "labels",
+  "value-not-numeric": "value",
+  "no-values": "value",
+};
+
+const fieldFor = (id) => {
+  const node = FIELD[id] && $(FIELD[id]);
+  const target = node?.id === "palettes" ? (node.querySelector("input:checked") ?? node.querySelector("input")) : node;
+  return target?.offsetParent ? target : null;
+};
+
+function focusField(target) {
+  const calm = matchMedia("(prefers-reduced-motion: reduce)").matches;
+  target.scrollIntoView({ block: "center", behavior: calm ? "auto" : "smooth" });
+  target.focus({ preventScroll: true });
+}
+
+const gotoButton = (f) => {
+  const target = fieldFor(f.id);
+  return target
+    ? el("button", { class: "goto", type: "button", onclick: () => focusField(target) }, ui("checks.goto"))
+    : null;
+};
 
 function tipElement() {
   let tip = document.getElementById("tip");
@@ -672,7 +729,7 @@ function showFindings(result) {
           el("span", { class: "tag" }, ui(`level.${f.allowed ? (f.was ?? "info") : f.level}`)),
           el("code", {}, f.id),
         ),
-        el("p", {}, f.message),
+        el("p", {}, f.message, f.fixable || f.level === "info" ? null : gotoButton(f)),
         el("details", {}, el("summary", {}, ui("checks.why")), f.reason),
         (canAllow && f.level !== "info") || f.allowed
           ? el(
@@ -680,7 +737,7 @@ function showFindings(result) {
               { class: "actions" },
               el(
                 "button",
-                { class: "btn small", type: "button", onclick: () => toggleAllow(f.id) },
+                { class: "btn small", type: "button", "data-allow": f.id, onclick: () => toggleAllow(f.id) },
                 f.allowed ? ui("checks.allowed") : ui("checks.allow"),
               ),
             )
@@ -688,12 +745,18 @@ function showFindings(result) {
       ),
     );
   }
+  const signature = result.findings.map((f) => `${f.id}:${f.level}`).join();
+  list.classList.toggle("enter", signature !== state.signature);
+  state.signature = signature;
   list.replaceChildren(...items);
+  if (state.refocus) list.querySelector(`[data-allow="${state.refocus}"]`)?.focus({ preventScroll: true });
+  state.refocus = "";
 }
 
 function toggleAllow(id) {
   if (state.allow.has(id)) state.allow.delete(id);
   else state.allow.add(id);
+  state.refocus = id;
   schedule(0);
 }
 
@@ -745,6 +808,7 @@ async function fixAll() {
     buildPalettes();
     syncControls();
     await render();
+    $("sheet").focus({ preventScroll: true });
   } finally {
     button.disabled = false;
   }

@@ -5,11 +5,12 @@
   --muted: #5b626b;
   --line: #e2ddd1;
   --line-strong: #c9c3b4;
+  --control: #8a8473;
   --input: #ffffff;
   --accent: #c8412b;
   --accent-soft: #f6e3de;
   --accent-ink: #ffffff;
-  --warn: #b7791f;
+  --warn: #8a5a0b;
   --warn-soft: #f7ecd5;
   --ok: #2f7d4f;
   --shadow: 0 1px 0 rgba(27, 31, 35, 0.04), 0 18px 40px -28px rgba(27, 31, 35, 0.4);
@@ -27,6 +28,7 @@
   --muted: #a3abb5;
   --line: #262c35;
   --line-strong: #3a424d;
+  --control: #6b7683;
   --input: #11151a;
   --accent: #ff7a59;
   --accent-soft: #3a2119;
@@ -119,6 +121,7 @@ body {
   transform: rotate(60deg);
 }
 .brand-name {
+  margin: 0;
   font: 600 23px/1 var(--serif);
   letter-spacing: -0.01em;
 }
@@ -148,7 +151,7 @@ body {
 .select-chip select,
 .icon-btn {
   height: 34px;
-  border: 1px solid var(--line-strong);
+  border: 1px solid var(--control);
   border-radius: 999px;
   background: var(--panel);
   color: var(--ink);
@@ -213,6 +216,9 @@ body {
     padding-top: 6px;
     background: var(--bg);
   }
+  .stage:has(.has-note) {
+    position: static;
+  }
   .sheet svg {
     max-height: 42vh;
   }
@@ -221,6 +227,41 @@ body {
   }
   .link {
     display: none;
+  }
+}
+
+@media (max-width: 520px) {
+  .stage-errors li {
+    grid-template-columns: 1fr;
+    gap: 2px;
+  }
+  .stage-note {
+    padding: 18px 16px;
+  }
+}
+@media (pointer: coarse) {
+  .chip,
+  .btn.small {
+    min-height: 44px;
+  }
+  .chip {
+    padding: 0 14px;
+  }
+  input[type="text"],
+  input[type="number"],
+  select,
+  textarea {
+    min-height: 44px;
+  }
+  .select-chip select,
+  .icon-btn {
+    height: 44px;
+  }
+  .icon-btn {
+    width: 44px;
+  }
+  .finding summary {
+    padding: 10px 0;
   }
 }
 
@@ -277,7 +318,7 @@ textarea {
   width: 100%;
   min-height: 36px;
   padding: 6px 10px;
-  border: 1px solid var(--line-strong);
+  border: 1px solid var(--control);
   border-radius: 8px;
   background: var(--input);
   color: var(--ink);
@@ -323,7 +364,7 @@ button {
   min-height: 38px;
   padding: 0 16px;
   border-radius: 10px;
-  border: 1px solid var(--line-strong);
+  border: 1px solid var(--control);
   background: var(--panel);
   color: var(--ink);
   cursor: pointer;
@@ -364,7 +405,7 @@ button {
   align-items: center;
   gap: 12px;
   padding: 16px;
-  border: 1.5px dashed var(--line-strong);
+  border: 1.5px dashed var(--control);
   border-radius: 12px;
   cursor: pointer;
   color: var(--muted);
@@ -403,7 +444,7 @@ button {
 .chip {
   padding: 5px 11px;
   border-radius: 999px;
-  border: 1px solid var(--line-strong);
+  border: 1px solid var(--control);
   background: var(--panel);
   color: var(--ink);
   font-size: 13px;
@@ -559,6 +600,8 @@ button {
   border: 1px solid var(--line);
   border-radius: 10px;
   font-size: 13.5px;
+}
+.findings.enter .finding {
   animation: slide 0.25s ease both;
 }
 .finding::before {
@@ -647,7 +690,12 @@ button {
   box-shadow: var(--shadow);
 }
 .sheet-wrap.has-note {
+  display: grid;
   min-height: 340px;
+}
+.sheet-wrap.has-note > .sheet,
+.sheet-wrap.has-note > .stage-note {
+  grid-area: 1 / 1;
 }
 .sheet {
   line-height: 0;
@@ -656,18 +704,18 @@ button {
   display: block;
   width: 100%;
   height: auto;
-  animation: fade 0.3s ease both;
   transition:
     filter 0.25s,
     opacity 0.25s;
+}
+.sheet.fresh svg {
+  animation: fade 0.3s ease both;
 }
 .sheet.stale svg {
   filter: grayscale(0.85) blur(1.5px);
   opacity: 0.35;
 }
 .stage-note {
-  position: absolute;
-  inset: 0;
   display: none;
   place-items: center;
   padding: 24px;
@@ -681,11 +729,21 @@ button {
   background: color-mix(in srgb, var(--panel) 78%, transparent);
   pointer-events: none;
 }
-.stage-note .btn {
+.stage-note button {
   pointer-events: auto;
 }
 .stage-note .cta {
   margin-top: 16px;
+}
+.goto {
+  margin-left: 6px;
+  padding: 0;
+  border: 0;
+  background: none;
+  color: var(--accent);
+  font-size: inherit;
+  text-decoration: underline;
+  cursor: pointer;
 }
 .stage-errors {
   list-style: none;
@@ -749,6 +807,17 @@ button {
   padding: 0 clamp(16px, 3vw, 40px) 36px;
   color: var(--muted);
   font-size: 13px;
+  display: flex;
+  flex-wrap: wrap;
+  gap: 6px 20px;
+  align-items: center;
+}
+.foot a {
+  color: var(--muted);
+  padding: 8px 0;
+}
+.foot a:hover {
+  color: var(--ink);
 }
 
 .tip {

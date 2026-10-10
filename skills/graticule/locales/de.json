@@ -59,6 +59,7 @@
     },
     "join-unmatched": {
       "message": "{count} Zeilen passen zu keinem Gebiet und werden nicht gezeichnet: {list}.",
+      "message_one": "{count} Zeile passt zu keinem Gebiet und wird nicht gezeichnet: {list}.",
       "reason": "Zeilen, die still verschwinden, lassen eine Karte vollständig wirken, obwohl sie es nicht ist. Korrigieren Sie die Schreibweise oder die Schlüsselspalte."
     },
     "join-ambiguous": {
@@ -67,6 +68,7 @@
     },
     "duplicate-keys": {
       "message": "{count} Gebiete haben mehr als eine Zeile (zum Beispiel {example} hat {rows}).",
+      "message_one": "{count} Gebiet hat mehr als eine Zeile (zum Beispiel {example} hat {rows}).",
       "reason": "Pro Gebiet lässt sich nur ein Wert zeichnen, und die letzte Zeile zu behalten verbirgt die übrigen. Setzen Sie data.aggregate oder wählen Sie mit data.filter eine Zeile, etwa ein Jahr."
     },
     "raw-counts": {
@@ -116,18 +118,22 @@
     },
     "normalize-missing": {
       "message": "Für {count} Gebiete ist keine eingebaute {by} zum Teilen vorhanden, sie erscheinen ohne Daten.",
+      "message_one": "Für {count} Gebiet ist keine eingebaute {by} zum Teilen vorhanden, es erscheint ohne Daten.",
       "reason": "Ohne Nenner lässt sich keine Rate berechnen. Liefern Sie ihn mit normalize.by column oder akzeptieren Sie die Lücken und nennen Sie das in der Anmerkung."
     },
     "values-skipped": {
       "message": "{count} Zeilen erreichten ein Gebiet, wurden aber ausgelassen, weil eine Zelle keine Zahl ist oder der Nenner eines Wertes fehlt oder null ist (zum Beispiel {example}).",
+      "message_one": "{count} Zeile erreichte ein Gebiet, wurde aber ausgelassen, weil eine Zelle keine Zahl ist oder der Nenner eines Wertes fehlt oder null ist (zum Beispiel {example}).",
       "reason": "Eine ausgelassene Zeile verändert den Wert ihres Gebiets, ohne dass die Karte es zeigt. Korrigiere die Zelle oder nimm die Lücke hin und sage es in der Notiz."
     },
     "no-data-share": {
       "message": "{count} von {total} Gebieten ({percent} %) haben keinen Wert.",
+      "message_one": "{count} von {total} Gebieten ({percent} %) hat keinen Wert.",
       "reason": "Eine Karte mit großen grauen Flächen kann in die Irre führen. Nennen Sie den Grund in der Anmerkung oder wählen Sie eine Region, die die Daten abdecken."
     },
     "label-overlap": {
       "message": "{count} Beschriftungen überlappen sich.",
+      "message_one": "{count} Beschriftung überlappt eine andere.",
       "reason": "Überlappende Beschriftungen lassen sich nicht lesen."
     },
     "highlight-unmatched": {
@@ -136,6 +142,7 @@
     },
     "symbols-negative": {
       "message": "Proportionale Symbole können {count} Werte kleiner oder gleich null nicht darstellen.",
+      "message_one": "Proportionale Symbole können {count} Wert kleiner oder gleich null nicht darstellen.",
       "reason": "Die Fläche eines Kreises steht für eine Menge, ein negativer Wert hat daher keine Größe."
     },
     "fix-applied": {
@@ -144,22 +151,27 @@
     },
     "labels-hidden": {
       "message": "{count} Beschriftungen wurden weggelassen, weil sie nicht in ihr Gebiet passen oder eine andere überlappen würden.",
+      "message_one": "{count} Beschriftung wurde weggelassen, weil sie nicht in ihr Gebiet passt oder eine andere überlappen würde.",
       "reason": "Weggelassene Beschriftungen werden aufgeführt, damit eine ruhigere Karte nicht für eine vollständige gehalten wird."
     },
     "small-areas-marked": {
       "message": "{count} Gebiete sind in diesem Maßstab zu klein und werden als Punkte gezeichnet.",
+      "message_one": "{count} Gebiet ist in diesem Maßstab zu klein und wird als Punkt gezeichnet.",
       "reason": "Sonst würden kleine Länder und Gebiete von der Karte verschwinden."
     },
     "outside-frame": {
       "message": "{count} Gebiete mit Daten liegen außerhalb des Kartenausschnitts: {list}.",
+      "message_one": "{count} Gebiet mit Daten liegt außerhalb des Kartenausschnitts: {list}.",
       "reason": "Sie werden nicht gezeichnet. Wählen Sie eine größere Region, um sie zu zeigen."
     },
     "table-ragged": {
       "message": "{count} Zeilen haben eine andere Zellenzahl als die Kopfzeile.",
+      "message_one": "{count} Zeile hat eine andere Zellenzahl als die Kopfzeile.",
       "reason": "In einer zu kurzen oder zu langen Zeile können Zellen unter der falschen Spalte stehen. Prüfen Sie Anführungszeichen und Trennzeichen der Datei."
     },
     "join-blank": {
       "message": "{count} Zeilen haben einen leeren Namen in der Schlüsselspalte und werden nicht gezeichnet.",
+      "message_one": "{count} Zeile hat einen leeren Namen in der Schlüsselspalte und wird nicht gezeichnet.",
       "reason": "Eine Zeile ohne Namen lässt sich nicht platzieren. Ein leeres Feld ist oft eine Summenzeile oder eine Anmerkung am Tabellenende."
     },
     "glyphs-missing": {
@@ -168,6 +180,7 @@
     },
     "symbols-min-size": {
       "message": "{count} Symbole sind kleiner als die Mindestgröße und wurden in dieser Größe gezeichnet.",
+      "message_one": "{count} Symbol ist kleiner als die Mindestgröße und wurde in dieser Größe gezeichnet.",
       "reason": "Diese Kreise sind etwas größer, als ihr Wert sagt. Sie werden aufgeführt, damit Größen nicht zu genau gelesen werden."
     }
   },
@@ -200,6 +213,7 @@
       "pastePlaceholder": "country,value\nFrance,12.5\nJapan,8.1",
       "examples": "Oder mit einem Beispiel beginnen",
       "loaded": "{rows} Zeilen, {cols} Spalten",
+      "loaded_one": "{rows} Zeile, {cols} Spalten",
       "error": "Konnte nicht gelesen werden: {detail}",
       "empty": "Fügen Sie eine Tabelle hinzu, dann erscheint hier die Karte."
     },
@@ -264,12 +278,15 @@
     "checks": {
       "ok": "Keine Probleme gefunden.",
       "blocked": "{count} Probleme verhindern diese Karte.",
+      "blocked_one": "{count} Problem verhindert diese Karte.",
       "warnings": "{count} Warnungen zum Lesen.",
+      "warnings_one": "{count} Warnung zum Lesen.",
       "fixAll": "Beheben",
       "fixed": "Behoben: {list}",
       "allow": "Akzeptieren",
       "allowed": "Akzeptiert",
       "why": "Warum",
+      "goto": "Zum Feld",
       "matched": "{matched} von {rows} Zeilen passten zu {areas} Gebieten",
       "unmatched": "Ohne Treffer: {list}",
       "pending": "Prüfe..."

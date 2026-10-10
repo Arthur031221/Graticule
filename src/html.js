@@ -19,8 +19,20 @@ export function interactions(svg, tip) {
     el.setAttribute("data-tip", text);
     el.setAttribute("aria-label", text);
     el.setAttribute("role", "graphics-symbol");
-    if (keyboard) el.setAttribute("tabindex", "0");
   });
+  // One tab stop for the whole map; the arrow keys move between areas.
+  var current = null;
+  function rove(el) {
+    if (current) current.setAttribute("tabindex", "-1");
+    current = el;
+    el.setAttribute("tabindex", "0");
+  }
+  if (keyboard) {
+    areas.forEach(function (el) {
+      el.setAttribute("tabindex", "-1");
+    });
+    if (areas.length) rove(areas[0]);
+  }
   function show(el, x, y) {
     tip.textContent = el.getAttribute("data-tip");
     tip.hidden = false;
@@ -46,8 +58,38 @@ export function interactions(svg, tip) {
   svg.addEventListener("focusin", function (e) {
     var el = /** @type {Element} */ (e.target).closest("[data-tip]");
     if (!el) return;
+    if (keyboard) rove(el);
     var box = el.getBoundingClientRect();
     show(el, box.left + box.width / 2, box.top);
+  });
+  svg.addEventListener("keydown", function (e) {
+    var from = /** @type {Element} */ (e.target).closest("[data-tip]");
+    /** @type {Record<string, number[]>} */
+    var steps = { ArrowRight: [1, 0], ArrowLeft: [-1, 0], ArrowDown: [0, 1], ArrowUp: [0, -1] };
+    var dir = steps[e.key];
+    if (!keyboard || !from || !dir || e.altKey || e.ctrlKey || e.metaKey) return;
+    var a = from.getBoundingClientRect();
+    var ax = a.left + a.width / 2;
+    var ay = a.top + a.height / 2;
+    var best = null;
+    var bestScore = Infinity;
+    areas.forEach(function (el) {
+      if (el === from) return;
+      var b = el.getBoundingClientRect();
+      var dx = b.left + b.width / 2 - ax;
+      var dy = b.top + b.height / 2 - ay;
+      var along = dx * dir[0] + dy * dir[1];
+      if (along <= 0) return;
+      var score = along + 2 * Math.abs(dx * dir[1] - dy * dir[0]);
+      if (score < bestScore) {
+        best = el;
+        bestScore = score;
+      }
+    });
+    if (!best) return;
+    e.preventDefault();
+    rove(best);
+    /** @type {SVGElement} */ (best).focus();
   });
   svg.addEventListener("focusout", hide);
   function focusClass(index) {

@@ -3,17 +3,31 @@
  * ("msg", "rules", "ui"); keys are dotted paths. Missing keys fall back to English.
  */
 
+const PLURAL_TAGS = { "zh-Hant": "zh-TW", "zh-Hans": "zh-CN", pt: "pt-BR" };
+
 function dig(tree, path) {
   return path.split(".").reduce((node, part) => (node && typeof node === "object" ? node[part] : undefined), tree);
 }
 
 /**
+ * A message with a numeric `count` parameter may carry a plural form under the
+ * same key plus a category suffix ("checks.blocked_one"). The plain key is the
+ * "other" form, so a language that needs no extra form needs no extra keys.
  * @param {Record<string, any>} messages locale messages
  * @param {Record<string, any>} [fallback] English messages
+ * @param {string} [lang] language of `messages`, for the plural rule
  */
-export function createTranslator(messages, fallback = messages) {
+export function createTranslator(messages, fallback = messages, lang = "en") {
+  const own = new Intl.PluralRules(PLURAL_TAGS[lang] ?? lang);
+  const english = new Intl.PluralRules("en");
+  const pick = (tree, key, category) =>
+    (category === "other" ? undefined : dig(tree, `${key}_${category}`)) ?? dig(tree, key);
   return (key, params = {}) => {
-    const template = dig(messages, key) ?? dig(fallback, key) ?? key;
+    const count = typeof params.count === "number" ? params.count : null;
+    const template =
+      pick(messages, key, count === null ? "other" : own.select(count)) ??
+      pick(fallback, key, count === null ? "other" : english.select(count)) ??
+      key;
     return String(template).replace(/\{(\w+)\}/g, (_, name) => (name in params ? String(params[name]) : `{${name}}`));
   };
 }

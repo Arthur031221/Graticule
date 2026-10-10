@@ -98,6 +98,7 @@ async function translator(assets, lang) {
   return createTranslator(
     code === "en" ? english : await assets.json(`locales/${code}.json`).catch(() => english),
     english,
+    code,
   );
 }
 

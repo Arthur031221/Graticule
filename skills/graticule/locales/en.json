@@ -49,6 +49,7 @@
     },
     "join-unmatched": {
       "message": "{count} rows matched no area and are not drawn: {list}.",
+      "message_one": "{count} row matched no area and is not drawn: {list}.",
       "reason": "Rows that vanish quietly make a map look complete when it is not. Fix the spelling or the key column."
     },
     "join-ambiguous": {
@@ -57,6 +58,7 @@
     },
     "duplicate-keys": {
       "message": "{count} areas have more than one row (for example {example} has {rows}).",
+      "message_one": "{count} area has more than one row (for example {example} has {rows}).",
       "reason": "Only one value can be drawn per area, and keeping the last row hides the others. Set data.aggregate, or data.filter to pick one row such as one year."
     },
     "raw-counts": {
@@ -106,10 +108,12 @@
     },
     "no-data-share": {
       "message": "{count} of {total} areas ({percent}%) have no value.",
+      "message_one": "{count} of {total} areas ({percent}%) has no value.",
       "reason": "A map with large grey areas can mislead. Say why in the note, or pick a region that the data covers."
     },
     "label-overlap": {
       "message": "{count} labels overlap.",
+      "message_one": "{count} label overlaps another.",
       "reason": "Labels that overlap cannot be read."
     },
     "highlight-unmatched": {
@@ -118,6 +122,7 @@
     },
     "symbols-negative": {
       "message": "Proportional symbols cannot show {count} values at or below zero.",
+      "message_one": "Proportional symbols cannot show {count} value at or below zero.",
       "reason": "The area of a circle stands for a quantity, so a negative value has no size."
     },
     "fix-applied": {
@@ -126,30 +131,37 @@
     },
     "labels-hidden": {
       "message": "{count} labels were left out because they do not fit inside their area or would overlap another label.",
+      "message_one": "{count} label was left out because it does not fit inside its area or would overlap another label.",
       "reason": "Hidden labels are listed so that a quieter map is not mistaken for a complete one."
     },
     "small-areas-marked": {
       "message": "{count} areas are too small to see at this scale and are drawn as dots.",
+      "message_one": "{count} area is too small to see at this scale and is drawn as a dot.",
       "reason": "Small countries and territories would otherwise vanish from the map."
     },
     "outside-frame": {
       "message": "{count} areas with data lie outside the map frame: {list}.",
+      "message_one": "{count} area with data lies outside the map frame: {list}.",
       "reason": "They are not drawn. Pick a larger region to show them."
     },
     "normalize-missing": {
       "message": "{count} areas have no bundled {by} to divide by and are shown as no data.",
+      "message_one": "{count} area has no bundled {by} to divide by and is shown as no data.",
       "reason": "A rate cannot be computed without a denominator. Supply one with normalize.by column, or accept the gaps and say so in the note."
     },
     "values-skipped": {
       "message": "{count} rows reached an area but were left out because a cell is not a number, or a value has a missing or zero denominator (for example {example}).",
+      "message_one": "{count} row reached an area but was left out because a cell is not a number, or a value has a missing or zero denominator (for example {example}).",
       "reason": "A skipped row changes the value of its area with no sign on the map. Fix the cell, or accept the gap and say so in the note."
     },
     "table-ragged": {
       "message": "{count} rows have a different number of cells than the header.",
+      "message_one": "{count} row has a different number of cells than the header.",
       "reason": "Cells in a short or long row may sit under the wrong column. Check the quoting and the delimiter of the file."
     },
     "join-blank": {
       "message": "{count} rows have an empty name in the key column and are not drawn.",
+      "message_one": "{count} row has an empty name in the key column and is not drawn.",
       "reason": "A row that names no area cannot be placed. A blank key is often a total row or a note at the end of the table."
     },
     "glyphs-missing": {
@@ -158,6 +170,7 @@
     },
     "symbols-min-size": {
       "message": "{count} symbols are smaller than the minimum size and were drawn at the minimum.",
+      "message_one": "{count} symbol is smaller than the minimum size and was drawn at the minimum.",
       "reason": "Those circles are slightly larger than their value says. They are listed so that sizes are not read too precisely."
     }
   },
@@ -195,6 +208,7 @@
       "pastePlaceholder": "country,value\nFrance,12.5\nJapan,8.1",
       "examples": "Or start from an example",
       "loaded": "{rows} rows, {cols} columns",
+      "loaded_one": "{rows} row, {cols} columns",
       "error": "Could not read that: {detail}",
       "empty": "Add a table and the map appears here."
     },
@@ -259,12 +273,15 @@
     "checks": {
       "ok": "No problems found.",
       "blocked": "{count} problems stop this map.",
+      "blocked_one": "{count} problem stops this map.",
       "warnings": "{count} warnings to read.",
+      "warnings_one": "{count} warning to read.",
       "fixAll": "Fix them",
       "fixed": "Fixed: {list}",
       "allow": "Accept",
       "allowed": "Accepted",
       "why": "Why",
+      "goto": "Go to field",
       "matched": "{matched} of {rows} rows matched {areas} areas",
       "unmatched": "Not matched: {list}",
       "pending": "Checking..."

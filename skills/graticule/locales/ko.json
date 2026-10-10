@@ -270,6 +270,7 @@
       "allow": "허용",
       "allowed": "허용됨",
       "why": "이유",
+      "goto": "입력란으로 이동",
       "matched": "{rows}행 중 {matched}행이 {areas}개 지역과 일치",
       "unmatched": "일치하지 않음: {list}",
       "pending": "점검 중..."

@@ -27,6 +27,7 @@ export async function buildMap(input, ctx) {
   const t = createTranslator(
     wanted === "en" ? english : await ctx.assets.json(`locales/${wanted}.json`).catch(() => english),
     english,
+    wanted,
   );
 
   let spec = structuredClone(input);
