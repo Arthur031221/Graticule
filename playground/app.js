@@ -482,8 +482,9 @@ async function loadBytes(bytes, label) {
     const known = ENCODINGS.some(([value]) => value === decoded.encoding);
     options($("encoding"), ENCODINGS, known ? decoded.encoding : "windows-1252");
   }
-  await setTable(decoded.text);
-  if (decoded.guessed) $("data-status").textContent += ` ${ui("data.encodingNote", { encoding: decoded.encoding })}`;
+  const applied = await setTable(decoded.text);
+  if (applied && decoded.guessed)
+    $("data-status").textContent += ` ${ui("data.encodingNote", { encoding: decoded.encoding })}`;
 }
 
 /** Your own boundaries: a GeoJSON or TopoJSON file becomes a region of its own, next to the bundled ones. */
@@ -499,6 +500,7 @@ async function loadBoundaries(bytes, name) {
     return setStatus(ui("data.error", { detail: error.message }), true);
   }
   state.boundaries = { geojson, name, loaded };
+  tableRun++;
   if (state.example) {
     // The table of an example never names your areas, so it goes.
     resetForNewData();
@@ -527,6 +529,7 @@ function setStatus(text, error = false) {
 }
 
 const REGION_ORDER = ["world", "us-states", "us-counties", "jp-prefectures", "kr-provinces", "tw-counties", "tw-towns"];
+/** @returns {Promise<boolean>} false when a newer table or file replaced this one before it was applied */
 async function setTable(text, { keepSpec = false } = {}) {
   const run = ++tableRun;
   let table;
@@ -535,13 +538,13 @@ async function setTable(text, { keepSpec = false } = {}) {
     if (!table.columns.length || !table.rows.length) throw new Error(ui("data.empty"));
   } catch (error) {
     setStatus(ui("data.error", { detail: error.message }), true);
-    return;
+    return false;
   }
   state.csv = text;
   state.table = table;
   if (!keepSpec) {
     const found = await detectKey(table);
-    if (run !== tableRun) return;
+    if (run !== tableRun) return false;
     if (found.region && found.region !== state.spec.region) {
       state.spec.region = found.region;
       toast(ui("status.detected", { region: ui(`regions.${found.region}`) }));
@@ -565,6 +568,7 @@ async function setTable(text, { keepSpec = false } = {}) {
   fillColumns();
   syncControls();
   schedule();
+  return true;
 }
 
 /**
@@ -646,6 +650,7 @@ async function render() {
     note.className = "stage-note show";
     showNote(true);
     note.replaceChildren(el("div", {}, el("strong", {}, ui("tagline")), ui("data.empty")));
+    wrap.classList.add("settled");
     return;
   }
   wrap.classList.add("loading");
@@ -716,7 +721,10 @@ async function render() {
     note.replaceChildren(el("div", {}, ui("stage.failed", { detail: error.message })));
     console.error(error);
   } finally {
-    if (token === state.token) wrap.classList.remove("loading");
+    if (token === state.token) {
+      wrap.classList.remove("loading");
+      wrap.classList.add("settled");
+    }
   }
 }
 

@@ -407,6 +407,7 @@ button {
   margin-top: 8px;
 }
 .chips {
+  min-height: 111px;
   display: flex;
   flex-wrap: wrap;
   gap: 8px;
@@ -658,6 +659,13 @@ button {
   background: var(--panel);
   border: 1px solid var(--line);
   box-shadow: var(--shadow);
+}
+/* Hold the stage open until the first drawing, so the form below it does not jump. */
+html[data-start="note"] .sheet-wrap:not(.settled) {
+  min-height: 340px;
+}
+html[data-start="map"] .sheet-wrap:not(.settled) {
+  min-height: 230px;
 }
 .sheet-wrap.has-note {
   display: grid;

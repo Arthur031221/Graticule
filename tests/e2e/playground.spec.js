@@ -200,7 +200,7 @@ test("the map is one tab stop and the arrow keys move between areas", async ({ p
 
 for (const theme of ["light", "dark"]) {
   test(`the playground has no serious accessibility violations in the ${theme} theme`, async ({ page }) => {
-    await page.emulateMedia({ colorScheme: theme });
+    await page.emulateMedia({ colorScheme: theme, reducedMotion: "reduce" });
     await page.goto("/?example=life-expectancy");
     await expect(svg(page)).toBeVisible();
     await expect(page.locator("html")).toHaveAttribute("data-theme", theme);
@@ -358,3 +358,20 @@ test("boundaries added after a file that is not UTF-8 keep the encoding picker",
   await expect(page.locator("#region")).toHaveValue("custom");
   await expect(page.locator("#data-status")).not.toContainText("not UTF-8");
 });
+
+for (const query of ["/", "/?example=life-expectancy"]) {
+  test(`the page does not jump while it loads on a phone (${query})`, async ({ page, browserName }) => {
+    test.skip(browserName !== "chromium", "layout shifts are only reported by Chromium");
+    await page.setViewportSize({ width: 390, height: 844 });
+    await page.addInitScript(() => {
+      window.shift = 0;
+      new PerformanceObserver((list) => {
+        for (const entry of list.getEntries()) if (!entry.hadRecentInput) window.shift += entry.value;
+      }).observe({ type: "layout-shift", buffered: true });
+    });
+    await page.goto(query);
+    await expect(page.locator("#sheet svg, #stage-note.show").first()).toBeVisible();
+    await page.waitForTimeout(1500);
+    expect(await page.evaluate(() => window.shift)).toBeLessThan(0.05);
+  });
+}
