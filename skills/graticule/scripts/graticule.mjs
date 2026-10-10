@@ -153787,8 +153787,32 @@ function nameIn(area, lang) {
 }
 
 // src/csv.js
+var YEAR_NAME = /^(year|yr|fiscal[_ ]?year|survey[_ ]?year|census[_ ]?year|period)$/i;
+function looksLikeYear(name, cells) {
+  if (YEAR_NAME.test(name.trim())) return true;
+  const filled = cells.filter((c) => c !== "");
+  if (filled.length < 4 || !filled.every((c) => /^\d{4}$/.test(c))) return false;
+  return filled.every((c) => Number(c) >= 1800 && Number(c) <= 2100) && new Set(filled).size <= filled.length / 2;
+}
+function sniffBinary(bytes, { nul = true } = {}) {
+  const b = bytes instanceof Uint8Array ? bytes : new Uint8Array(bytes);
+  const starts = (...head) => head.every((byte, i2) => b[i2] === byte);
+  if (starts(80, 75, 3, 4))
+    return "a zip archive or an Excel workbook (.xlsx). In Excel use Save As and choose CSV";
+  if (starts(208, 207, 17, 224)) return "an Excel workbook (.xls). In Excel use Save As and choose CSV";
+  if (starts(37, 80, 68, 70)) return "a PDF";
+  if (starts(137, 80, 78, 71)) return "a PNG image";
+  if (starts(255, 216, 255)) return "a JPEG image";
+  const utf16 = starts(255, 254) || starts(254, 255);
+  if (nul && !utf16 && b.subarray(0, 4096).includes(0)) return "a binary file";
+  return "";
+}
+var NotATableError = class extends Error {
+};
 function decodeBytes(bytes, label) {
   const data = bytes instanceof Uint8Array ? bytes : new Uint8Array(bytes);
+  const binary = sniffBinary(data, { nul: !/^utf-?16/i.test(label ?? "") });
+  if (binary) throw new NotATableError(`this is ${binary}, not a text table`);
   if (label) {
     const decoder = new TextDecoder(label);
     return { text: decoder.decode(data), encoding: decoder.encoding, guessed: false };
@@ -155056,6 +155080,13 @@ function normalizeSpec(input) {
     }
     return value;
   };
+  const isObject2 = (v) => v !== null && typeof v === "object" && !Array.isArray(v);
+  const objectField = (value, path) => {
+    if (value === void 0) return {};
+    if (isObject2(value)) return value;
+    bad(path, "must be an object");
+    return {};
+  };
   const region = oneOf(input.region, [...REGION_IDS, "custom"], "region", "world");
   const boundaries = input.boundaries;
   if (region === "custom") {
@@ -155117,8 +155148,9 @@ function normalizeSpec(input) {
     bad("data.value", "is required: the column to map");
   if (Array.isArray(data.value) && type !== "small-multiples")
     bad("data.value", 'a list of columns is only for type "small-multiples"');
-  const classes = { method: "quantile", count: 5, ...input.classes ?? {} };
-  unknown("classes.", input.classes, KEYS.classes);
+  const classesInput = objectField(input.classes, "classes");
+  const classes = { method: "quantile", count: 5, ...classesInput };
+  unknown("classes.", classesInput, KEYS.classes);
   if (!METHODS.includes(classes.method)) bad("classes.method", `must be one of: ${METHODS.join(", ")}`);
   if (!Number.isInteger(classes.count) || classes.count < 2) bad("classes.count", "must be an integer of at least 2");
   if (classes.method === "manual" || classes.breaks !== void 0) {
@@ -155146,18 +155178,32 @@ function normalizeSpec(input) {
   const language = input.language === void 0 ? "en" : normalizeLang(input.language);
   if (!language)
     bad("language", "must be one of: en, zh-Hant (zh-TW), zh-Hans (zh-CN), ja, ko, es, fr, de, pt (pt-BR)");
-  const labels = typeof input.labels === "string" ? { show: input.labels } : { show: "auto", ...input.labels ?? {} };
+  const labels = typeof input.labels === "string" ? { show: input.labels } : { show: "auto", ...input.labels === void 0 ? {} : objectField(input.labels, "labels") };
   if (!["auto", "none", "all"].includes(labels.show)) bad("labels", 'must be "auto", "none" or "all"');
-  const size = { width: 1200, ...input.size ?? {} };
+  const size = { width: 1200, ...objectField(input.size, "size") };
   if (!(size.width >= 320 && size.width <= 6e3)) bad("size.width", "must be between 320 and 6000 pixels");
   if (size.height !== void 0 && !(size.height >= 200 && size.height <= 8e3))
     bad("size.height", "must be between 200 and 8000 pixels");
-  const symbols = input.symbols ?? {};
+  const symbols = objectField(input.symbols, "symbols");
   if (symbols.color !== void 0 && !/^#[0-9a-f]{6}$/i.test(symbols.color))
     bad("symbols.color", "must be a #rrggbb colour");
   if (symbols.maxRadius !== void 0 && !(symbols.maxRadius >= 4 && symbols.maxRadius <= 200))
     bad("symbols.maxRadius", "must be between 4 and 200 pixels");
   const theme = oneOf(input.theme, ["light", "dark"], "theme", "light");
+  if (input.center !== void 0 && !Number.isFinite(input.center)) bad("center", "must be a number, for example 0");
+  if (input.grid !== void 0 && typeof input.grid !== "boolean") bad("grid", "must be true or false");
+  if (input.highlight !== void 0 && !Array.isArray(input.highlight))
+    bad("highlight", "must be a list of area names or ids");
+  if (input.panels !== void 0 && !Array.isArray(input.panels)) bad("panels", "must be a list of objects");
+  if (input.columns !== void 0 && !(Number.isInteger(input.columns) && input.columns >= 1 && input.columns <= 4))
+    bad("columns", "must be a whole number from 1 to 4");
+  if (input.attribution !== void 0 && typeof input.attribution !== "boolean")
+    bad("attribution", "must be true or false");
+  for (const field of ["key", "keyType", "label", "file", "csv", "encoding"])
+    if (data[field] !== void 0 && typeof data[field] !== "string") bad(`data.${field}`, "must be a string");
+  if (data.rows !== void 0 && !Array.isArray(data.rows)) bad("data.rows", "must be a list of objects");
+  if (data.value !== void 0 && typeof data.value !== "string" && !(Array.isArray(data.value) && data.value.every((v) => typeof v === "string")))
+    bad("data.value", "must be a column name, or a list of names for small multiples");
   const allow = input.checks?.allow ?? [];
   if (!Array.isArray(allow)) bad("checks.allow", "must be a list of rule ids");
   const spec = {
@@ -155175,7 +155221,7 @@ function normalizeSpec(input) {
     projection: projection2,
     language: language || "en",
     labels,
-    legend: { ...input.legend ?? {} },
+    legend: { ...objectField(input.legend, "legend") },
     size,
     theme,
     grid: Boolean(input.grid),
@@ -156660,11 +156706,11 @@ function numberFormatter(lang, edges = []) {
   const tag = { "zh-Hant": "zh-TW", "zh-Hans": "zh-CN", pt: "pt-BR" }[lang] ?? lang;
   const big = Math.max(...edges.map(Math.abs), 0) >= 1e4;
   const decimals = Math.min(
-    10,
+    6,
     Math.max(
       0,
       ...edges.map(
-        (e) => Number.isInteger(e) ? 0 : (Number(e.toPrecision(10)).toFixed(10).replace(/0+$/, "").split(".")[1] ?? "").length
+        (e) => Number.isInteger(e) ? 0 : (Number(e.toPrecision(4)).toFixed(8).replace(/0+$/, "").split(".")[1] ?? "").length
       )
     )
   );
@@ -156756,7 +156802,7 @@ var THEMES = {
     bg: "#fbfaf7",
     ink: "#1b1f23",
     muted: "#5b626b",
-    faint: "#939aa3",
+    faint: "#6b7280",
     noData: "#e5e2d9",
     base: "#e9e6dd",
     stroke: "#ffffff",
@@ -156768,7 +156814,7 @@ var THEMES = {
     bg: "#14171c",
     ink: "#eef0f2",
     muted: "#a5adb7",
-    faint: "#78808a",
+    faint: "#868e98",
     noData: "#2a2f37",
     base: "#262b33",
     stroke: "#14171c",
@@ -157541,7 +157587,17 @@ async function buildMap(input, ctx) {
     analysis = await analyze(spec, { assets: ctx.assets, readText });
     resolveHighlight(analysis);
     findings = analysis.ok === false && !analysis.index ? analysis.findings : [...analysis.findings, ...checkAnalysis(analysis)];
-    markAllowed(findings, [...analysis.spec?.checks.allow ?? [], ...ctx.allow ?? []]);
+    const allow = [...analysis.spec?.checks.allow ?? [], ...ctx.allow ?? []];
+    for (const id of new Set(allow.filter((id2) => !Object.hasOwn(RULES, id2))))
+      findings.push({
+        id: "spec",
+        level: "error",
+        params: {
+          path: "checks.allow",
+          detail: `"${id}" is not a rule. The rules are: ${Object.keys(RULES).join(", ")}`
+        }
+      });
+    markAllowed(findings, allow);
     const fixable = ctx.fix ? findings.filter((f) => f.level === "error" && !f.allowed && f.fix) : [];
     if (!fixable.length || pass === MAX_PASSES) break;
     for (const finding of fixable) {
@@ -158427,7 +158483,7 @@ function nodeAssets(root = findAssetRoot()) {
 }
 
 // src/version.js
-var VERSION = "0.3.1";
+var VERSION = "0.3.2";
 
 // src/report.js
 var MAX_LISTED = 12;
@@ -158493,7 +158549,7 @@ function formatText(summary, { name = "map" } = {}) {
   const c = summary.classes;
   if (c?.edges?.length)
     lines.push(
-      `classes: ${c.method}, ${c.edges.length - 1} classes, edges ${c.edges.join(" | ")}, areas per class ${c.counts.join(" ")}`
+      `classes: ${c.method}, ${c.edges.length - 1} ${c.edges.length === 2 ? "class" : "classes"}, edges ${c.edges.join(" | ")}, areas per class ${c.counts.join(" ")}`
     );
   if (c?.categories) lines.push(`categories: ${c.categories.map((cat, i2) => `${cat} (${c.counts[i2]})`).join(", ")}`);
   if (summary.labels && (summary.labels.placed || summary.labels.dots))
@@ -158527,10 +158583,25 @@ Options
   --lang          map label language and message language (en, zh-TW, zh-CN, ja, ko, es, fr, de, pt-BR)
   --dpi           PNG resolution, 96 is screen size, 300 is print (default 96)
   --json          print the report as JSON
+  --write         with check: write the spec back to its file when --fix changed it
   --encoding      how a table that is not UTF-8 is read: big5, shift_jis, euc-kr, gbk, windows-1252 (join, init)
   --data-root     also allow data files from this folder (by default only the spec's own folder)
-Exit codes: 0 done, 1 usage or file error, 2 blocked by a rule.`;
+Exit codes: 0 done, 1 usage or file error, 2 blocked by a rule or an error in the spec.`;
 var BOOLEAN = /* @__PURE__ */ new Set(["fix", "json", "write", "help", "version"]);
+var VALUE_FLAGS = [
+  "out",
+  "format",
+  "allow",
+  "lang",
+  "dpi",
+  "data-root",
+  "key",
+  "key-type",
+  "region",
+  "value",
+  "encoding",
+  "boundaries"
+];
 var SHORT = { o: "out", f: "format", h: "help", v: "version" };
 function parseArgs(argv) {
   const positional = [];
@@ -158543,6 +158614,8 @@ function parseArgs(argv) {
     }
     const name = arg.startsWith("--") ? arg.slice(2) : SHORT[arg.slice(1)] ?? arg.slice(1);
     const [key, inline] = name.split(/=(.*)/s);
+    if (!BOOLEAN.has(key) && !VALUE_FLAGS.includes(key))
+      throw new UsageError(`unknown option ${arg.startsWith("--") ? "--" : "-"}${key}. Run: graticule --help`);
     if (BOOLEAN.has(key)) flags[key] = true;
     else {
       const value = inline ?? argv[++i2];
@@ -158604,6 +158677,7 @@ function decode(bytes, encoding, name) {
     return decodeBytes(bytes, encoding);
   } catch (error) {
     if (error instanceof RangeError) throw new UsageError(`${name}: "${encoding}" is not an encoding name`);
+    if (error instanceof NotATableError) throw new UsageError(`${name}: ${error.message}`);
     throw error;
   }
 }
@@ -158646,6 +158720,11 @@ async function build(specPath, flags, assets) {
 async function commandRender(args, assets, check) {
   const [specPath] = args.positional;
   if (!specPath) throw new UsageError("give the spec file: graticule render <spec.json>");
+  const dpi = args.flags.dpi === void 0 ? 96 : Number(args.flags.dpi);
+  if (!Number.isInteger(dpi) || dpi < 24 || dpi > 600)
+    throw new UsageError("--dpi must be a whole number from 24 to 600 (96 is screen size, 300 is print)");
+  if (args.flags.encoding)
+    console.error("graticule: --encoding applies to join and init. For a spec, set data.encoding in it.");
   const { result, summary } = await build(specPath, args.flags, assets);
   const files = [];
   if (!result.blocked && !check) {
@@ -158653,7 +158732,7 @@ async function commandRender(args, assets, check) {
     const bad = formats.find((f) => !FORMATS.includes(f));
     if (bad) throw new UsageError(`unknown format "${bad}". Use: ${FORMATS.join(", ")}`);
     const base = await outputBase(specPath, args.flags.out);
-    const outputs = await exportMap(result, formats, { assets, dpi: args.flags.dpi ? Number(args.flags.dpi) : 96 });
+    const outputs = await exportMap(result, formats, { assets, dpi });
     for (const [format, data] of Object.entries(outputs)) {
       await writeFile(`${base}.${format}`, data);
       files.push(`${base}.${format}`);
@@ -158676,10 +158755,15 @@ async function commandRender(args, assets, check) {
       console.log(
         `wrote ${files.map((f) => relative(process.cwd(), resolve2(f)) || f).join(" ")}${result.scene ? ` (${result.scene.width} x ${result.scene.height})` : ""}`
       );
-    if (result.blocked)
+    if (result.blocked) {
+      const errors = result.findings.filter((f) => f.level === "error" && !f.allowed);
+      const fixable = !args.flags.fix && errors.some((f) => f.fixable);
+      const allowable = errors.some((f) => !["spec", "no-values", "value-not-numeric"].includes(f.id));
       console.log(
-        "\nNo map was written. Fix the errors above, or rerun with --fix, or accept a rule with --allow <id>."
+        `
+No map was written. Fix the errors above${fixable ? ", rerun with --fix" : ""}${allowable ? `${fixable ? "," : ""} or accept a rule with --allow <id>` : ""}.`
       );
+    }
   }
   return result.blocked ? 2 : 0;
 }
@@ -158756,8 +158840,17 @@ async function commandInit(args, assets) {
   const numeric2 = table.columns.filter(
     (c) => c !== key.column && table.rows.some((r) => Number.isFinite(Number(String(r[c]).replace(/,/g, ""))) && String(r[c]).trim() !== "")
   );
-  const value = args.flags.value ?? numeric2[0];
+  if (args.flags.value && !table.columns.includes(String(args.flags.value)))
+    throw new UsageError(`no column "${args.flags.value}" in ${tablePath}. Columns: ${table.columns.join(", ")}`);
+  const cells = (column) => table.rows.map((r) => (r[column] ?? "").trim());
+  const years = numeric2.filter((c) => looksLikeYear(c, cells(c)));
+  const value = args.flags.value ?? numeric2.find((c) => !years.includes(c)) ?? numeric2[0];
   if (!value) throw new UsageError("no numeric column found. Pass --value <column>");
+  const named = cells(key.column).filter(Boolean);
+  if (new Set(named).size < named.length)
+    console.error(
+      years.length ? `Several rows name the same area. Add "filter": { "${years[0]}": "${Math.max(...cells(years[0]).filter(Boolean).map(Number))}" } to data to map one ${years[0]}, or "aggregate" to combine them.` : 'Several rows name the same area. Add "aggregate" ("sum", "mean", "last") or "filter" to data so that each area has one value.'
+    );
   const specDir = args.flags.out ? dirname2(resolve2(String(args.flags.out))) : process.cwd();
   const file = relative(specDir, resolve2(tablePath)).split(sep).join("/");
   const spec = {
@@ -158849,8 +158942,14 @@ async function main(argv) {
         throw new UsageError(`unknown command "${command}". Run: graticule --help`);
     }
   } catch (error) {
-    console.error(`graticule: ${error.message}`);
-    if (!(error instanceof UsageError) && process.env.GRATICULE_DEBUG) console.error(error.stack);
+    if (error instanceof UsageError) console.error(`graticule: ${error.message}`);
+    else {
+      console.error(
+        `graticule: unexpected error: ${error.message}
+This is a bug. Please report it at https://github.com/Arthur031221/Graticule/issues with the command you ran (GRATICULE_DEBUG=1 prints the stack).`
+      );
+      if (process.env.GRATICULE_DEBUG) console.error(error.stack);
+    }
     return 1;
   }
 }

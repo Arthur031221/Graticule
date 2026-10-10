@@ -11,6 +11,7 @@ test.beforeEach(async ({ page }) => {
 test("the bad example is blocked, one click fixes it, and the legend says per 100,000", async ({ page }) => {
   await page.goto("/?example=covid-raw");
   await expect(page.locator("#stage-note")).toContainText("4 problems stop this map");
+  await expect(page.locator("#stage-note .demo-note")).toContainText("drawn badly on purpose");
   await expect(page.locator("#findings .finding.error")).toHaveCount(4);
   for (const id of ["raw-counts", "projection-mercator", "max-classes", "palette-order"])
     await expect(page.locator("#findings")).toContainText(id);
@@ -495,4 +496,65 @@ test("a table of county names with their state joins US counties", async ({ page
   await expect(page.locator("#region")).toHaveValue("us-counties");
   await expect(page.locator("#join-summary")).toContainText("6 of 6 rows matched 6 areas");
   await expect(page.locator("#value")).toHaveValue("rate");
+});
+
+test("a table with a row per country and year offers the years and maps the latest", async ({ page }) => {
+  await page.goto("/");
+  const countries = ["France", "Japan", "Brazil", "Kenya", "Peru", "Norway"];
+  const rows = countries.flatMap((name, i) =>
+    [2020, 2021, 2022].map((year) => `${name},${year},${i * 10 + (year - 2019)}`),
+  );
+  await page.locator("#file").setInputFiles({
+    name: "long.csv",
+    mimeType: "text/csv",
+    buffer: Buffer.from(["country,year,score", ...rows].join("\n")),
+  });
+  await expect(page.locator("#field-period")).toBeVisible();
+  await expect(page.locator("#period-label")).toHaveText("year");
+  await expect(page.locator("#period")).toHaveValue("2022");
+  await expect(page.locator("#value")).toHaveValue("score");
+  await expect(page.locator("#join-summary")).toContainText("6 of 6 rows matched 6 areas");
+  await expect(page.locator("#findings")).not.toContainText("duplicate-keys");
+  await page.selectOption("#period", "2020");
+  await expect(page.locator("#join-summary")).toContainText("6 of 6 rows matched 6 areas");
+  await page.locator("#file").setInputFiles("tests/fixtures/squares.csv");
+  await expect(page.locator("#field-period")).toBeHidden();
+});
+
+test("an Excel workbook is named, not read, and the page keeps its map", async ({ page }) => {
+  await page.goto("/?example=life-expectancy");
+  await expect(svg(page)).toBeVisible();
+  await page.locator("#file").setInputFiles({
+    name: "book.xlsx",
+    mimeType: "application/octet-stream",
+    buffer: Buffer.concat([Buffer.from([0x50, 0x4b, 0x03, 0x04]), Buffer.alloc(64, 7)]),
+  });
+  await expect(page.locator("#data-status")).toContainText("Excel workbook (.xlsx)");
+  await expect(page.locator("#data-status")).toHaveClass(/error/);
+  await expect(svg(page)).toBeVisible();
+});
+
+test("four plain numbers that look like codes do not pick a region, and typing while a table loads starts from empty fields", async ({
+  page,
+}) => {
+  await page.goto("/");
+  await expect(page.locator("#source")).toHaveValue(/WHO/);
+  await page.locator("#file").setInputFiles({
+    name: "atlantis.csv",
+    mimeType: "text/csv",
+    buffer: Buffer.from("place,value\nAtlantis,1\nLemuria,2\nMu,3\nThule,4\n"),
+  });
+  await expect(page.locator("#source")).toHaveValue("");
+  await expect(page.locator("#title")).toHaveValue("");
+  await expect(page.locator("#data-status")).toContainText("4 rows");
+  await expect(page.locator("#region")).toHaveValue("world");
+  await expect(page.locator("#stage-note")).toContainText("names the areas");
+});
+
+test("an empty file says to add a table instead of calling it unreadable", async ({ page }) => {
+  await page.goto("/");
+  await page.locator("#file").setInputFiles({ name: "empty.csv", mimeType: "text/csv", buffer: Buffer.from("") });
+  await expect(page.locator("#data-status")).toContainText("Add a table");
+  await expect(page.locator("#data-status")).not.toContainText("Could not read");
+  await expect(page.locator("#data-status")).toHaveClass(/error/);
 });

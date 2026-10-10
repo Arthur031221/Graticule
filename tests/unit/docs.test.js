@@ -36,9 +36,13 @@ for (const file of readmes) {
   });
 }
 
-test("every relative link and image in the READMEs and docs points at a file", async () => {
-  const docs = (await readdir(join(root, "docs"))).filter((f) => f.endsWith(".md")).map((f) => `docs/${f}`);
-  for (const file of [...readmes, ...docs, "CONTRIBUTING.md", "CHANGELOG.md", "NOTICE.md"]) {
+test("every relative link and image in the READMEs, docs and skill pages points at a file", async () => {
+  const pages = async (dir) =>
+    (await readdir(join(root, dir))).filter((f) => f.endsWith(".md")).map((f) => `${dir}/${f}`);
+  const docs = await pages("docs");
+  const references = await pages("skills/graticule/references");
+  const own = ["CONTRIBUTING.md", "CHANGELOG.md", "NOTICE.md", "SECURITY.md", "skills/graticule/SKILL.md"];
+  for (const file of [...readmes, ...docs, ...references, ...own]) {
     const text = await read(file);
     const targets = [...text.matchAll(/\]\(([^)\s]+)\)|(?:src|href)="([^"]+)"/g)].map((m) => m[1] ?? m[2]);
     for (const target of targets) {
@@ -49,7 +53,7 @@ test("every relative link and image in the READMEs and docs points at a file", a
   }
 });
 
-test("the reference pages in the skill are copies of the docs", async () => {
+test("the reference pages in the skill are copies of the docs, with the link to the spec page renamed", async () => {
   for (const [doc, ref] of [
     ["config.md", "spec.md"],
     ["rules.md", "rules.md"],
@@ -57,7 +61,7 @@ test("the reference pages in the skill are copies of the docs", async () => {
     ["data.md", "data.md"],
   ]) {
     assert.equal(
-      await read(`docs/${doc}`),
+      (await read(`docs/${doc}`)).replaceAll("](config.md)", "](spec.md)"),
       await read(`skills/graticule/references/${ref}`),
       `${ref} differs from docs/${doc}`,
     );

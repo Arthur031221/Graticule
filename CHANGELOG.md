@@ -1,5 +1,15 @@
 # Changelog
 
+## 0.3.2 (2026-10-11)
+
+- The command line no longer crashes or stays silent on bad input. A spec field of the wrong type (a text `center`, a text `size`, `grid`, `highlight`, `columns`, `data.key` and others) is named. A rule id with a typo in `--allow` or `checks.allow` is an error. Unknown options are refused. `--dpi` must be between 24 and 600. An Excel workbook, an image or another binary file is named instead of being read as a table. The closing line suggests `--fix` only when a rule has a repair, and an internal error says it is a bug and where to report it.
+- `init` skips a year column when it picks the value to map, and says how to map one year when several rows name the same area. `init --value` checks that the column exists. `join` and `init` warn about a quote that never closes, repeated column names and short rows.
+- Playground: a table with a row per area and year gets a year selector, set to the latest year. The first screen says that the example is drawn badly on purpose. A new file clears the fields of the last map at once, a handful of plain numbers no longer picks a region, an empty file says to add a table, and the status says Checking while regions are detected.
+- The buttons of a blocked card, the match pills and the long lists in findings are tidier: a list shows twenty names and how many are left out.
+- Legends show four significant digits and the report says "1 class". The small print under a map reads at 4.5 to 1 in both themes.
+- Translations: the explanation of the colour vision thresholds now matches the code in all nine languages, the empty class wording says that no area falls into it, and typos in French, Spanish, Japanese and German are fixed.
+- The demo data restores five names that the WHO file spells with a damaged accent. The docs no longer claim a repair for skewed classes, say where population is bundled and name the program for each install route.
+
 ## 0.3.1 (2026-10-11)
 
 - US counties join by name with the state: `Mohave County, AZ`, `Orleans Parish, LA`, `Anchorage Municipality, AK`, `Alexandria city, VA`. The state may be the postal code or the full name. A name two areas share is reported as ambiguous and a name without a state is never matched.

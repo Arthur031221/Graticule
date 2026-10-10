@@ -2,7 +2,7 @@ import { mkdir, readFile, realpath, stat, writeFile } from "node:fs/promises";
 import { basename, dirname, extname, join, relative, resolve, sep } from "node:path";
 import { buildMap } from "./build.js";
 import { RULES, THRESHOLDS } from "./checks.js";
-import { decodeBytes, parseTable } from "./csv.js";
+import { NotATableError, decodeBytes, looksLikeYear, parseTable } from "./csv.js";
 import { BoundaryError, loadCustomAreas } from "./custom.js";
 import { exportMap, FORMATS } from "./export.js";
 import { createTranslator } from "./i18n.js";
@@ -33,11 +33,26 @@ Options
   --lang          map label language and message language (en, zh-TW, zh-CN, ja, ko, es, fr, de, pt-BR)
   --dpi           PNG resolution, 96 is screen size, 300 is print (default 96)
   --json          print the report as JSON
+  --write         with check: write the spec back to its file when --fix changed it
   --encoding      how a table that is not UTF-8 is read: big5, shift_jis, euc-kr, gbk, windows-1252 (join, init)
   --data-root     also allow data files from this folder (by default only the spec's own folder)
-Exit codes: 0 done, 1 usage or file error, 2 blocked by a rule.`;
+Exit codes: 0 done, 1 usage or file error, 2 blocked by a rule or an error in the spec.`;
 
 const BOOLEAN = new Set(["fix", "json", "write", "help", "version"]);
+const VALUE_FLAGS = [
+  "out",
+  "format",
+  "allow",
+  "lang",
+  "dpi",
+  "data-root",
+  "key",
+  "key-type",
+  "region",
+  "value",
+  "encoding",
+  "boundaries",
+];
 const SHORT = { o: "out", f: "format", h: "help", v: "version" };
 
 function parseArgs(argv) {
@@ -51,6 +66,8 @@ function parseArgs(argv) {
     }
     const name = arg.startsWith("--") ? arg.slice(2) : (SHORT[arg.slice(1)] ?? arg.slice(1));
     const [key, inline] = name.split(/=(.*)/s);
+    if (!BOOLEAN.has(key) && !VALUE_FLAGS.includes(key))
+      throw new UsageError(`unknown option ${arg.startsWith("--") ? "--" : "-"}${key}. Run: graticule --help`);
     if (BOOLEAN.has(key)) flags[key] = true;
     else {
       const value = inline ?? argv[++i];
@@ -125,6 +142,7 @@ function decode(bytes, encoding, name) {
     return decodeBytes(bytes, encoding);
   } catch (error) {
     if (error instanceof RangeError) throw new UsageError(`${name}: "${encoding}" is not an encoding name`);
+    if (error instanceof NotATableError) throw new UsageError(`${name}: ${error.message}`);
     throw error;
   }
 }
@@ -176,6 +194,11 @@ async function build(specPath, flags, assets) {
 async function commandRender(args, assets, check) {
   const [specPath] = args.positional;
   if (!specPath) throw new UsageError("give the spec file: graticule render <spec.json>");
+  const dpi = args.flags.dpi === undefined ? 96 : Number(args.flags.dpi);
+  if (!Number.isInteger(dpi) || dpi < 24 || dpi > 600)
+    throw new UsageError("--dpi must be a whole number from 24 to 600 (96 is screen size, 300 is print)");
+  if (args.flags.encoding)
+    console.error("graticule: --encoding applies to join and init. For a spec, set data.encoding in it.");
   const { result, summary } = await build(specPath, args.flags, assets);
   const files = [];
   if (!result.blocked && !check) {
@@ -185,7 +208,7 @@ async function commandRender(args, assets, check) {
     const bad = formats.find((f) => !FORMATS.includes(f));
     if (bad) throw new UsageError(`unknown format "${bad}". Use: ${FORMATS.join(", ")}`);
     const base = await outputBase(specPath, args.flags.out);
-    const outputs = await exportMap(result, formats, { assets, dpi: args.flags.dpi ? Number(args.flags.dpi) : 96 });
+    const outputs = await exportMap(result, formats, { assets, dpi });
     for (const [format, data] of Object.entries(outputs)) {
       await writeFile(`${base}.${format}`, data);
       files.push(`${base}.${format}`);
@@ -208,10 +231,14 @@ async function commandRender(args, assets, check) {
       console.log(
         `wrote ${files.map((f) => relative(process.cwd(), resolve(f)) || f).join(" ")}${result.scene ? ` (${result.scene.width} x ${result.scene.height})` : ""}`,
       );
-    if (result.blocked)
+    if (result.blocked) {
+      const errors = result.findings.filter((f) => f.level === "error" && !f.allowed);
+      const fixable = !args.flags.fix && errors.some((f) => f.fixable);
+      const allowable = errors.some((f) => !["spec", "no-values", "value-not-numeric"].includes(f.id));
       console.log(
-        "\nNo map was written. Fix the errors above, or rerun with --fix, or accept a rule with --allow <id>.",
+        `\nNo map was written. Fix the errors above${fixable ? ", rerun with --fix" : ""}${allowable ? `${fixable ? "," : ""} or accept a rule with --allow <id>` : ""}.`,
       );
+    }
   }
   return result.blocked ? 2 : 0;
 }
@@ -302,8 +329,19 @@ async function commandInit(args, assets) {
       c !== key.column &&
       table.rows.some((r) => Number.isFinite(Number(String(r[c]).replace(/,/g, ""))) && String(r[c]).trim() !== ""),
   );
-  const value = args.flags.value ?? numeric[0];
+  if (args.flags.value && !table.columns.includes(String(args.flags.value)))
+    throw new UsageError(`no column "${args.flags.value}" in ${tablePath}. Columns: ${table.columns.join(", ")}`);
+  const cells = (column) => table.rows.map((r) => (r[column] ?? "").trim());
+  const years = numeric.filter((c) => looksLikeYear(c, cells(c)));
+  const value = args.flags.value ?? numeric.find((c) => !years.includes(c)) ?? numeric[0];
   if (!value) throw new UsageError("no numeric column found. Pass --value <column>");
+  const named = cells(key.column).filter(Boolean);
+  if (new Set(named).size < named.length)
+    console.error(
+      years.length
+        ? `Several rows name the same area. Add "filter": { "${years[0]}": "${Math.max(...cells(years[0]).filter(Boolean).map(Number))}" } to data to map one ${years[0]}, or "aggregate" to combine them.`
+        : 'Several rows name the same area. Add "aggregate" ("sum", "mean", "last") or "filter" to data so that each area has one value.',
+    );
   // File names in a spec are relative to the spec, so the path is taken from where the spec will be saved.
   const specDir = args.flags.out ? dirname(resolve(String(args.flags.out))) : process.cwd();
   const file = relative(specDir, resolve(tablePath)).split(sep).join("/");
@@ -400,8 +438,13 @@ export async function main(argv) {
         throw new UsageError(`unknown command "${command}". Run: graticule --help`);
     }
   } catch (error) {
-    console.error(`graticule: ${error.message}`);
-    if (!(error instanceof UsageError) && process.env.GRATICULE_DEBUG) console.error(error.stack);
+    if (error instanceof UsageError) console.error(`graticule: ${error.message}`);
+    else {
+      console.error(
+        `graticule: unexpected error: ${error.message}\nThis is a bug. Please report it at https://github.com/Arthur031221/Graticule/issues with the command you ran (GRATICULE_DEBUG=1 prints the stack).`,
+      );
+      if (process.env.GRATICULE_DEBUG) console.error(error.stack);
+    }
     return 1;
   }
 }

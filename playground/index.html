@@ -158,6 +158,10 @@
             ><span data-i18n="map.value">Column to map</span
             ><select id="value"></select
           ></label>
+          <label class="field" id="field-period" hidden
+            ><span id="period-label"></span
+            ><select id="period"></select
+          ></label>
           <fieldset class="field" id="field-values" hidden>
             <legend data-i18n="map.values">Columns to map (one panel each)</legend>
             <div class="checks" id="values"></div>
@@ -260,6 +264,7 @@
           <div class="stage-note show" id="stage-note" role="status">
             <div>
               <strong>4 problems stop this map.</strong>
+              <p class="demo-note">This example is drawn badly on purpose: four rules stop it.</p>
               <ul class="stage-errors">
                 <li><code>raw-counts</code><span>The values are raw counts (data.kind is count).</span></li>
                 <li><code>projection-mercator</code><span>Mercator on a region 141 degrees of latitude tall.</span></li>

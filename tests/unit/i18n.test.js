@@ -73,3 +73,9 @@ test("small numbers keep the digits that tell neighbouring edges apart", () => {
   const format = numberFormatter("en", edges);
   assert.deepEqual(edges.map(format), ["0.00001", "0.00002", "0.00003"]);
 });
+
+test("a legend shows four significant digits, not the ten of an unrounded class edge", () => {
+  const format = numberFormatter("en", [10, 26.666666667, 43.33333333, 60]);
+  assert.deepEqual([10, 26.666666667, 43.33333333, 60].map(format), ["10.00", "26.67", "43.33", "60.00"]);
+  assert.equal(numberFormatter("de", [0.5, 12.25])(12.25), "12,25");
+});

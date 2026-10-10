@@ -229,6 +229,72 @@ test("join and init warn about a table with a quote that never closes, repeated 
   assert.equal(clean.stderr, "");
 });
 
+test("an unknown option, a rule id with a typo and a dpi out of range are refused with a message", async () => {
+  const bogus = await graticule("render", "life-expectancy/spec.json", "--bogusflag");
+  assert.equal(bogus.code, 1);
+  assert.match(bogus.stderr, /unknown option --bogusflag/);
+  const typo = await graticule("check", "covid-deaths/spec.raw.json", "--allow", "raw-count");
+  assert.equal(typo.code, 2);
+  assert.match(typo.stdout, /"raw-count" is not a rule\. The rules are: source-required/);
+  for (const dpi of ["abc", "0", "-5", "3000", "2.5"]) {
+    const result = await graticule("render", "life-expectancy/spec.json", "--dpi", dpi);
+    assert.equal(result.code, 1, dpi);
+    assert.match(result.stderr, /--dpi must be a whole number from 24 to 600/);
+  }
+  const encoding = await graticule("check", "life-expectancy/spec.json", "--encoding", "big5");
+  assert.match(encoding.stderr, /--encoding applies to join and init/);
+});
+
+test("an Excel workbook, an image and a binary file are named instead of being read as a table", async () => {
+  const out = await mkdtemp(join(tmpdir(), "graticule-"));
+  const files = {
+    "book.xlsx": Buffer.concat([Buffer.from([0x50, 0x4b, 0x03, 0x04]), Buffer.alloc(40, 1)]),
+    "old.xls": Buffer.concat([Buffer.from([0xd0, 0xcf, 0x11, 0xe0]), Buffer.alloc(40, 1)]),
+    "pic.png": Buffer.concat([Buffer.from([0x89, 0x50, 0x4e, 0x47]), Buffer.alloc(40, 1)]),
+    "blob.csv": Buffer.from("country,value\nFrance\u0000,1\n"),
+  };
+  const expected = {
+    "book.xlsx": /Excel workbook \(\.xlsx\)/,
+    "old.xls": /Excel workbook \(\.xls\)/,
+    "pic.png": /PNG image/,
+    "blob.csv": /binary file/,
+  };
+  for (const [name, bytes] of Object.entries(files)) {
+    await writeFile(join(out, name), bytes);
+    const result = await graticule("join", join(out, name), "--region", "world");
+    assert.equal(result.code, 1, name);
+    assert.match(result.stderr, expected[name], name);
+    assert.match(result.stderr, /not a text table/, name);
+  }
+});
+
+test("the closing line says only what can help: --fix when a rule has a repair, --allow for a rule", async () => {
+  const raw = await graticule("check", "covid-deaths/spec.raw.json");
+  assert.match(raw.stdout, /Fix the errors above, rerun with --fix, or accept a rule with --allow <id>\./);
+  const fixed = await graticule("check", "covid-deaths/spec.raw.json", "--fix", "--allow", "source-required");
+  assert.doesNotMatch(fixed.stdout, /rerun with --fix/);
+  const out = await mkdtemp(join(tmpdir(), "graticule-"));
+  await writeFile(join(out, "bad.json"), JSON.stringify({ region: "mars", data: { rows: [], value: "v" } }));
+  const bad = await graticule("check", join(out, "bad.json"));
+  assert.equal(bad.code, 2);
+  assert.match(bad.stdout, /No map was written\. Fix the errors above\.$/m);
+});
+
+test("init skips a year column when it picks the value, and says how to map one year", async () => {
+  const out = await mkdtemp(join(tmpdir(), "graticule-"));
+  const rows = ["France", "Japan", "Brazil", "Kenya"].flatMap((name, i) =>
+    [2020, 2021, 2022].map((year) => `${name},${year},${i * 10 + year - 2019}`),
+  );
+  await writeFile(join(out, "long.csv"), ["country,year,value", ...rows].join("\n"));
+  const result = await graticule("init", join(out, "long.csv"), "--region", "world");
+  assert.equal(result.code, 0, result.stderr);
+  assert.equal(JSON.parse(result.stdout).data.value, "value");
+  assert.match(result.stderr, /Several rows name the same area\. Add "filter": \{ "year": "2022" \}/);
+  const missing = await graticule("init", join(out, "long.csv"), "--region", "world", "--value", "nope");
+  assert.equal(missing.code, 1);
+  assert.match(missing.stderr, /no column "nope" in .*long\.csv\. Columns: country, year, value/);
+});
+
 test("init writes the table's path relative to where the spec will be saved", async () => {
   const out = await mkdtemp(join(tmpdir(), "graticule-"));
   await writeFile(join(out, "data.csv"), await readFile(join(gallery, "life-expectancy/data.csv"), "utf8"));

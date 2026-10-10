@@ -78,7 +78,7 @@ export function formatText(summary, { name = "map" } = {}) {
   const c = summary.classes;
   if (c?.edges?.length)
     lines.push(
-      `classes: ${c.method}, ${c.edges.length - 1} classes, edges ${c.edges.join(" | ")}, areas per class ${c.counts.join(" ")}`,
+      `classes: ${c.method}, ${c.edges.length - 1} ${c.edges.length === 2 ? "class" : "classes"}, edges ${c.edges.join(" | ")}, areas per class ${c.counts.join(" ")}`,
     );
   if (c?.categories) lines.push(`categories: ${c.categories.map((cat, i) => `${cat} (${c.counts[i]})`).join(", ")}`);
   if (summary.labels && (summary.labels.placed || summary.labels.dots))

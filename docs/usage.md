@@ -24,7 +24,6 @@ not matched: Gibraltar
 
 ```
 $ graticule check covid.json
-Graticule 0.1.0  covid.json
 region: world, type: choropleth, projection: mercator
 join: 226 of 240 rows matched 226 areas (column "country" as name)
 classes: jenks, 9 classes, edges 0 | 13000 | 41000 | ... | 1000000 | 1300000, areas per class 167 31 8 9 6 2 1 1 1

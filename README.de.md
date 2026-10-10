@@ -180,7 +180,7 @@ Die Agenten-Sitzungen sind eine kleine Stichprobe: zwei Prompts, zwei Agenten, j
 - Die Schriften decken die gängigen Zeichen jeder Sprache ab (zum Beispiel die 5.401 Zeichen der Big5-Stufe 1 für Traditionelles Chinesisch). Ein Zeichen außerhalb davon wird als `glyphs-missing` gemeldet. Schriften, die von rechts nach links laufen oder Formung brauchen, werden nicht unterstützt.
 - In der US-Karte ist Alaska mit 35 Prozent des Maßstabs der 48 zusammenhängenden Staaten gezeichnet. Flächen sind innerhalb jedes Teils vergleichbar.
 - Die Beschriftungen nutzen einen gierigen Platzierer. Dichte Karten lassen einige weg, und der Bericht zählt sie.
-- Eigene Grenzen werden unverändert gezeichnet, ohne Vereinfachung: Eine Datei mit Millionen Stützpunkten zeichnet sich also langsam. Die Koordinaten müssen Längen- und Breitengrad sein. Damit `--fix` absolute Zahlen durch die Bevölkerung teilen kann, braucht die Datei eine Bevölkerungseigenschaft.
+- Eigene Grenzen werden unverändert gezeichnet. Eine sehr große Datei ist langsam und braucht viel Speicher, vereinfache sie also zuerst, zum Beispiel mit mapshaper. Die Koordinaten müssen Längen- und Breitengrad sein. Damit `--fix` absolute Zahlen durch die Bevölkerung teilen kann, braucht die Datei eine Bevölkerungseigenschaft.
 
 ## Mehr
 

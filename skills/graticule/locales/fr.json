@@ -94,7 +94,7 @@
     },
     "empty-class": {
       "message": "La classe {index} ne contient aucune zone.",
-      "reason": "Une entrée de légende que rien n'utilise suggère que les seuils ne conviennent pas aux données."
+      "reason": "Une entrée de légende dans laquelle ne tombe aucune zone suggère que les seuils ne conviennent pas aux données."
     },
     "skewed-classes": {
       "message": "{percent} % des zones tombent dans une seule classe.",
@@ -105,8 +105,8 @@
       "reason": "Sur une échelle séquentielle, l'ordre de luminosité est le seul signe de \"plus\". Les palettes arc-en-ciel montent et descendent en luminosité et inventent des frontières."
     },
     "cvd-separation": {
-      "message": "Les couleurs de la palette {palette} ne diffèrent que de {worst} (CIEDE2000) pour certaines personnes daltoéniennes.",
-      "reason": "Environ 1 homme sur 12 ne distingue pas certaines de ces couleurs. Des classes voisines doivent différer d'au moins 3, et 5 est confortable (8 pour des catégories)."
+      "message": "Les couleurs de la palette {palette} ne diffèrent que de {worst} (CIEDE2000) pour certaines personnes daltoniennes.",
+      "reason": "Environ 1 homme sur 12 ne distingue pas certaines de ces couleurs. Des classes voisines doivent différer d'au moins 2,5, et 4 est confortable (4 et 8 pour des catégories)."
     },
     "diverging-center": {
       "message": "La palette divergente {palette} nécessite une valeur centrale.",
@@ -326,7 +326,8 @@
       "loading": "Dessin en cours...",
       "failed": "Impossible de dessiner cette carte : {detail}",
       "expand": "Agrandir",
-      "close": "Fermer"
+      "close": "Fermer",
+      "demo": "Cet exemple est dessiné de travers exprès : quatre règles l'arrêtent."
     },
     "footer": {
       "note": "Open source, licence MIT. Tout s'exécute dans votre navigateur et rien n'est envoyé."

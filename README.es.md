@@ -180,7 +180,7 @@ Las sesiones con agentes son una muestra pequeña: dos mensajes, dos agentes, do
 - Las fuentes cubren los caracteres comunes de cada idioma (por ejemplo, los 5.401 caracteres del nivel 1 de Big5 para el chino tradicional). Un carácter fuera de ese conjunto se informa como `glyphs-missing`. No se admiten escrituras que van de derecha a izquierda o necesitan composición.
 - En el mapa de Estados Unidos, Alaska se dibuja al 35 % de la escala de los 48 estados contiguos. Las áreas son comparables dentro de cada pieza.
 - Las etiquetas usan un colocador voraz. Los mapas densos dejan algunas fuera y el informe las cuenta.
-- Tus propios límites se dibujan tal cual, sin simplificar, así que un archivo con millones de vértices tarda en dibujarse. Las coordenadas deben ser longitud y latitud. Hace falta una propiedad de población para que `--fix` divida los recuentos brutos.
+- Tus propios límites se dibujan tal cual. Un archivo muy grande es lento y gasta mucha memoria, así que simplifícalo antes, por ejemplo con mapshaper. Las coordenadas deben ser longitud y latitud. Hace falta una propiedad de población para que `--fix` divida los recuentos brutos.
 
 ## Más
 

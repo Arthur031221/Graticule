@@ -180,7 +180,7 @@ Les sessions avec des agents forment un petit échantillon : deux consignes, deu
 - Les polices couvrent les caractères courants de chaque langue (par exemple les 5 401 caractères du niveau 1 de Big5 pour le chinois traditionnel). Un caractère hors de cet ensemble est signalé par `glyphs-missing`. Les écritures de droite à gauche ou qui demandent une mise en forme complexe ne sont pas prises en charge.
 - Sur la carte des États-Unis, l'Alaska est dessinée à 35 % de l'échelle des 48 États contigus. Les surfaces sont comparables à l'intérieur de chaque morceau.
 - Les étiquettes utilisent un placement glouton. Les cartes denses en omettent certaines, et le rapport les compte.
-- Vos propres limites sont dessinées telles quelles, sans simplification : un fichier de plusieurs millions de sommets se dessine lentement. Les coordonnées doivent être en longitude et latitude. Il faut une propriété de population pour que `--fix` divise les effectifs bruts.
+- Vos propres limites sont dessinées telles quelles. Un très gros fichier est lent et gourmand en mémoire, simplifiez-le donc d'abord, par exemple avec mapshaper. Les coordonnées doivent être en longitude et latitude. Il faut une propriété de population pour que `--fix` divise les effectifs bruts.
 
 ## Pour aller plus loin
 

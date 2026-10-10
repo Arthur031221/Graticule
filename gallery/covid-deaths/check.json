@@ -1,5 +1,5 @@
 {
-  "graticule": "0.3.1",
+  "graticule": "0.3.2",
   "ok": true,
   "region": "world",
   "type": "choropleth",
@@ -46,7 +46,7 @@
         "suggestions": []
       },
       {
-        "value": "R�union",
+        "value": "Réunion",
         "rows": 1,
         "suggestions": []
       },
@@ -129,7 +129,7 @@
       "id": "join-unmatched",
       "level": "warn",
       "allowed": false,
-      "message": "14 rows matched no area and are not drawn: Bonaire, Saint Eustatius and Saba; French Guiana; Gibraltar; Martinique; Mayotte; R�union; International conveyance (American Samoa); International conveyance (Solomon Islands); International conveyance (Vanuatu); International conveyance (Diamond Princess); Guadeloupe; Tokelau; International conveyance (Kiribati); International commercial vessel.",
+      "message": "14 rows matched no area and are not drawn: Bonaire, Saint Eustatius and Saba; French Guiana; Gibraltar; Martinique; Mayotte; Réunion; International conveyance (American Samoa); International conveyance (Solomon Islands); International conveyance (Vanuatu); International conveyance (Diamond Princess); Guadeloupe; Tokelau; International conveyance (Kiribati); International commercial vessel.",
       "reason": "Rows that vanish quietly make a map look complete when it is not. Fix the spelling or the key column.",
       "fixable": false
     },

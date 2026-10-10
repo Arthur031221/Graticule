@@ -68,6 +68,15 @@ const round = (v, digits) => Math.round(v * 10 ** digits) / 10 ** digits;
 const wbSource = (code, year) => `World Bank, World Development Indicators, ${code}, ${year}`;
 const note = `Data retrieved ${RETRIEVED}.`;
 
+/** The WHO file has U+FFFD where five names have an accent. The names are restored so that the first screen of the playground shows them. */
+const WHO_NAMES = new Map([
+  ["Saint Barth\uFFFDlemy", "Saint Barth\u00e9lemy"],
+  ["C\uFFFDte d'Ivoire", "C\u00f4te d'Ivoire"],
+  ["R\uFFFDunion", "R\u00e9union"],
+  ["Cura\uFFFDao", "Cura\u00e7ao"],
+  ["T\uFFFDrkiye", "T\u00fcrkiye"],
+]);
+
 /** The states of one country from Natural Earth admin-1, simplified to a small TopoJSON file. */
 async function naturalEarthStates(iso3, keep) {
   const url =
@@ -130,7 +139,7 @@ const GALLERY = [
       return {
         columns: ["country", "code", "deaths"],
         rows: [...last.values()].map((r) => ({
-          country: r.Country,
+          country: WHO_NAMES.get(r.Country) ?? r.Country,
           code: r.Country_code,
           deaths: r.Cumulative_deaths,
         })),

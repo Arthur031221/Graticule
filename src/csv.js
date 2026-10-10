@@ -1,5 +1,38 @@
 /** A small CSV reader for the tables people paste into maps. */
 
+const YEAR_NAME = /^(year|yr|fiscal[_ ]?year|survey[_ ]?year|census[_ ]?year|period)$/i;
+
+/**
+ * A column that says when, not how much: named year, or whole years that repeat down the rows (a long
+ * table with one row per area and year). It is not the column to map, though its cells are numbers.
+ * @param {string} name column name
+ * @param {string[]} cells
+ */
+export function looksLikeYear(name, cells) {
+  if (YEAR_NAME.test(name.trim())) return true;
+  const filled = cells.filter((c) => c !== "");
+  if (filled.length < 4 || !filled.every((c) => /^\d{4}$/.test(c))) return false;
+  return filled.every((c) => Number(c) >= 1800 && Number(c) <= 2100) && new Set(filled).size <= filled.length / 2;
+}
+
+/** What a file is when it clearly is not a text table, or "" when it may be one. */
+export function sniffBinary(bytes, { nul = true } = {}) {
+  const b = bytes instanceof Uint8Array ? bytes : new Uint8Array(bytes);
+  const starts = (...head) => head.every((byte, i) => b[i] === byte);
+  if (starts(0x50, 0x4b, 0x03, 0x04))
+    return "a zip archive or an Excel workbook (.xlsx). In Excel use Save As and choose CSV";
+  if (starts(0xd0, 0xcf, 0x11, 0xe0)) return "an Excel workbook (.xls). In Excel use Save As and choose CSV";
+  if (starts(0x25, 0x50, 0x44, 0x46)) return "a PDF";
+  if (starts(0x89, 0x50, 0x4e, 0x47)) return "a PNG image";
+  if (starts(0xff, 0xd8, 0xff)) return "a JPEG image";
+  const utf16 = starts(0xff, 0xfe) || starts(0xfe, 0xff);
+  if (nul && !utf16 && b.subarray(0, 4096).includes(0)) return "a binary file";
+  return "";
+}
+
+/** A file that is not a table at all, such as an Excel workbook. */
+export class NotATableError extends Error {}
+
 /**
  * Decodes the bytes of a table file. A byte order mark settles UTF-8 or UTF-16.
  * Without one the bytes must be valid UTF-8; if they are not, the file is read
@@ -9,9 +42,12 @@
  * @param {string} [label] an encoding name such as "big5" or "shift_jis", used as given
  * @returns {{ text: string, encoding: string, guessed: boolean }}
  * @throws {RangeError} when `label` is not an encoding name
+ * @throws {NotATableError} when the bytes are an Excel workbook, an image or another binary file
  */
 export function decodeBytes(bytes, label) {
   const data = bytes instanceof Uint8Array ? bytes : new Uint8Array(bytes);
+  const binary = sniffBinary(data, { nul: !/^utf-?16/i.test(label ?? "") });
+  if (binary) throw new NotATableError(`this is ${binary}, not a text table`);
   if (label) {
     const decoder = new TextDecoder(label);
     return { text: decoder.decode(data), encoding: decoder.encoding, guessed: false };

@@ -94,7 +94,7 @@
     },
     "empty-class": {
       "message": "A classe {index} não contém nenhuma área.",
-      "reason": "Uma entrada da legenda que ninguém usa sugere que as quebras não combinam com os dados."
+      "reason": "Uma entrada da legenda em que nenhuma área se encaixa sugere que as quebras não combinam com os dados."
     },
     "skewed-classes": {
       "message": "{percent}% das áreas caem em uma só classe.",
@@ -106,7 +106,7 @@
     },
     "cvd-separation": {
       "message": "As cores da paleta {palette} chegam a diferir apenas {worst} (CIEDE2000) para algumas pessoas com deficiência de visão de cores.",
-      "reason": "Cerca de 1 em cada 12 homens não distingue algumas dessas cores. Classes vizinhas precisam de diferença de pelo menos 3, e 5 é confortável (8 para categorias)."
+      "reason": "Cerca de 1 em cada 12 homens não distingue algumas dessas cores. Classes vizinhas precisam de diferença de pelo menos 2,5, e 4 é confortável (4 e 8 para categorias)."
     },
     "diverging-center": {
       "message": "A paleta divergente {palette} precisa de um valor central.",
@@ -326,7 +326,8 @@
       "loading": "Desenhando...",
       "failed": "Não foi possível desenhar este mapa: {detail}",
       "expand": "Ampliar",
-      "close": "Fechar"
+      "close": "Fechar",
+      "demo": "Este exemplo foi desenhado mal de propósito: quatro regras o impedem."
     },
     "footer": {
       "note": "Código aberto, licença MIT. Tudo roda no seu navegador e nada é enviado."

@@ -180,7 +180,7 @@ As sessões com agentes são uma amostra pequena: dois pedidos, dois agentes, du
 - As fontes cobrem os caracteres comuns de cada idioma (por exemplo, os 5.401 caracteres do nível 1 do Big5 para o chinês tradicional). Um caractere fora desse conjunto é informado como `glyphs-missing`. Escritas da direita para a esquerda ou que exigem composição não são suportadas.
 - No mapa dos Estados Unidos, o Alasca é desenhado a 35% da escala dos 48 estados contíguos. As áreas são comparáveis dentro de cada parte.
 - Os rótulos usam um posicionador guloso. Mapas densos deixam alguns de fora, e o relatório os conta.
-- Seus próprios limites são desenhados como vieram, sem simplificação, então um arquivo com milhões de vértices demora a desenhar. As coordenadas devem ser longitude e latitude. É preciso uma propriedade de população para o `--fix` dividir as contagens brutas.
+- Seus próprios limites são desenhados como vieram. Um arquivo muito grande é lento e usa muita memória, então simplifique-o antes, por exemplo com o mapshaper. As coordenadas devem ser longitude e latitude. É preciso uma propriedade de população para o `--fix` dividir as contagens brutas.
 
 ## Mais
 

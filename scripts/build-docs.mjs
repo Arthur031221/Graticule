@@ -1,7 +1,7 @@
 // Generates the pages that must match the code (docs/rules.md and
 // docs/regions.md) and copies the reference pages into the skill. Run by
 // `npm run build`, and CI fails when the output differs from what is committed.
-import { copyFile, readFile, writeFile } from "node:fs/promises";
+import { readFile, writeFile } from "node:fs/promises";
 import { join } from "node:path";
 import { fileURLToPath } from "node:url";
 import { RULES, THRESHOLDS } from "../src/checks.js";
@@ -39,7 +39,6 @@ Thresholds: neighbouring classes must differ by CIEDE2000 ${THRESHOLDS.sequentia
 | \`projection-mercator\` | Sets \`projection\` to auto. |
 | \`max-classes\` | Sets \`classes.count\` to 7. Not for manual breaks. |
 | \`class-breaks-coverage\` | Adds a class below or above the manual breaks so every value is covered. |
-| \`skewed-classes\` | Switches to quantile classes. |
 | \`palette-order\` | Removes the custom palette, which restores the default. |
 | \`cvd-separation\` | Same, when the finding is an error. |
 | \`diverging-center\` | Sets \`center\` to 0 when the data has both signs. |
@@ -115,5 +114,8 @@ for (const [file, target] of [
   ["regions.md", "regions.md"],
   ["data.md", "data.md"],
 ])
-  await copyFile(join(docs, file), join(refs, target));
+  await writeFile(
+    join(refs, target),
+    (await readFile(join(docs, file), "utf8")).replaceAll("](config.md)", "](spec.md)"),
+  );
 console.log("docs and references written");

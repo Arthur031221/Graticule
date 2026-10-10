@@ -36,12 +36,13 @@ export function createTranslator(messages, fallback = messages, lang = "en") {
 export function numberFormatter(lang, edges = []) {
   const tag = { "zh-Hant": "zh-TW", "zh-Hans": "zh-CN", pt: "pt-BR" }[lang] ?? lang;
   const big = Math.max(...edges.map(Math.abs), 0) >= 10000;
+  // Four significant digits are all a legend can use: an edge such as 26.66666667 is shown as 26.67.
   const decimals = Math.min(
-    10,
+    6,
     Math.max(
       0,
       ...edges.map((e) =>
-        Number.isInteger(e) ? 0 : (Number(e.toPrecision(10)).toFixed(10).replace(/0+$/, "").split(".")[1] ?? "").length,
+        Number.isInteger(e) ? 0 : (Number(e.toPrecision(4)).toFixed(8).replace(/0+$/, "").split(".")[1] ?? "").length,
       ),
     ),
   );

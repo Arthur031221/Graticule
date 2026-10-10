@@ -84,7 +84,7 @@
     },
     "empty-class": {
       "message": "Class {index} holds no area.",
-      "reason": "A legend entry that nothing uses suggests the breaks do not fit the data."
+      "reason": "A legend entry that no area falls into suggests the breaks do not fit the data."
     },
     "skewed-classes": {
       "message": "{percent}% of the areas fall into one class.",
@@ -96,7 +96,7 @@
     },
     "cvd-separation": {
       "message": "Colours of palette {palette} come as close as a CIEDE2000 difference of {worst} for some viewers with colour vision deficiency.",
-      "reason": "About 1 in 12 men cannot tell some of these colours apart. Neighbouring classes need a difference of at least 3, and 5 is comfortable (8 for categories)."
+      "reason": "About 1 in 12 men cannot tell some of these colours apart. Neighbouring classes need a difference of at least 2.5, and 4 is comfortable (4 and 8 for categories)."
     },
     "diverging-center": {
       "message": "Diverging palette {palette} needs a centre value.",
@@ -321,7 +321,8 @@
       "loading": "Drawing...",
       "failed": "Could not draw this map: {detail}",
       "expand": "View larger",
-      "close": "Close"
+      "close": "Close",
+      "demo": "This example is drawn badly on purpose: four rules stop it."
     },
     "footer": {
       "note": "Open source, MIT license. Everything runs in your browser and nothing is uploaded."

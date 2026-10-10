@@ -1,5 +1,5 @@
 import { buildMap } from "../src/build.js";
-import { decodeBytes, parseNumber, parseTable } from "../src/csv.js";
+import { decodeBytes, looksLikeYear, parseNumber, parseTable } from "../src/csv.js";
 import { loadCustomAreas } from "../src/custom.js";
 import { exportMap } from "../src/export.js";
 import { createFontStore } from "../src/fonts.js";
@@ -114,6 +114,7 @@ const state = {
   refocus: "",
   bytes: null,
   boundaries: null,
+  period: null,
 };
 
 /** Counts the tables loaded, so a slow region lookup for an older table cannot change a newer one. */
@@ -345,6 +346,7 @@ function readControls() {
     theme: text("map-theme"),
     values: [...document.querySelectorAll("#values input:checked")].map((i) => i.value),
   });
+  if (state.period) state.period.value = $("period").value;
   const type = document.querySelector('input[name="type"]:checked');
   if (type) s.type = type.value;
   const palette = document.querySelector('input[name="palette"]:checked');
@@ -395,6 +397,7 @@ function toSpec() {
   const multiples = s.type === "small-multiples";
   const data = { ...base.data, csv: state.csv };
   delete data.file;
+  if (state.period) data.filter = { ...base.data?.filter, [state.period.column]: state.period.value };
   if (s.key) data.key = s.key;
   else delete data.key;
   data.value = multiples ? s.values : s.value;
@@ -453,6 +456,8 @@ function fromSpec(spec) {
 /** A new table starts a new map: nothing from the previous one carries over except the language and theme. */
 function resetForNewData() {
   tableRun++;
+  state.period = null;
+  fillPeriod();
   state.bytes = null;
   $("field-encoding").hidden = true;
   state.example = "";
@@ -466,6 +471,10 @@ function resetForNewData() {
     state.spec.region = "custom";
     state.regionTouched = true;
   }
+  // The fields of the last map go at once: a reader who types while the new table is read starts from empty ones.
+  fillColumns();
+  syncControls();
+  $("sheet").classList.add("stale");
   buildExamples();
   buildPalettes();
 }
@@ -475,7 +484,13 @@ function resetForNewData() {
  * read it again with the encoding it really has.
  */
 async function loadBytes(bytes, label) {
-  const decoded = decodeBytes(bytes, label);
+  let decoded;
+  try {
+    decoded = decodeBytes(bytes, label);
+  } catch (error) {
+    // An Excel workbook or an image: say what it is, and keep what was on the page.
+    return setStatus(ui("data.error", { detail: error.message }), true);
+  }
   state.bytes = decoded.guessed || label ? bytes : null;
   $("field-encoding").hidden = !state.bytes;
   if (state.bytes) {
@@ -529,14 +544,44 @@ function setStatus(text, error = false) {
 }
 
 const REGION_ORDER = ["world", "us-states", "us-counties", "jp-prefectures", "kr-provinces", "tw-counties", "tw-towns"];
-/** Columns whose cells are numbers, leaving out `except` (the column that names the areas). */
+const cellsOf = (table, column) => table.rows.map((r) => (r[column] ?? "").trim());
+
+/**
+ * Columns whose cells are numbers, leaving out `except` (the column that names the areas) and the
+ * columns that say when, unless nothing else is numeric.
+ */
 function numericColumns(table, except = "") {
   const sample = table.rows.slice(0, 60);
-  return table.columns.filter(
+  const numeric = table.columns.filter(
     (c) =>
       c !== except &&
       sample.some((r) => (r[c] ?? "") !== "") &&
       sample.every((r) => (r[c] ?? "") === "" || parseNumber(r[c]) !== null),
+  );
+  const plain = numeric.filter((c) => !looksLikeYear(c, cellsOf(table, c)));
+  return plain.length ? plain : numeric;
+}
+
+/** A long table has a row per area and year: the year to map, the latest unless the reader picks another. */
+function periodOf(table, keyColumn) {
+  if (!keyColumn) return null;
+  const named = cellsOf(table, keyColumn).filter(Boolean);
+  if (new Set(named).size >= named.length) return null;
+  const column = table.columns.find((c) => c !== keyColumn && looksLikeYear(c, cellsOf(table, c)));
+  if (!column) return null;
+  const values = [...new Set(cellsOf(table, column).filter(Boolean))].sort().reverse();
+  return { column, values, value: values[0] };
+}
+
+function fillPeriod() {
+  const period = state.period;
+  $("field-period").hidden = !period;
+  if (!period) return;
+  $("period-label").textContent = period.column;
+  options(
+    $("period"),
+    period.values.map((v) => [v, v]),
+    period.value,
   );
 }
 
@@ -546,9 +591,13 @@ async function setTable(text, { keepSpec = false } = {}) {
   let table;
   try {
     table = parseTable(text);
-    if (!table.columns.length || !table.rows.length) throw new Error(ui("data.empty"));
   } catch (error) {
     setStatus(ui("data.error", { detail: error.message }), true);
+    return false;
+  }
+  if (!table.columns.length || !table.rows.length) {
+    // An empty file is not an error to read: say what to do.
+    setStatus(ui("data.empty"), true);
     return false;
   }
   state.csv = text;
@@ -563,6 +612,7 @@ async function setTable(text, { keepSpec = false } = {}) {
     }
     const columns = table.columns;
     const numeric = numericColumns(table, found.column);
+    state.period = periodOf(table, found.column);
     state.spec.key = "";
     state.spec.value =
       state.spec.value && state.spec.value !== found.column && columns.includes(state.spec.value)
@@ -572,6 +622,7 @@ async function setTable(text, { keepSpec = false } = {}) {
   }
   setStatus(ui("data.loaded", { rows: table.rows.length, count: table.rows.length, cols: table.columns.length }));
   fillColumns();
+  fillPeriod();
   syncControls();
   schedule();
   return true;
@@ -590,14 +641,15 @@ async function detectKey(table) {
     return rankKeyColumns(columns, rows, buildIndex(areas, aliases), region.keys)[0];
   };
   if (!state.regionTouched) {
-    let best = { region: "", column: "", rate: 0, strong: false };
+    let best = { region: "", column: "", rate: 0, strong: false, hits: 0 };
     for (const id of REGION_ORDER) {
       const top = await topOf(id);
       if (top && (Number(top.strong) - Number(best.strong) || top.rate - best.rate) > 0)
-        best = { region: id, column: top.column, rate: top.rate, strong: top.strong };
+        best = { region: id, column: top.column, rate: top.rate, strong: top.strong, hits: top.hits };
       if (best.rate >= 0.9 && best.strong) break;
     }
-    if (best.strong || best.rate >= 0.6) return best;
+    // A handful of plain numbers that happen to be codes (1 to 4, say) is not evidence of a region.
+    if (best.strong || (best.rate >= 0.6 && best.hits >= 8)) return best;
   }
   const top = await topOf(state.spec.region);
   return { region: "", column: top && top.rate >= 0.5 ? top.column : "" };
@@ -612,6 +664,8 @@ async function loadExample(id) {
   ]);
   if (run !== fileRun) return;
   tableRun++;
+  state.period = null;
+  fillPeriod();
   state.bytes = null;
   state.boundaries = null;
   $("field-encoding").hidden = true;
@@ -703,6 +757,7 @@ async function render() {
           "div",
           {},
           el("strong", {}, ui("checks.blocked", { count: errors.length })),
+          state.example === "covid-raw" ? el("p", { class: "demo-note" }, ui("stage.demo")) : null,
           el(
             "ul",
             { class: "stage-errors" },

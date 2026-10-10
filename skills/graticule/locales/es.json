@@ -94,7 +94,7 @@
     },
     "empty-class": {
       "message": "La clase {index} no contiene ninguna zona.",
-      "reason": "Una entrada de la leyenda que nada usa sugiere que los cortes no se ajustan a los datos."
+      "reason": "Una entrada de la leyenda en la que no cae ninguna zona sugiere que los cortes no se ajustan a los datos."
     },
     "skewed-classes": {
       "message": "El {percent}% de las zonas cae en una sola clase.",
@@ -106,14 +106,14 @@
     },
     "cvd-separation": {
       "message": "Los colores de la paleta {palette} llegan a diferir solo {worst} (CIEDE2000) para algunas personas con daltonismo.",
-      "reason": "Aproximadamente 1 de cada 12 hombres no distingue algunos de estos colores. Las clases vecinas necesitan una diferencia de al menos 3, y 5 es holgada (8 para categorías)."
+      "reason": "Aproximadamente 1 de cada 12 hombres no distingue algunos de estos colores. Las clases vecinas necesitan una diferencia de al menos 2,5, y 4 es holgada (4 y 8 para categorías)."
     },
     "diverging-center": {
       "message": "La paleta divergente {palette} necesita un valor central.",
       "reason": "Sin un punto medio con sentido, como 0, una escala divergente sugiere una división que los datos no tienen. Define \"center\"."
     },
     "too-many-categories": {
-      "message": "{count} categorías son más de los {max} colores que cabe en una leyenda.",
+      "message": "{count} categorías son más de los {max} colores que caben en una leyenda.",
       "reason": "Con más de ocho colores no se puede relacionar el mapa con la leyenda. Agrupa las categorías pequeñas como Otros."
     },
     "normalize-missing": {
@@ -326,7 +326,8 @@
       "loading": "Dibujando...",
       "failed": "No se pudo dibujar este mapa: {detail}",
       "expand": "Ver más grande",
-      "close": "Cerrar"
+      "close": "Cerrar",
+      "demo": "Este ejemplo está mal dibujado a propósito: cuatro reglas lo detienen."
     },
     "footer": {
       "note": "Código abierto, licencia MIT. Todo se ejecuta en tu navegador y no se sube nada."

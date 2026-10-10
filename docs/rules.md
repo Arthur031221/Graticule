@@ -21,10 +21,10 @@ An error stops the map from being drawn. `--fix` repairs the errors marked fixab
 | `projection-not-equal-area` | warn | A shaded map of a region more than 10 degrees of latitude tall uses a projection that does not preserve area. | Areas read larger or smaller than they are, which biases the comparison a little. Equal Earth, Albers and Lambert azimuthal keep areas true. |
 | `max-classes` | error | More than 7 classes. | People can match about seven shades against a legend and no more. |
 | `class-breaks-coverage` | error | Manual breaks stop short of the lowest or the highest value. | A value outside the first and last edge gets no colour, so the legend would not describe the map. List every edge, lowest value first and highest last. |
-| `empty-class` | warn | A class holds no area. | A legend entry that nothing uses suggests the breaks do not fit the data. |
+| `empty-class` | warn | A class holds no area. | A legend entry that no area falls into suggests the breaks do not fit the data. |
 | `skewed-classes` | warn | Equal or manual classes put more than 70% of the areas in one class. | Equal intervals and hand-set breaks on skewed data paint most of the map one colour. Quantile or Jenks classes spread the areas out. |
 | `palette-order` | error | A palette for ordered classes, sequential or categorical, whose lightness does not move one way or moves less than 2 L* between neighbours. | On a sequential scale the order of lightness is the only sign of "more". Rainbow palettes jump up and down in lightness and invent boundaries. |
-| `cvd-separation` | error | Neighbouring colours (all pairs for categories) come closer than CIEDE2000 2.5 under normal vision or a simulated protanopia, deuteranopia or tritanopia. A warning below 4 (for categories: error below 4, warning below 8). | About 1 in 12 men cannot tell some of these colours apart. Neighbouring classes need a difference of at least 3, and 5 is comfortable (8 for categories). |
+| `cvd-separation` | error | Neighbouring colours (all pairs for categories) come closer than CIEDE2000 2.5 under normal vision or a simulated protanopia, deuteranopia or tritanopia. A warning below 4 (for categories: error below 4, warning below 8). | About 1 in 12 men cannot tell some of these colours apart. Neighbouring classes need a difference of at least 2.5, and 4 is comfortable (4 and 8 for categories). |
 | `diverging-center` | error | A diverging palette is used without center. | Without a meaningful midpoint, such as 0, a diverging scale suggests a split that the data does not have. Set "center". |
 | `too-many-categories` | error | A categorical map has more than 8 categories. | Beyond eight colours readers cannot match the map to the legend. Group the small categories as Other. |
 | `normalize-missing` | warn | Some areas have no bundled population or area to divide by and are shown as no data. | A rate cannot be computed without a denominator. Supply one with normalize.by column, or accept the gaps and say so in the note. |
@@ -42,7 +42,6 @@ Thresholds: neighbouring classes must differ by CIEDE2000 2.5 or more under norm
 | `projection-mercator` | Sets `projection` to auto. |
 | `max-classes` | Sets `classes.count` to 7. Not for manual breaks. |
 | `class-breaks-coverage` | Adds a class below or above the manual breaks so every value is covered. |
-| `skewed-classes` | Switches to quantile classes. |
 | `palette-order` | Removes the custom palette, which restores the default. |
 | `cvd-separation` | Same, when the finding is an error. |
 | `diverging-center` | Sets `center` to 0 when the data has both signs. |

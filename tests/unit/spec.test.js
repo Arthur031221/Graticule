@@ -74,3 +74,31 @@ test("normalize.per must be a positive number, defaults to 1 and must agree with
   assert.equal(declaredPer("Cases per 1,000 residents"), 1000);
   assert.equal(declaredPer("Share per 0.5 units"), null);
 });
+
+test("a field of the wrong type is named, never spread, ignored or allowed to crash", () => {
+  const good = { title: "t", source: "s", region: "world", data: { rows: [], key: "iso3", value: "v" } };
+  const wrong = {
+    center: "50",
+    size: "huge",
+    grid: "x",
+    highlight: 3,
+    columns: 9,
+    panels: "a",
+    classes: 5,
+    legend: "L",
+    symbols: 4,
+    attribution: "no",
+    labels: 4,
+    data: { rows: "x", key: 7, keyType: 1, label: 2, file: 3, value: {} },
+  };
+  for (const [field, value] of Object.entries(wrong)) {
+    const input = field === "data" ? { ...good, data: { ...good.data, ...value } } : { ...good, [field]: value };
+    const { findings } = normalizeSpec(input);
+    const paths = findings.filter((f) => f.id === "spec").map((f) => f.params.path);
+    if (field === "data")
+      for (const key of ["data.rows", "data.key", "data.keyType", "data.label", "data.file", "data.value"])
+        assert.ok(paths.includes(key), key);
+    else assert.ok(paths.includes(field), `${field}: ${paths.join()}`);
+  }
+  assert.deepEqual(normalizeSpec(good).findings, []);
+});

@@ -39,7 +39,18 @@ export async function buildMap(input, ctx) {
     resolveHighlight(analysis);
     findings =
       analysis.ok === false && !analysis.index ? analysis.findings : [...analysis.findings, ...checkAnalysis(analysis)];
-    markAllowed(findings, [...(analysis.spec?.checks.allow ?? []), ...(ctx.allow ?? [])]);
+    const allow = [...(analysis.spec?.checks.allow ?? []), ...(ctx.allow ?? [])];
+    // A rule id with a typo would let the person think the rule is set aside while it still applies.
+    for (const id of new Set(allow.filter((id) => !Object.hasOwn(RULES, id))))
+      findings.push({
+        id: "spec",
+        level: "error",
+        params: {
+          path: "checks.allow",
+          detail: `"${id}" is not a rule. The rules are: ${Object.keys(RULES).join(", ")}`,
+        },
+      });
+    markAllowed(findings, allow);
     const fixable = ctx.fix ? findings.filter((f) => f.level === "error" && !f.allowed && f.fix) : [];
     if (!fixable.length || pass === MAX_PASSES) break;
     for (const finding of fixable) {

@@ -45,7 +45,7 @@ With `"region": "custom"` the map is drawn from your own polygons. Give exactly 
 | `credit` | Who made the boundaries. Printed under the map as `Boundaries: ...`. |
 | `title` | The title used when the spec has none. |
 
-Every property that holds a different value on every feature is a key type of its own, so a table column can join on any of them (`data.keyType` names one). The display name feeds the `name` key type, which ignores case, accents and punctuation. A property such as `01` also matches `1`. Coordinates must be longitude and latitude in degrees (WGS84). A file in metres is refused with the `ogr2ogr` command that reprojects it. Features that are not polygons are skipped and counted in `boundaries-skipped`. The projection is chosen from the extent and is always equal-area: Equal Earth for a world-sized extent, an equal-area conic for a wide band, otherwise Lambert azimuthal. Set `projection` to use another. Keep the file small, because every vertex is drawn: simplify detailed files first (for example with mapshaper).
+Every property that holds a different value on every feature is a key type of its own, so a table column can join on any of them (`data.keyType` names one). The display name feeds the `name` key type, which ignores case, accents and punctuation. A property such as `01` also matches `1`. Coordinates must be longitude and latitude in degrees (WGS84). A file in metres is refused with the `ogr2ogr` command that reprojects it. Features that are not polygons are skipped and counted in `boundaries-skipped`. The projection is chosen from the extent and is always equal-area: Equal Earth for a world-sized extent, an equal-area conic for a wide band, otherwise Lambert azimuthal. Set `projection` to use another. A very large file is slow and needs a lot of memory, so simplify detailed files first (for example with mapshaper).
 
 ```json
 {
@@ -66,12 +66,12 @@ Give exactly one of `file`, `csv` (the text itself) or `rows` (a list of objects
 | Field | Meaning |
 | --- | --- |
 | `key` | Column that names the areas. Found automatically when omitted. |
-| `keyType` | `auto` (default) or one of the region's key types: iso3, iso2, isonum, name for countries, fips, postal, name for US states, fips for counties, code and name for Taiwan, iso, jis, name for Japan, iso and name for Korea. |
+| `keyType` | `auto` (default) or one of the region's key types: iso3, iso2, isonum, name for countries, fips, postal, name for US states, fips and name for counties, code and name for Taiwan, iso, jis, name for Japan, iso and name for Korea. |
 | `encoding` | How `file` is read when it is not UTF-8, for example `big5`, `shift_jis`, `euc-kr`, `gbk` or `windows-1252`. Without it a file must be valid UTF-8 (a byte order mark is honoured, UTF-16 too). One that is not is read as Windows-1252 and the report carries `table-encoding`. |
 | `value` | Column to map. A list of columns for small multiples. |
 | `kind` | `count`, `rate`, `share`, `index` or `other`. Counts are refused on choropleths. |
 | `label` | Legend title, normally the unit. |
-| `normalize` | `{ "by": "population", "per": 100000 }`, `{ "by": "area", "per": 1 }` (per square kilometre) or `{ "by": "column", "column": "pop", "per": 1000 }`. `per` must be above 0 and defaults to 1. If the title, the legend title or `label` says "per 100,000" or similar, `per` has to agree with it. Population is bundled for countries and US states and counties. |
+| `normalize` | `{ "by": "population", "per": 100000 }`, `{ "by": "area", "per": 1 }` (per square kilometre) or `{ "by": "column", "column": "pop", "per": 1000 }`. `per` must be above 0 and defaults to 1. If the title, the legend title or `label` says "per 100,000" or similar, `per` has to agree with it. Population is bundled for countries, US states and counties, Taiwan counties and townships, Japan prefectures and South Korean provinces. |
 | `aggregate` | `sum`, `mean`, `first`, `last`, `min`, `max` when several rows name the same area. |
 | `filter` | Equality filter on the table, for example `{ "year": "2022" }` or `{ "year": ["2021", "2022"] }`. |
 

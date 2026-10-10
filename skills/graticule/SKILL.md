@@ -40,7 +40,7 @@ The program is `scripts/graticule.mjs` in this skill folder. It needs Node 20 or
 - **Declare what the numbers are.** `data.kind` is count, rate, share, index or other. A choropleth of counts is refused (`raw-counts`). `--fix` divides by the bundled population, per 1,000, 100,000 or 1,000,000 people (or the unit the legend already states), and puts that unit in the legend. Counts that should be sized go in `type: "symbols"`.
 - **One value per area.** A table with several years or several rows per place is refused (`duplicate-keys`). Pick one with `data.filter` (for example `{"year": "2022"}`) or combine with `data.aggregate`.
 - **Say where it came from.** `source` is required.
-- **Never pick the projection by habit.** Leave `projection` as auto. Mercator is refused for anything larger than a city.
+- **Never pick the projection by habit.** Leave `projection` as auto. Mercator is refused for a region more than 20 degrees of latitude tall.
 - **Do not turn a rule off to get a picture.** `--allow <rule-id>` exists for real exceptions. When you use it, tell the person which rule and why.
 
 ## What to tell the person

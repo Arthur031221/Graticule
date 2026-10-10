@@ -22,7 +22,7 @@ A cartography skill for coding agents: 1 skill, 5 map types, 13 regions or your 
 
 Same prompt and file, fresh sessions of the same agent (Sonnet 5.5). All four sessions without the skill shaded raw counts: two with that agent and two with Codex. Transcripts are in [eval/runs](eval/runs).
 
-I wrote down the rules agents skip when they draw maps in a hurry, then built a renderer that won't run until they pass. No new map library.
+I wrote down the rules agents skip when drawing maps in a hurry and built a renderer that won't run until they pass. No new map library.
 
 ## Why the name
 
@@ -30,15 +30,15 @@ A graticule is the grid of latitude and longitude lines on a map. Readers use it
 
 - **Counts instead of rates.** Coloring countries by death counts shows where the people are. Graticule asks for the data kind, or spots values that rank like population, and divides.
 - **Mercator for the world.** Greenland as big as Africa. Equal-area projections are the default. Graticule refuses Mercator above 20 degrees of latitude.
-- **Rows that vanish.** "Korea, Rep." doesn't match "South Korea" and nobody hears about it. Every row that fails to join is listed with its closest names. If a name fits two places, Graticule won't guess.
+- **Rows that vanish.** "Korea, Rep." doesn't match "South Korea" and nobody hears about it. Graticule lists every row that fails to join alongside its closest names. If a name fits two places, it won't guess.
 - **Files that are not UTF-8.** A table saved by a Windows spreadsheet is often Big5, Shift_JIS or Windows-1252. Read as UTF-8, it joins nothing. Graticule flags files that aren't UTF-8 and reads them as Windows-1252. It accepts `--encoding big5` or `data.encoding` for the rest.
 - **Rainbow palettes.** Lightness that goes up and down draws borders that aren't in the data. The palette must get steadily lighter or darker. Its colors must stay apart for the three kinds of color vision deficiency I simulate.
-- **Labels that turn into empty boxes.** Chinese, Japanese and Korean labels need fonts. Each output carries a subset of Noto Sans CJK with only the glyphs it uses.
+- **Labels that turn into empty boxes.** Chinese, Japanese and Korean labels need fonts. Each output carries a subset of Noto Sans CJK with just the glyphs it uses.
 - **No source.** Graticule refuses maps without a source line.
 
 ## What it checks
 
-25 rules, each with a plain reason beside the finding. Errors stop the map. `--fix` repairs errors that have a single mechanical fix. `--allow <id>` accepts a rule and adds a note to the report.
+25 rules, each with a plain reason beside the finding. Errors stop rendering. `--fix` repairs errors with a single mechanical fix. `--allow <id>` accepts a rule and adds a note to the report.
 
 | Rule | What it catches |
 | --- | --- |
@@ -93,7 +93,7 @@ Run the same command and pick your agent when the `skills` program asks. I haven
 <details>
 <summary><b>Chat apps that accept a skill upload</b></summary>
 
-After cloning, build `graticule-skill.zip` with `npm run package:skill`, or get it from a release. Upload it where the app accepts a custom skill. Turn on code execution so the skill can run its program.
+After cloning, build `graticule-skill.zip` with `npm run package:skill`, or get it from a release. Upload it where the app accepts a custom skill. Turn on code execution so the skill can run.
 
 </details>
 
@@ -111,7 +111,7 @@ Or clone and run `node skills/graticule/scripts/graticule.mjs --help`. Node 20 o
 <details>
 <summary><b>In the browser</b></summary>
 
-Open the [playground](https://arthur031221.github.io/Graticule/). Drop a CSV and fix what the checker finds. Then download SVG, PNG, PDF or an interactive HTML page. Everything runs in the page. Nothing is uploaded. The interface is in nine languages. Drop a GeoJSON or TopoJSON file next to the table to draw your own boundaries.
+Open the [playground](https://arthur031221.github.io/Graticule/). Drop a CSV and fix what the checker finds. Download SVG, PNG, PDF or an interactive HTML page. Everything runs in the page. Nothing is uploaded. The interface is in nine languages. Drop a GeoJSON or TopoJSON file next to the table to draw your own boundaries.
 
 </details>
 
@@ -136,7 +136,7 @@ A spec is a small JSON file:
 }
 ```
 
-`render` writes `map.svg`, `map.png`, optionally `map.pdf` and `map.html`, and `map.check.json`. The report lists what matched, the class edges and every finding. See [docs/usage.md](docs/usage.md) for the full walk-through and [docs/config.md](docs/config.md) for the fields.
+`render` writes `map.svg`, `map.png`, optionally `map.pdf` and `map.html`, and `map.check.json`. The report lists what matched, the class edges and every finding. See [docs/usage.md](docs/usage.md) for the walk-through and [docs/config.md](docs/config.md) for the fields.
 
 ## Maps and regions
 
@@ -180,7 +180,7 @@ The agent sessions are a small sample: two prompts, two agents, two runs each. R
 - Fonts cover each language's common characters (5,401 Big5 level 1 characters for Traditional Chinese, for example). Characters outside that set return `glyphs-missing`. Scripts that run right to left or need shaping aren't supported.
 - In the US map, Alaska is drawn at 35 percent of the lower 48 scale. Areas are comparable inside each piece.
 - Labels use a greedy placer. Dense maps leave some out, and the report counts them.
-- Your own boundaries are drawn as given, without simplification. Files with millions of vertices draw slowly. Coordinates must be longitude and latitude. `--fix` needs a population property in the file to divide raw counts.
+- Your own boundaries are drawn as given. A very large file is slow and needs a lot of memory. Simplify it first, for example with mapshaper. Coordinates must be longitude and latitude. `--fix` needs a population property in the file before it can divide raw counts.
 
 ## More
 

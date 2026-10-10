@@ -94,7 +94,7 @@
     },
     "empty-class": {
       "message": "Klasse {index} enthält kein Gebiet.",
-      "reason": "Ein Legendeneintrag, den nichts verwendet, deutet darauf hin, dass die Grenzen nicht zu den Daten passen."
+      "reason": "Ein Legendeneintrag, in den kein Gebiet fällt, deutet darauf hin, dass die Grenzen nicht zu den Daten passen."
     },
     "skewed-classes": {
       "message": "{percent} % der Gebiete fallen in eine einzige Klasse.",
@@ -106,7 +106,7 @@
     },
     "cvd-separation": {
       "message": "Farben der Palette {palette} kommen sich für manche Menschen mit Farbsehschwäche bis auf CIEDE2000 {worst} nahe.",
-      "reason": "Etwa 1 von 12 Männern kann einige dieser Farben nicht unterscheiden. Benachbarte Klassen brauchen einen Unterschied von mindestens 3, 5 ist komfortabel (8 bei Kategorien)."
+      "reason": "Etwa 1 von 12 Männern kann einige dieser Farben nicht unterscheiden. Benachbarte Klassen brauchen einen Unterschied von mindestens 2,5, 4 ist komfortabel (4 und 8 bei Kategorien)."
     },
     "diverging-center": {
       "message": "Die divergierende Palette {palette} braucht einen Mittelwert.",
@@ -124,7 +124,7 @@
     "values-skipped": {
       "message": "{count} Zeilen erreichten ein Gebiet, wurden aber ausgelassen, weil eine Zelle keine Zahl ist oder der Nenner eines Wertes fehlt oder null ist (zum Beispiel {example}).",
       "message_one": "{count} Zeile erreichte ein Gebiet, wurde aber ausgelassen, weil eine Zelle keine Zahl ist oder der Nenner eines Wertes fehlt oder null ist (zum Beispiel {example}).",
-      "reason": "Eine ausgelassene Zeile verändert den Wert ihres Gebiets, ohne dass die Karte es zeigt. Korrigiere die Zelle oder nimm die Lücke hin und sage es in der Notiz."
+      "reason": "Eine ausgelassene Zeile verändert den Wert ihres Gebiets, ohne dass die Karte es zeigt. Korrigieren Sie die Zelle oder akzeptieren Sie die Lücke und nennen Sie das in der Anmerkung."
     },
     "no-data-share": {
       "message": "{count} von {total} Gebieten ({percent} %) haben keinen Wert.",
@@ -326,7 +326,8 @@
       "loading": "Zeichne...",
       "failed": "Diese Karte konnte nicht gezeichnet werden: {detail}",
       "expand": "Vergrößern",
-      "close": "Schließen"
+      "close": "Schließen",
+      "demo": "Dieses Beispiel ist absichtlich schlecht gezeichnet: Vier Regeln halten es auf."
     },
     "footer": {
       "note": "Open Source, MIT-Lizenz. Alles läuft in Ihrem Browser, nichts wird hochgeladen."

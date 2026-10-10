@@ -105,6 +105,14 @@ export function normalizeSpec(input) {
     return value;
   };
 
+  const isObject = (v) => v !== null && typeof v === "object" && !Array.isArray(v);
+  /** An optional object field. A string or a number there would otherwise be spread into the spec as letters. */
+  const objectField = (value, path) => {
+    if (value === undefined) return {};
+    if (isObject(value)) return value;
+    bad(path, "must be an object");
+    return {};
+  };
   const region = oneOf(input.region, [...REGION_IDS, "custom"], "region", "world");
   const boundaries = input.boundaries;
   if (region === "custom") {
@@ -168,8 +176,9 @@ export function normalizeSpec(input) {
   if (Array.isArray(data.value) && type !== "small-multiples")
     bad("data.value", 'a list of columns is only for type "small-multiples"');
 
-  const classes = { method: "quantile", count: 5, ...(input.classes ?? {}) };
-  unknown("classes.", input.classes, KEYS.classes);
+  const classesInput = objectField(input.classes, "classes");
+  const classes = { method: "quantile", count: 5, ...classesInput };
+  unknown("classes.", classesInput, KEYS.classes);
   if (!METHODS.includes(classes.method)) bad("classes.method", `must be one of: ${METHODS.join(", ")}`);
   if (!Number.isInteger(classes.count) || classes.count < 2) bad("classes.count", "must be an integer of at least 2");
   if (classes.method === "manual" || classes.breaks !== undefined) {
@@ -205,20 +214,41 @@ export function normalizeSpec(input) {
   if (!language)
     bad("language", "must be one of: en, zh-Hant (zh-TW), zh-Hans (zh-CN), ja, ko, es, fr, de, pt (pt-BR)");
 
-  const labels = typeof input.labels === "string" ? { show: input.labels } : { show: "auto", ...(input.labels ?? {}) };
+  const labels =
+    typeof input.labels === "string"
+      ? { show: input.labels }
+      : { show: "auto", ...(input.labels === undefined ? {} : objectField(input.labels, "labels")) };
   if (!["auto", "none", "all"].includes(labels.show)) bad("labels", 'must be "auto", "none" or "all"');
 
-  const size = { width: 1200, ...(input.size ?? {}) };
+  const size = { width: 1200, ...objectField(input.size, "size") };
   if (!(size.width >= 320 && size.width <= 6000)) bad("size.width", "must be between 320 and 6000 pixels");
   if (size.height !== undefined && !(size.height >= 200 && size.height <= 8000))
     bad("size.height", "must be between 200 and 8000 pixels");
 
-  const symbols = input.symbols ?? {};
+  const symbols = objectField(input.symbols, "symbols");
   if (symbols.color !== undefined && !/^#[0-9a-f]{6}$/i.test(symbols.color))
     bad("symbols.color", "must be a #rrggbb colour");
   if (symbols.maxRadius !== undefined && !(symbols.maxRadius >= 4 && symbols.maxRadius <= 200))
     bad("symbols.maxRadius", "must be between 4 and 200 pixels");
   const theme = oneOf(input.theme, ["light", "dark"], "theme", "light");
+  if (input.center !== undefined && !Number.isFinite(input.center)) bad("center", "must be a number, for example 0");
+  if (input.grid !== undefined && typeof input.grid !== "boolean") bad("grid", "must be true or false");
+  if (input.highlight !== undefined && !Array.isArray(input.highlight))
+    bad("highlight", "must be a list of area names or ids");
+  if (input.panels !== undefined && !Array.isArray(input.panels)) bad("panels", "must be a list of objects");
+  if (input.columns !== undefined && !(Number.isInteger(input.columns) && input.columns >= 1 && input.columns <= 4))
+    bad("columns", "must be a whole number from 1 to 4");
+  if (input.attribution !== undefined && typeof input.attribution !== "boolean")
+    bad("attribution", "must be true or false");
+  for (const field of ["key", "keyType", "label", "file", "csv", "encoding"])
+    if (data[field] !== undefined && typeof data[field] !== "string") bad(`data.${field}`, "must be a string");
+  if (data.rows !== undefined && !Array.isArray(data.rows)) bad("data.rows", "must be a list of objects");
+  if (
+    data.value !== undefined &&
+    typeof data.value !== "string" &&
+    !(Array.isArray(data.value) && data.value.every((v) => typeof v === "string"))
+  )
+    bad("data.value", "must be a column name, or a list of names for small multiples");
   const allow = input.checks?.allow ?? [];
   if (!Array.isArray(allow)) bad("checks.allow", "must be a list of rule ids");
 
@@ -237,7 +267,7 @@ export function normalizeSpec(input) {
     projection,
     language: language || "en",
     labels,
-    legend: { ...(input.legend ?? {}) },
+    legend: { ...objectField(input.legend, "legend") },
     size,
     theme,
     grid: Boolean(input.grid),
