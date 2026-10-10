@@ -1,6 +1,6 @@
 # Install
 
-Graticule is an agent skill and a command line program in one folder. It needs Node 20 or newer. It never uses the network when it draws.
+Graticule is an agent skill and a command line program in one folder. It needs Node 20 or newer. It never uses the network when it draws. The unit tests run on Linux with Node 20, 22 and 24, and on Windows and macOS with Node 22, on every push.
 
 ## As a skill for a coding agent
 

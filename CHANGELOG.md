@@ -1,5 +1,11 @@
 # Changelog
 
+## 0.3.3 (2026-10-11)
+
+- An area named over two columns joins: `data.key` may be a list such as `["county", "state"]`, joined as `Mohave, AZ`. A county column next to a column called `state` is found without being listed, by `join`, `init` (`--key county,state` names the pair), the spec and the playground, where it also decides the region over a bare state column.
+- A CSV with only a header row says so.
+- The unit tests run on Windows and macOS as well as Linux on every push.
+
 ## 0.3.2 (2026-10-11)
 
 - The command line no longer crashes or stays silent on bad input. A spec field of the wrong type (a text `center`, a text `size`, `grid`, `highlight`, `columns`, `data.key` and others) is named. A rule id with a typo in `--allow` or `checks.allow` is an error. Unknown options are refused. `--dpi` must be between 24 and 600. An Excel workbook, an image or another binary file is named instead of being read as a table. The closing line suggests `--fix` only when a rule has a repair, and an internal error says it is a bug and where to report it.

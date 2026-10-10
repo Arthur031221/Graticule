@@ -158506,7 +158506,7 @@ function nodeAssets(root = findAssetRoot()) {
 }
 
 // src/version.js
-var VERSION = "0.3.2";
+var VERSION = "0.3.3";
 
 // src/report.js
 var MAX_LISTED = 12;
