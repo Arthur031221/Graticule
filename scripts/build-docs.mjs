@@ -97,7 +97,7 @@ Not in the table: \`custom\` draws boundaries from your own GeoJSON or TopoJSON 
 - **us-states** and **us-counties** use Albers with Alaska, Hawaii and Puerto Rico moved below the lower 48. Alaska is drawn at 35 percent of the scale of the lower 48, so areas are comparable inside each piece and not between Alaska and the rest. American Samoa, Guam, the Northern Mariana Islands and the US Virgin Islands are not drawn. Population is the Census Bureau estimate for 2023 (July 1).
 - **tw-counties** and **tw-towns** use a Lambert azimuthal equal-area projection centred on Taiwan. Kinmen and Lienchiang (Matsu) are shown as insets, each with its own projection. Wuqiu, a part of Kinmen County far from Kinmen, is not drawn. Township names exist in English and Traditional Chinese only, so other label languages fall back to those.
 - **jp-prefectures** shows Okinawa as an inset. Islands south of 30 degrees north other than Okinawa (Amami, Ogasawara) are not drawn.
-- **kr-provinces** covers South Korea.
+- **kr-provinces** covers South Korea. Population is bundled for Taiwan (end of 2023), Japan and South Korea (2020 census), so \`--fix\` divides raw counts there too. Sources are in [data.md](data.md).
 - Boundaries are drawn as Natural Earth, the US Census Bureau and the Taiwan Ministry of the Interior publish them. Graticule takes no position on disputed borders.
 
 ## Projections

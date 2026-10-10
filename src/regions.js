@@ -147,6 +147,7 @@ export const REGIONS = {
     insets: taiwanInsets((code) => ({ ids: [code] })),
     keys: ["code", "name"],
     title: "Taiwan, counties and cities (Ministry of the Interior)",
+    population: true,
   },
   "tw-towns": {
     file: "tw-towns.json",
@@ -157,6 +158,7 @@ export const REGIONS = {
     insets: taiwanInsets((code) => ({ county: [code] })),
     keys: ["code", "name"],
     title: "Taiwan, townships and districts (Ministry of the Interior)",
+    population: true,
   },
   "jp-prefectures": {
     file: "jp-prefectures.json",
@@ -174,6 +176,7 @@ export const REGIONS = {
     ],
     keys: ["iso", "jis", "name"],
     title: "Japan, prefectures (Natural Earth 1:10m)",
+    population: true,
   },
   "kr-provinces": {
     file: "kr-provinces.json",
@@ -182,6 +185,7 @@ export const REGIONS = {
     projection: { name: "conic-equal-area", parallels: [33, 38], rotate: [-127.5, 0], center: [0, 36] },
     keys: ["iso", "name"],
     title: "South Korea, provinces and metropolitan cities (Natural Earth 1:10m)",
+    population: true,
   },
 };
 

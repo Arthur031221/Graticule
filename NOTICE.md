@@ -6,6 +6,7 @@ Graticule is MIT licensed (see LICENSE). It bundles or derives from the work bel
 
 - Natural Earth, public domain. Country, Japan prefecture and South Korea province boundaries and names. https://www.naturalearthdata.com
 - US Census Bureau cartographic boundary files, 2017 edition, public domain, redistributed as TopoJSON by us-atlas (ISC, Mike Bostock). Population estimates for 2023 from the Census Bureau, public domain.
+- Population of Taiwan counties and townships: Ministry of the Interior household registration, end of 2023, Open Government Data License 1.0. Population of Japanese prefectures: Statistics Bureau of Japan, 2020 Census. Population of South Korean provinces: Statistics Korea, 2020 Census. `scripts/add-population.mjs` fetches and checks them.
 - Taiwan Ministry of the Interior boundary files for counties, cities and townships, published under the Open Government Data License 1.0 (compatible with CC BY 4.0), redistributed as TopoJSON by taiwan-atlas 2021.9.20 (MIT, Daniel Kao).
 
 ## Fonts

@@ -375,3 +375,28 @@ for (const query of ["/", "/?example=life-expectancy"]) {
     expect(await page.evaluate(() => window.shift)).toBeLessThan(0.05);
   });
 }
+
+test("raw counts for Taiwan counties are blocked and one click divides them by population", async ({ page }) => {
+  await page.goto("/");
+  const rows = [
+    "Taipei City",
+    "New Taipei City",
+    "Taoyuan City",
+    "Taichung City",
+    "Tainan City",
+    "Kaohsiung City",
+    "Yilan County",
+    "Hualien County",
+  ];
+  const csv = ["county,cases", ...rows.map((name, i) => `${name},${1000 + i * 250}`)].join("\n");
+  await page.locator("#file").setInputFiles({ name: "cases.csv", mimeType: "text/csv", buffer: Buffer.from(csv) });
+  await expect(page.locator("#region")).toHaveValue("tw-counties");
+  await page.fill("#title", "Cases");
+  await page.fill("#source", "Made up");
+  await page.selectOption("#kind", "count");
+  await expect(page.locator("#stage-note")).toContainText("raw-counts");
+  await page.locator("#stage-note .btn.primary").click();
+  await expect(svg(page)).toBeVisible();
+  await expect(svg(page)).toContainText("per");
+  await expect(page.locator("#findings")).toContainText("Fixed:");
+});

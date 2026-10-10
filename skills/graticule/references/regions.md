@@ -13,10 +13,10 @@ Generated from the code by scripts/build-docs.mjs.
 | `oceania` | country | azimuthal-equal-area | iso3, iso2, isonum, name | yes |
 | `us-states` | state | albers-usa | fips, postal, name | yes |
 | `us-counties` | county | albers-usa | fips | yes |
-| `tw-counties` | county | azimuthal-equal-area | code, name | no |
-| `tw-towns` | town | azimuthal-equal-area | code, name | no |
-| `jp-prefectures` | prefecture | conic-equal-area | iso, jis, name | no |
-| `kr-provinces` | province | conic-equal-area | iso, name | no |
+| `tw-counties` | county | azimuthal-equal-area | code, name | yes |
+| `tw-towns` | town | azimuthal-equal-area | code, name | yes |
+| `jp-prefectures` | prefecture | conic-equal-area | iso, jis, name | yes |
+| `kr-provinces` | province | conic-equal-area | iso, name | yes |
 
 Key types: `iso3`, `iso2` and `isonum` are ISO 3166-1 codes, `fips` are US FIPS codes (a county code is five digits and a missing leading zero is added back), `postal` is the US state abbreviation, `code` is the Taiwan Ministry of the Interior code, `iso` is ISO 3166-2 such as JP-13, `jis` is the Japanese prefecture number, `name` is any spelling in the nine label languages plus common aliases: World Bank, UN, IMF, WHO and everyday names for countries, and for the other regions the Associated Press state abbreviations (`Calif.`, `N.Y.`), Taiwan county names from before 2014 and bare city names (`Taipei`, `New Taipei`), the Korean provinces renamed in 2023 and 2024 and romanised Japanese suffixes (`Osaka-fu`, `Fukuoka-ken`). A name that fits two areas, such as `Chiayi`, is reported, never guessed.
 
@@ -28,7 +28,7 @@ Not in the table: `custom` draws boundaries from your own GeoJSON or TopoJSON fi
 - **us-states** and **us-counties** use Albers with Alaska, Hawaii and Puerto Rico moved below the lower 48. Alaska is drawn at 35 percent of the scale of the lower 48, so areas are comparable inside each piece and not between Alaska and the rest. American Samoa, Guam, the Northern Mariana Islands and the US Virgin Islands are not drawn. Population is the Census Bureau estimate for 2023 (July 1).
 - **tw-counties** and **tw-towns** use a Lambert azimuthal equal-area projection centred on Taiwan. Kinmen and Lienchiang (Matsu) are shown as insets, each with its own projection. Wuqiu, a part of Kinmen County far from Kinmen, is not drawn. Township names exist in English and Traditional Chinese only, so other label languages fall back to those.
 - **jp-prefectures** shows Okinawa as an inset. Islands south of 30 degrees north other than Okinawa (Amami, Ogasawara) are not drawn.
-- **kr-provinces** covers South Korea.
+- **kr-provinces** covers South Korea. Population is bundled for Taiwan (end of 2023), Japan and South Korea (2020 census), so `--fix` divides raw counts there too. Sources are in [data.md](data.md).
 - Boundaries are drawn as Natural Earth, the US Census Bureau and the Taiwan Ministry of the Interior publish them. Graticule takes no position on disputed borders.
 
 ## Projections
