@@ -27,6 +27,23 @@ jobs:
       - run: npm run typecheck
       - run: npm test
 
+  portable:
+    name: Unit tests, ${{ matrix.os }}
+    runs-on: ${{ matrix.os }}
+    strategy:
+      fail-fast: false
+      matrix:
+        os: [windows-latest, macos-latest]
+    steps:
+      - run: git config --global core.autocrlf false
+      - uses: actions/checkout@v4
+      - uses: actions/setup-node@v4
+        with:
+          node-version: 22
+          cache: npm
+      - run: npm ci
+      - run: npm test
+
   generated:
     name: Generated files are current
     runs-on: ubuntu-latest
