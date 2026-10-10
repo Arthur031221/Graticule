@@ -34,6 +34,8 @@ Open https://arthur031221.github.io/Graticule/. Nothing is installed and nothing
 
 ## Check that it works
 
+`graticule` below stands for the program. After `npx skills add` it is `node .agents/skills/graticule/scripts/graticule.mjs` (the folder your agent reads may have another name), and from a clone it is `node skills/graticule/scripts/graticule.mjs`. With npx, write `npx -y github:Arthur031221/Graticule` in its place.
+
 ```
 graticule rules
 graticule join table.csv --region world

@@ -183,6 +183,7 @@ async function commandRender(args, assets, check) {
       files.push(`${base}.spec.json`);
     }
     await writeFile(`${base}.check.json`, JSON.stringify({ ...summary, files }, null, 2) + "\n");
+    files.push(`${base}.check.json`);
   }
   if (check && args.flags.write && result.fixes.length && !result.blocked) {
     await writeFile(specPath, JSON.stringify(result.spec, null, 2) + "\n");
