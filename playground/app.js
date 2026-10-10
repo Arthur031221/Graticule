@@ -554,6 +554,7 @@ async function setTable(text, { keepSpec = false } = {}) {
   state.csv = text;
   state.table = table;
   if (!keepSpec) {
+    setStatus(ui("checks.pending"));
     const found = await detectKey(table);
     if (run !== tableRun) return false;
     if (found.region && found.region !== state.spec.region) {
