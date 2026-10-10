@@ -110,7 +110,7 @@ test("init takes the column of names as the key, not a column of numbers that lo
     assert.deepEqual([data.key, data.keyType, data.value], ["state", "name", "electoral_votes"]);
   }
   const join_ = await graticule("join", join(out, "votes.csv"), "--region", "us-states");
-  assert.match(join_.stdout, /column "state" matches 3 areas/);
+  assert.match(join_.stdout, /column "state" matches 6 areas/);
 });
 
 test("join and init read a table that is not UTF-8: a note on stderr, or --encoding", async () => {

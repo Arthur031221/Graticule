@@ -1,5 +1,5 @@
 {
-  "_comment": "Country name variants used by the World Bank, the United Nations, the IMF, OWID and everyday speech. Each maps to an ISO 3166-1 alpha-3 code. Names are matched after normalisation.",
+  "_comment": "Country name variants used by the World Bank, the United Nations, the IMF, OWID and everyday speech. Each maps to an ISO 3166-1 alpha-3 code. Names are matched after normalisation. The regions block does the same for other regions: common spellings that the boundary data does not carry (US Associated Press abbreviations, Taiwanese county names before 2014 and bare city names, Korean provinces renamed in 2023 and 2024, romanised Japanese suffixes), each mapped to an area id. A name that fits two areas, such as Chiayi or Hsinchu, is left out on purpose.",
   "country": {
     "Bahamas, The": "BHS", "The Bahamas": "BHS", "Bahamas": "BHS",
     "Brunei Darussalam": "BRN", "Brunei": "BRN",
@@ -76,5 +76,47 @@
     "Somalia": "SOM",
     "Somaliland": "SOL",
     "Fr. Polynesia": "PYF", "French Polynesia": "PYF"
+  },
+  "regions": {
+    "us-states": {
+      "Ala.": "01", "Ariz.": "04", "Ark.": "05", "Calif.": "06", "Colo.": "08", "Conn.": "09", "Del.": "10", "D.C.": "11",
+      "Washington, D.C.": "11", "Washington D.C.": "11", "Fla.": "12", "Ga.": "13", "Ill.": "17", "Ind.": "18", "Kan.": "20",
+      "Ky.": "21", "La.": "22", "Md.": "24", "Mass.": "25", "Mich.": "26", "Minn.": "27", "Miss.": "28", "Mo.": "29", "Mont.": "30",
+      "Neb.": "31", "Nev.": "32", "N.H.": "33", "N.J.": "34", "N.M.": "35", "N.Y.": "36", "N.C.": "37", "N.D.": "38", "Okla.": "40",
+      "Ore.": "41", "Pa.": "42", "Penn.": "42", "R.I.": "44", "S.C.": "45", "S.D.": "46", "Tenn.": "47", "Tex.": "48",
+      "Vt.": "50", "Va.": "51", "Wash.": "53", "W.Va.": "54", "Wis.": "55", "Wyo.": "56", "P.R.": "72"
+    },
+    "tw-counties": {
+      "桃園縣": "68000", "桃园县": "68000", "Taoyuan County": "68000", "Taoyuan": "68000", "桃園": "68000", "臺北縣": "65000", "台北縣": "65000",
+      "台北县": "65000", "Taipei County": "65000", "New Taipei": "65000", "新北": "65000", "Xinbei": "65000", "Taipei": "63000",
+      "台北": "63000", "臺北": "63000", "Taibei": "63000", "Kaohsiung": "64000", "高雄": "64000", "Gaoxiong": "64000", "Taichung": "66000",
+      "台中": "66000", "臺中": "66000", "Taizhong": "66000", "Tainan": "67000", "台南": "67000", "臺南": "67000", "Yilan": "10002",
+      "Hualien": "10015", "Hualian": "10015", "Taitung": "10014", "Taidong": "10014", "Penghu": "10016", "Kinmen": "09020",
+      "Quemoy": "09020", "Jinmen": "09020", "Lienchiang": "09007", "Matsu": "09007", "馬祖": "09007", "Lianjiang": "09007",
+      "Keelung": "10017", "Jilong": "10017", "Miaoli": "10005", "Changhua": "10007", "Zhanghua": "10007", "Nantou": "10008",
+      "Yunlin": "10009", "Pingtung": "10013", "Pingdong": "10013"
+    },
+    "kr-provinces": {
+      "강원특별자치도": "KR-42", "Gangwon State": "KR-42", "Gangwon Special Self-Governing Province": "KR-42", "전북특별자치도": "KR-45",
+      "전북": "KR-45", "Jeonbuk": "KR-45", "Jeonbuk State": "KR-45", "Jeonbuk Special Self-Governing Province": "KR-45",
+      "North Jeolla Province": "KR-45", "전남": "KR-46", "Jeonnam": "KR-46", "South Jeolla Province": "KR-46", "경북": "KR-47",
+      "Gyeongbuk": "KR-47", "North Gyeongsang Province": "KR-47", "경남": "KR-48", "Gyeongnam": "KR-48", "South Gyeongsang Province": "KR-48",
+      "충북": "KR-43", "Chungbuk": "KR-43", "North Chungcheong Province": "KR-43", "충남": "KR-44", "Chungnam": "KR-44", "South Chungcheong Province": "KR-44",
+      "제주도": "KR-49", "Jeju Island": "KR-49", "Jeju Special Self-Governing Province": "KR-49", "Gyeonggi Province": "KR-41",
+      "Seoul Special City": "KR-11", "Busan Metropolitan City": "KR-26", "Daegu Metropolitan City": "KR-27", "Incheon Metropolitan City": "KR-28",
+      "Gwangju Metropolitan City": "KR-29", "Daejeon Metropolitan City": "KR-30", "Ulsan Metropolitan City": "KR-31", "Sejong Special Self-Governing City": "KR-50"
+    },
+    "jp-prefectures": {
+      "Kagoshima-ken": "JP-46", "Ōita-ken": "JP-44", "Fukuoka-ken": "JP-40", "Saga-ken": "JP-41", "Nagasaki-ken": "JP-42",
+      "Kumamoto-ken": "JP-43", "Miyazaki-ken": "JP-45", "Tokushima-ken": "JP-36", "Kagawa-ken": "JP-37", "Ehime-ken": "JP-38",
+      "Kōchi-ken": "JP-39", "Shimane-ken": "JP-32", "Yamaguchi-ken": "JP-35", "Tottori-ken": "JP-31", "Hyōgo-ken": "JP-28",
+      "Fukui-ken": "JP-18", "Ishikawa-ken": "JP-17", "Toyama-ken": "JP-16", "Niigata-ken": "JP-15", "Yamagata-ken": "JP-06",
+      "Akita-ken": "JP-05", "Aomori-ken": "JP-02", "Iwate-ken": "JP-03", "Miyagi-ken": "JP-04", "Fukushima-ken": "JP-07",
+      "Ibaraki-ken": "JP-08", "Chiba-ken": "JP-12", "Kanagawa-ken": "JP-14", "Shizuoka-ken": "JP-22", "Aichi-ken": "JP-23",
+      "Mie-ken": "JP-24", "Wakayama-ken": "JP-30", "Okayama-ken": "JP-33", "Hiroshima-ken": "JP-34", "Okinawa-ken": "JP-47",
+      "Gunma-ken": "JP-10", "Nagano-ken": "JP-20", "Tochigi-ken": "JP-09", "Gifu-ken": "JP-21", "Shiga-ken": "JP-25", "Saitama-ken": "JP-11",
+      "Yamanashi-ken": "JP-19", "Nara-ken": "JP-29", "Tokyo-to": "JP-13", "Tokyo Metropolis": "JP-13", "Tokyo Prefecture": "JP-13",
+      "Osaka-fu": "JP-27", "Kyoto-fu": "JP-26", "Hokkaido Prefecture": "JP-01"
+    }
   }
 }

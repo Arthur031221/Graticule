@@ -78,8 +78,11 @@ export function suggest(value, candidates, limit = 2) {
   if (key.length < 3) return [];
   const best = new Map();
   for (const [norm, label] of candidates) {
-    if (Math.abs(norm.length - key.length) > 4) continue;
-    const distance = editDistance(key, norm);
+    // Names are normalised without spaces, so "Chiayi" starts both "chiayicity" and "chiayicounty".
+    const prefix =
+      key.length >= 4 && norm.length > key.length && norm.startsWith(key) && norm.length - key.length <= 12;
+    if (!prefix && Math.abs(norm.length - key.length) > 4) continue;
+    const distance = prefix ? 1 : editDistance(key, norm);
     if (distance <= Math.max(2, Math.floor(key.length * 0.25)) && distance < (best.get(label) ?? Infinity))
       best.set(label, distance);
   }

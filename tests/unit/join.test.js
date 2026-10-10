@@ -1,14 +1,13 @@
 import assert from "node:assert/strict";
 import { test } from "node:test";
 import { loadAreas } from "../../src/geo.js";
-import { buildIndex, detectKind, joinKeys, rankKeyColumns } from "../../src/join.js";
+import { buildIndex, detectKind, joinKeys, loadAliases, rankKeyColumns } from "../../src/join.js";
 import { damagedNamePattern, normalizeName, suggest } from "../../src/names.js";
 import { assets } from "./helpers.js";
 
 async function indexFor(region) {
   const { areas, region: def } = await loadAreas(region, assets);
-  const aliases = def.level === "country" ? (await assets.json("data/aliases.json")).country : {};
-  return { index: buildIndex(areas, aliases), order: def.keys };
+  return { index: buildIndex(areas, await loadAliases(region, def, assets)), order: def.keys };
 }
 
 const world = await indexFor("world");
@@ -213,4 +212,69 @@ test("a requested key kind decides which column is the key", () => {
   assert.equal(rankKeyColumns(columns, rows, world.index, world.order)[0].column, "iso3");
   const forced = rankKeyColumns(columns, rows, world.index, world.order, { kind: "iso2" })[0];
   assert.deepEqual([forced.column, forced.kind], ["iso2", "iso2"]);
+});
+
+test("Associated Press state abbreviations join the right US state", async () => {
+  const us = await indexFor("us-states");
+  const pairs = {
+    "Calif.": "06",
+    "N.Y.": "36",
+    "Fla.": "12",
+    "W.Va.": "54",
+    "Wash.": "53",
+    "Mich.": "26",
+    "D.C.": "11",
+  };
+  for (const [name, id] of Object.entries(pairs))
+    assert.deepEqual(idsOf(joinKeys([name], us.index, "name")), [id], name);
+  assert.equal(joinKeys(["Washington"], us.index, "name").rowsByArea.size, 1);
+});
+
+test("Taiwan county names from before 2014 and bare city names join, Chiayi and Hsinchu are never guessed", async () => {
+  const tw = await indexFor("tw-counties");
+  const pairs = {
+    桃園縣: "68000",
+    臺北縣: "65000",
+    Taipei: "63000",
+    "New Taipei": "65000",
+    Kaohsiung: "64000",
+    Matsu: "09007",
+  };
+  for (const [name, id] of Object.entries(pairs))
+    assert.deepEqual(idsOf(joinKeys([name], tw.index, "name")), [id], name);
+  const result = joinKeys(["Chiayi", "Hsinchu"], tw.index, "name");
+  assert.equal(result.rowsByArea.size, 0);
+  assert.deepEqual(
+    result.unmatched.map((u) => u.value),
+    ["Chiayi", "Hsinchu"],
+  );
+  assert.ok(result.unmatched[0].suggestions.length >= 2);
+});
+
+test("Korean provinces renamed in 2023 and 2024 and Japanese suffix spellings join", async () => {
+  const kr = await indexFor("kr-provinces");
+  assert.deepEqual(idsOf(joinKeys(["강원특별자치도", "Gangwon State"], kr.index, "name")), ["KR-42"]);
+  assert.deepEqual(idsOf(joinKeys(["전북특별자치도", "Jeonbuk"], kr.index, "name")), ["KR-45"]);
+  const jp = await indexFor("jp-prefectures");
+  assert.deepEqual(idsOf(joinKeys(["Tokyo-to", "Tokyo Metropolis"], jp.index, "name")), ["JP-13"]);
+  assert.deepEqual(idsOf(joinKeys(["Osaka-fu", "Kyoto-fu", "Fukuoka-ken"], jp.index, "name")).sort(), [
+    "JP-26",
+    "JP-27",
+    "JP-40",
+  ]);
+});
+
+test("every regional alias points at an area of its region and no alias is claimed twice", async () => {
+  const file = await assets.json("data/aliases.json");
+  const { normalizeName } = await import("../../src/names.js");
+  for (const [regionId, table] of Object.entries(file.regions)) {
+    const { index } = await indexFor(regionId);
+    const seen = new Map();
+    for (const [alias, id] of Object.entries(table)) {
+      assert.ok(index.byId.has(id), `${regionId}: ${alias} points at ${id}`);
+      const key = normalizeName(alias);
+      assert.ok(!seen.has(key) || seen.get(key) === id, `${regionId}: ${alias} is claimed by two areas`);
+      seen.set(key, id);
+    }
+  }
 });

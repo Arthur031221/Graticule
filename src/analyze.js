@@ -1,6 +1,6 @@
 import { geoBounds } from "d3-geo";
 import { loadAreas } from "./geo.js";
-import { buildIndex, detectKind, joinKeys, kindsOf, rankKeyColumns } from "./join.js";
+import { buildIndex, detectKind, joinKeys, kindsOf, loadAliases, rankKeyColumns } from "./join.js";
 import { isNull, parseColumn, parseTable } from "./csv.js";
 import { breaksFor, classOf, equalEdges, equalEdgesAround, niceEdges, spearman } from "./classify.js";
 import { paletteColors, paletteType } from "./palettes.js";
@@ -66,7 +66,7 @@ export async function analyze(input, ctx) {
   if (!spec || specFindings.some((f) => f.level === "error")) return { spec, findings, ok: false };
 
   const { areas, borders, region } = await loadAreas(spec.region, ctx.assets);
-  const aliases = region.level === "country" ? (await ctx.assets.json("data/aliases.json")).country : {};
+  const aliases = await loadAliases(spec.region, region, ctx.assets);
   const index = buildIndex(areas, aliases);
   const analysis = {
     spec,

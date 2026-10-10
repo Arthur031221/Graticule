@@ -19,7 +19,7 @@ function normalizeCode(kind, value) {
  * Builds the lookup tables for a region. Country aliases come from
  * data/aliases.json; every other spelling comes from the boundary data.
  * @param {Area[]} areas
- * @param {Record<string, string>} [aliases] alias to ISO 3166-1 alpha-3
+ * @param {Record<string, string>} [aliases] alias to ISO 3166-1 alpha-3 (countries) or area id
  * @returns {Index}
  */
 export function buildIndex(areas, aliases = {}) {
@@ -42,11 +42,24 @@ export function buildIndex(areas, aliases = {}) {
     }
   }
   const byIso3 = new Map(areas.map((a) => [a.keys.iso3?.[0], a]));
-  for (const [alias, iso3] of Object.entries(aliases)) {
-    const area = byIso3.get(iso3);
+  for (const [alias, target] of Object.entries(aliases)) {
+    const area = byIso3.get(target) ?? index.byId.get(target);
     if (area) add("name", normalizeName(alias), { area, via: "alias" });
   }
   return index;
+}
+
+/**
+ * The alias table of a region from data/aliases.json: country names point at
+ * ISO 3166-1 alpha-3 codes, the names of other regions at area ids.
+ * @param {string} regionId
+ * @param {{ level: string }} region
+ * @param {{ json: (path: string) => Promise<any> }} assets
+ * @returns {Promise<Record<string, string>>}
+ */
+export async function loadAliases(regionId, region, assets) {
+  const file = await assets.json("data/aliases.json");
+  return region.level === "country" ? file.country : (file.regions?.[regionId] ?? {});
 }
 
 /** The key kinds this index can look up. */

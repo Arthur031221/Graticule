@@ -6,7 +6,7 @@ import { decodeBytes, parseTable } from "./csv.js";
 import { exportMap, FORMATS } from "./export.js";
 import { createTranslator } from "./i18n.js";
 import { loadAreas } from "./geo.js";
-import { buildIndex, detectKind, joinKeys, rankKeyColumns } from "./join.js";
+import { buildIndex, detectKind, joinKeys, loadAliases, rankKeyColumns } from "./join.js";
 import { normalizeLang } from "./lang.js";
 import { nodeAssets } from "./node-assets.js";
 import { listPalettes, paletteColors, separation } from "./palettes.js";
@@ -210,7 +210,7 @@ async function commandJoin(args, assets) {
   if (!region) throw new UsageError(`unknown region "${regionId}". Run: graticule regions`);
   const table = await readTable(tablePath, args.flags.encoding && String(args.flags.encoding));
   const { areas } = await loadAreas(regionId, assets);
-  const aliases = region.level === "country" ? (await assets.json("data/aliases.json")).country : {};
+  const aliases = await loadAliases(regionId, region, assets);
   const index = buildIndex(areas, aliases);
   const ranked = rankKeyColumns(table.columns, table.rows, index, region.keys, {
     kind: args.flags["key-type"] && String(args.flags["key-type"]),
@@ -259,7 +259,7 @@ async function commandInit(args, assets) {
   if (!region) throw new UsageError(`unknown region "${regionId}". Run: graticule regions`);
   const table = await readTable(tablePath, args.flags.encoding && String(args.flags.encoding));
   const { areas } = await loadAreas(regionId, assets);
-  const aliases = region.level === "country" ? (await assets.json("data/aliases.json")).country : {};
+  const aliases = await loadAliases(regionId, region, assets);
   const index = buildIndex(areas, aliases);
   const ranked = rankKeyColumns(table.columns, table.rows, index, region.keys, {
     exclude: args.flags.value ? [String(args.flags.value)] : [],

@@ -4,7 +4,7 @@ import { exportMap } from "../src/export.js";
 import { createFontStore } from "../src/fonts.js";
 import { interactions } from "../src/html.js";
 import { createTranslator } from "../src/i18n.js";
-import { buildIndex, rankKeyColumns } from "../src/join.js";
+import { buildIndex, loadAliases, rankKeyColumns } from "../src/join.js";
 import { loadAreas } from "../src/geo.js";
 import { LANGS, normalizeLang } from "../src/lang.js";
 import { listPalettes, paletteColors } from "../src/palettes.js";
@@ -530,7 +530,7 @@ async function detectKey(table) {
   const rows = table.rows.slice(0, 400);
   const topOf = async (id) => {
     const { areas, region } = await loadAreas(id, assets);
-    const aliases = region.level === "country" ? (await assets.json("data/aliases.json")).country : {};
+    const aliases = await loadAliases(id, region, assets);
     return rankKeyColumns(columns, rows, buildIndex(areas, aliases), region.keys)[0];
   };
   if (!state.regionTouched) {

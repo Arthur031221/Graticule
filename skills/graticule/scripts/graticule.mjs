@@ -153627,8 +153627,9 @@ function suggest(value, candidates, limit = 2) {
   if (key.length < 3) return [];
   const best = /* @__PURE__ */ new Map();
   for (const [norm, label] of candidates) {
-    if (Math.abs(norm.length - key.length) > 4) continue;
-    const distance2 = editDistance(key, norm);
+    const prefix = key.length >= 4 && norm.length > key.length && norm.startsWith(key) && norm.length - key.length <= 12;
+    if (!prefix && Math.abs(norm.length - key.length) > 4) continue;
+    const distance2 = prefix ? 1 : editDistance(key, norm);
     if (distance2 <= Math.max(2, Math.floor(key.length * 0.25)) && distance2 < (best.get(label) ?? Infinity))
       best.set(label, distance2);
   }
@@ -153832,11 +153833,15 @@ function buildIndex(areas, aliases = {}) {
     }
   }
   const byIso3 = new Map(areas.map((a) => [a.keys.iso3?.[0], a]));
-  for (const [alias, iso3] of Object.entries(aliases)) {
-    const area = byIso3.get(iso3);
+  for (const [alias, target] of Object.entries(aliases)) {
+    const area = byIso3.get(target) ?? index.byId.get(target);
     if (area) add2("name", normalizeName(alias), { area, via: "alias" });
   }
   return index;
+}
+async function loadAliases(regionId, region, assets) {
+  const file = await assets.json("data/aliases.json");
+  return region.level === "country" ? file.country : file.regions?.[regionId] ?? {};
 }
 function kindsOf(index) {
   return Object.keys(index.kinds);
@@ -155131,7 +155136,7 @@ async function analyze(input, ctx) {
   const findings = [...specFindings];
   if (!spec || specFindings.some((f) => f.level === "error")) return { spec, findings, ok: false };
   const { areas, borders, region } = await loadAreas(spec.region, ctx.assets);
-  const aliases = region.level === "country" ? (await ctx.assets.json("data/aliases.json")).country : {};
+  const aliases = await loadAliases(spec.region, region, ctx.assets);
   const index = buildIndex(areas, aliases);
   const analysis = {
     spec,
@@ -158338,7 +158343,7 @@ async function commandJoin(args, assets) {
   if (!region) throw new UsageError(`unknown region "${regionId}". Run: graticule regions`);
   const table = await readTable(tablePath, args.flags.encoding && String(args.flags.encoding));
   const { areas } = await loadAreas(regionId, assets);
-  const aliases = region.level === "country" ? (await assets.json("data/aliases.json")).country : {};
+  const aliases = await loadAliases(regionId, region, assets);
   const index = buildIndex(areas, aliases);
   const ranked = rankKeyColumns(table.columns, table.rows, index, region.keys, {
     kind: args.flags["key-type"] && String(args.flags["key-type"])
@@ -158381,7 +158386,7 @@ async function commandInit(args, assets) {
   if (!region) throw new UsageError(`unknown region "${regionId}". Run: graticule regions`);
   const table = await readTable(tablePath, args.flags.encoding && String(args.flags.encoding));
   const { areas } = await loadAreas(regionId, assets);
-  const aliases = region.level === "country" ? (await assets.json("data/aliases.json")).country : {};
+  const aliases = await loadAliases(regionId, region, assets);
   const index = buildIndex(areas, aliases);
   const ranked = rankKeyColumns(table.columns, table.rows, index, region.keys, {
     exclude: args.flags.value ? [String(args.flags.value)] : []

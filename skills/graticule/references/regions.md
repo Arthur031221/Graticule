@@ -18,7 +18,7 @@ Generated from the code by scripts/build-docs.mjs.
 | `jp-prefectures` | prefecture | conic-equal-area | iso, jis, name | no |
 | `kr-provinces` | province | conic-equal-area | iso, name | no |
 
-Key types: `iso3`, `iso2` and `isonum` are ISO 3166-1 codes, `fips` are US FIPS codes (a county code is five digits and a missing leading zero is added back), `postal` is the US state abbreviation, `code` is the Taiwan Ministry of the Interior code, `iso` is ISO 3166-2 such as JP-13, `jis` is the Japanese prefecture number, `name` is any spelling in the nine label languages plus common aliases (World Bank, UN, IMF, WHO and everyday names).
+Key types: `iso3`, `iso2` and `isonum` are ISO 3166-1 codes, `fips` are US FIPS codes (a county code is five digits and a missing leading zero is added back), `postal` is the US state abbreviation, `code` is the Taiwan Ministry of the Interior code, `iso` is ISO 3166-2 such as JP-13, `jis` is the Japanese prefecture number, `name` is any spelling in the nine label languages plus common aliases: World Bank, UN, IMF, WHO and everyday names for countries, and for the other regions the Associated Press state abbreviations (`Calif.`, `N.Y.`), Taiwan county names from before 2014 and bare city names (`桃園縣`, `Taipei`), the Korean provinces renamed in 2023 and 2024 and romanised Japanese suffixes (`Osaka-fu`, `Fukuoka-ken`). A name that fits two areas, such as `Chiayi`, is reported, never guessed.
 
 ## Details that matter
 
