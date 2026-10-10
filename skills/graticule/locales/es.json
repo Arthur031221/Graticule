@@ -324,7 +324,9 @@
     "stage": {
       "blocked": "Corrige los errores de la izquierda para ver el mapa.",
       "loading": "Dibujando...",
-      "failed": "No se pudo dibujar este mapa: {detail}"
+      "failed": "No se pudo dibujar este mapa: {detail}",
+      "expand": "Ver más grande",
+      "close": "Cerrar"
     },
     "footer": {
       "note": "Código abierto, licencia MIT. Todo se ejecuta en tu navegador y no se sube nada."

@@ -324,7 +324,9 @@
     "stage": {
       "blocked": "Corrigez les erreurs à gauche pour voir la carte.",
       "loading": "Dessin en cours...",
-      "failed": "Impossible de dessiner cette carte : {detail}"
+      "failed": "Impossible de dessiner cette carte : {detail}",
+      "expand": "Agrandir",
+      "close": "Fermer"
     },
     "footer": {
       "note": "Open source, licence MIT. Tout s'exécute dans votre navigateur et rien n'est envoyé."

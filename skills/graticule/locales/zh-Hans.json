@@ -301,7 +301,9 @@
     "stage": {
       "blocked": "修复左边的错误，就能看到地图。",
       "loading": "绘制中...",
-      "failed": "无法画出这张地图：{detail}"
+      "failed": "无法画出这张地图：{detail}",
+      "expand": "放大查看",
+      "close": "关闭"
     },
     "footer": {
       "note": "开源，MIT 许可。所有运算都在你的浏览器中进行，不会上传任何数据。"

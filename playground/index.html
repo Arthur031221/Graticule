@@ -242,6 +242,19 @@
         <div class="sheet-wrap">
           <div class="sheet" id="sheet" tabindex="-1"></div>
           <div class="stage-note" id="stage-note" role="status"></div>
+          <button class="expand" id="expand" type="button" hidden aria-haspopup="dialog">
+            <svg viewBox="0 0 24 24" width="18" height="18" aria-hidden="true">
+              <path
+                d="M14 4h6v6m0-6-7 7M10 20H4v-6m0 6 7-7"
+                fill="none"
+                stroke="currentColor"
+                stroke-width="1.8"
+                stroke-linecap="round"
+                stroke-linejoin="round"
+              />
+            </svg>
+            <span class="sr" data-i18n="stage.expand">View larger</span>
+          </button>
         </div>
         <div class="join" id="join-summary"></div>
       </section>
@@ -254,6 +267,14 @@
       <a href="gallery/" data-i18n="nav.gallery">Gallery</a>
       <a href="https://github.com/Arthur031221/Graticule" data-i18n="nav.github">GitHub</a>
     </footer>
+    <dialog class="viewer" id="viewer">
+      <div class="viewer-bar">
+        <span id="viewer-title"></span>
+        <button class="btn small" id="viewer-close" type="button" data-i18n="stage.close">Close</button>
+      </div>
+      <div class="viewer-scroll" id="viewer-body" tabindex="0"></div>
+      <div class="tip" id="viewer-tip" hidden></div>
+    </dialog>
     <div class="toast" id="toast" role="status" aria-live="polite" hidden></div>
     <script type="module" src="app.js"></script>
   </body>

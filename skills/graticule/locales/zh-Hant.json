@@ -301,7 +301,9 @@
     "stage": {
       "blocked": "修正左邊的錯誤，就能看到地圖。",
       "loading": "繪製中...",
-      "failed": "無法畫出這張地圖：{detail}"
+      "failed": "無法畫出這張地圖：{detail}",
+      "expand": "放大檢視",
+      "close": "關閉"
     },
     "footer": {
       "note": "開放原始碼，MIT 授權。所有運算都在你的瀏覽器中進行，不會上傳任何資料。"

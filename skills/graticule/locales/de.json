@@ -324,7 +324,9 @@
     "stage": {
       "blocked": "Beheben Sie links die Fehler, um die Karte zu sehen.",
       "loading": "Zeichne...",
-      "failed": "Diese Karte konnte nicht gezeichnet werden: {detail}"
+      "failed": "Diese Karte konnte nicht gezeichnet werden: {detail}",
+      "expand": "Vergrößern",
+      "close": "Schließen"
     },
     "footer": {
       "note": "Open Source, MIT-Lizenz. Alles läuft in Ihrem Browser, nichts wird hochgeladen."

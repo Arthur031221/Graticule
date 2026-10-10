@@ -319,7 +319,9 @@
     "stage": {
       "blocked": "Fix the errors on the left to see the map.",
       "loading": "Drawing...",
-      "failed": "Could not draw this map: {detail}"
+      "failed": "Could not draw this map: {detail}",
+      "expand": "View larger",
+      "close": "Close"
     },
     "footer": {
       "note": "Open source, MIT license. Everything runs in your browser and nothing is uploaded."

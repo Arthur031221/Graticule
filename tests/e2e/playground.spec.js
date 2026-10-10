@@ -400,3 +400,33 @@ test("raw counts for Taiwan counties are blocked and one click divides them by p
   await expect(svg(page)).toContainText("per");
   await expect(page.locator("#findings")).toContainText("Fixed:");
 });
+
+test("on a phone the map opens full screen at a size where labels can be read", async ({ page }) => {
+  await page.setViewportSize({ width: 390, height: 800 });
+  await page.goto("/?example=europe-gdp-per-capita");
+  await expect(svg(page)).toBeVisible();
+  const small = (await svg(page).boundingBox()).width;
+  await page.locator("#expand").click();
+  await expect(page.locator("#viewer")).toBeVisible();
+  const large = (await page.locator("#viewer svg").boundingBox()).width;
+  expect(large).toBeGreaterThan(small * 2);
+  await expect(page.locator("#viewer-title")).toContainText("GDP");
+  await page.locator('#viewer [data-id="DEU"]').first().focus();
+  await expect(page.locator("#viewer-tip")).toContainText("Germany");
+  await page.keyboard.press("Escape");
+  await expect(page.locator("#viewer")).toBeHidden();
+  await page.locator("#expand").click();
+  await page.locator("#viewer-close").click();
+  await expect(page.locator("#viewer")).toBeHidden();
+});
+
+test("the larger view is for small screens only, and not offered for a blocked map", async ({ page }) => {
+  await page.goto("/?example=life-expectancy");
+  await expect(svg(page)).toBeVisible();
+  await expect(page.locator("#expand")).toBeHidden();
+  await page.setViewportSize({ width: 390, height: 800 });
+  await expect(page.locator("#expand")).toBeVisible();
+  await page.fill("#source", "");
+  await expect(page.locator("#stage-note")).toContainText("source-required");
+  await expect(page.locator("#expand")).toBeHidden();
+});

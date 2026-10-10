@@ -684,8 +684,10 @@ async function render() {
       svgEl.removeAttribute("width");
       svgEl.removeAttribute("height");
       interactions(svgEl, tipElement());
+      $("expand").hidden = false;
     } else {
       $("sheet").classList.add("stale");
+      $("expand").hidden = true;
       note.className = "stage-note show";
       showNote(true);
       const errors = result.findings.filter((f) => f.level === "error" && !f.allowed);
@@ -911,6 +913,27 @@ async function fixAll() {
   }
 }
 
+/* Larger view ------------------------------------------------------------- */
+
+/** On a phone the map is small, so it opens full screen at a size where the labels can be read. */
+function openViewer() {
+  const svg = $("sheet").querySelector("svg");
+  if (!svg) return;
+  const copy = svg.cloneNode(true);
+  copy.removeAttribute("style");
+  // The page keeps the original: the copy must not repeat its ids, and names itself instead.
+  copy.removeAttribute("aria-labelledby");
+  copy.querySelectorAll("#graticule-title, #graticule-desc").forEach((node) => node.removeAttribute("id"));
+  const viewer = $("viewer");
+  viewer.style.setProperty("--viewer-width", `${Math.round(Math.max(960, window.innerWidth * 2.4))}px`);
+  $("viewer-title").textContent = svg.querySelector("title")?.textContent ?? "";
+  viewer.setAttribute("aria-label", $("viewer-title").textContent);
+  copy.setAttribute("aria-label", $("viewer-title").textContent);
+  $("viewer-body").replaceChildren(copy);
+  interactions(copy, $("viewer-tip"));
+  viewer.showModal();
+}
+
 /* Export ------------------------------------------------------------------ */
 
 const EXPORTS = [
@@ -998,6 +1021,8 @@ function wire() {
   drop.addEventListener("click", () => file.click());
   drop.addEventListener("keydown", (e) => (e.key === "Enter" || e.key === " ") && (e.preventDefault(), file.click()));
   file.addEventListener("change", () => readFile(file.files[0]));
+  $("expand").addEventListener("click", openViewer);
+  $("viewer-close").addEventListener("click", () => $("viewer").close());
   $("encoding").addEventListener("change", async () => {
     const bytes = state.bytes;
     resetForNewData();

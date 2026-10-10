@@ -693,6 +693,74 @@ html[data-start="map"] .sheet-wrap:not(.settled) {
   filter: grayscale(0.85) blur(1.5px);
   opacity: 0.35;
 }
+.expand {
+  display: none;
+  position: absolute;
+  top: 8px;
+  right: 8px;
+  z-index: 2;
+  width: 38px;
+  height: 38px;
+  place-items: center;
+  border: 1px solid var(--control);
+  border-radius: 999px;
+  background: color-mix(in srgb, var(--panel) 92%, transparent);
+  color: var(--ink);
+  cursor: pointer;
+}
+.expand:hover {
+  background: var(--line);
+}
+@media (max-width: 960px) {
+  .expand {
+    display: grid;
+  }
+}
+.viewer {
+  width: 100vw;
+  height: 100vh;
+  height: 100dvh;
+  max-width: none;
+  max-height: none;
+  margin: 0;
+  padding: 0;
+  border: 0;
+  background: var(--panel);
+  color: var(--ink);
+}
+.viewer[open] {
+  display: flex;
+  flex-direction: column;
+}
+.viewer::backdrop {
+  background: rgba(0, 0, 0, 0.5);
+}
+.viewer-bar {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 12px;
+  padding: 8px 12px;
+  border-bottom: 1px solid var(--line);
+  font: 600 15px/1.2 var(--serif);
+}
+.viewer-bar span {
+  min-width: 0;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+.viewer-scroll {
+  flex: 1;
+  overflow: auto;
+  touch-action: pan-x pan-y pinch-zoom;
+}
+.viewer-scroll svg {
+  display: block;
+  width: var(--viewer-width, 1000px);
+  max-width: none;
+  height: auto;
+}
 .stage-note {
   display: none;
   place-items: center;
