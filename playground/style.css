@@ -407,7 +407,6 @@ button {
   margin-top: 8px;
 }
 .chips {
-  min-height: 111px;
   display: flex;
   flex-wrap: wrap;
   gap: 8px;
@@ -666,6 +665,9 @@ html[data-start="note"] .sheet-wrap:not(.settled) {
 }
 html[data-start="map"] .sheet-wrap:not(.settled) {
   min-height: 230px;
+}
+html[data-start="map"] .sheet-wrap:not(.settled) .stage-note {
+  display: none;
 }
 .sheet-wrap.has-note {
   display: grid;
@@ -929,6 +931,12 @@ html[data-start="map"] .sheet-wrap:not(.settled) {
   }
   100% {
     transform: translateX(250%);
+  }
+}
+@media (max-width: 960px) {
+  /* Three rows of pills fit under the map on a phone, so the form below does not move when they appear. */
+  .join {
+    min-height: 92px;
   }
 }
 @media (max-width: 520px) {

@@ -115,7 +115,22 @@
             ></textarea>
           </details>
           <p class="muted small" data-i18n="data.examples">Or start from an example</p>
-          <div class="chips" id="examples"></div>
+          <!-- The same chips as the script builds, so the page keeps its shape until the script runs. -->
+          <div class="chips" id="examples">
+            <button class="chip" type="button" disabled data-i18n="examples.covid-raw">
+              COVID deaths, drawn badly
+            </button>
+            <button class="chip" type="button" disabled data-i18n="examples.life-expectancy">Life expectancy</button>
+            <button class="chip" type="button" disabled data-i18n="examples.us-county-unemployment">US counties</button>
+            <button class="chip" type="button" disabled data-i18n="examples.europe-gdp-per-capita">Europe GDP</button>
+            <button class="chip" type="button" disabled data-i18n="examples.population-symbols">
+              Population circles
+            </button>
+            <button class="chip" type="button" disabled data-i18n="examples.taiwan-township-area">
+              Taiwan townships
+            </button>
+            <button class="chip" type="button" disabled data-i18n="examples.japan-regions">Japan regions</button>
+          </div>
           <p class="status" id="data-status" role="status"></p>
           <label class="field" id="field-encoding" hidden
             ><span data-i18n="data.encoding">File encoding</span
@@ -239,9 +254,23 @@
       </aside>
 
       <section class="stage" aria-label="Map">
-        <div class="sheet-wrap">
+        <div class="sheet-wrap has-note">
           <div class="sheet" id="sheet" tabindex="-1"></div>
-          <div class="stage-note" id="stage-note" role="status"></div>
+          <!-- The card the script draws first (the blocked example), so the page keeps its shape until the script runs. -->
+          <div class="stage-note show" id="stage-note" role="status">
+            <div>
+              <strong>4 problems stop this map.</strong>
+              <ul class="stage-errors">
+                <li><code>raw-counts</code><span>The values are raw counts (data.kind is count).</span></li>
+                <li><code>projection-mercator</code><span>Mercator on a region 141 degrees of latitude tall.</span></li>
+                <li>
+                  <code>max-classes</code><span>9 classes is more than readers can tell apart. The limit is 7.</span>
+                </li>
+                <li><code>palette-order</code><span>Palette custom does not get steadily lighter or darker.</span></li>
+              </ul>
+              <div class="cta"><button class="btn primary" type="button" disabled>Fix them</button></div>
+            </div>
+          </div>
           <button class="expand" id="expand" type="button" hidden aria-haspopup="dialog">
             <svg viewBox="0 0 24 24" width="18" height="18" aria-hidden="true">
               <path
