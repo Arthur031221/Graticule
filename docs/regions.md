@@ -12,7 +12,7 @@ Generated from the code by scripts/build-docs.mjs.
 | `south-america` | country | azimuthal-equal-area | iso3, iso2, isonum, name | yes |
 | `oceania` | country | azimuthal-equal-area | iso3, iso2, isonum, name | yes |
 | `us-states` | state | albers-usa | fips, postal, name | yes |
-| `us-counties` | county | albers-usa | fips | yes |
+| `us-counties` | county | albers-usa | fips, name | yes |
 | `tw-counties` | county | azimuthal-equal-area | code, name | yes |
 | `tw-towns` | town | azimuthal-equal-area | code, name | yes |
 | `jp-prefectures` | prefecture | conic-equal-area | iso, jis, name | yes |
@@ -25,6 +25,7 @@ Not in the table: `custom` draws boundaries from your own GeoJSON or TopoJSON fi
 ## Details that matter
 
 - **world** and the continents use Natural Earth 1:50m countries. Antarctica is left out. Countries too small to see at the map's scale are drawn as dots, so a value is never lost. Dependencies share their parent's polygon only when Natural Earth does: French Guiana, Martinique, Guadeloupe, Mayotte and Reunion are part of France and cannot be mapped separately. Gibraltar and Tokelau have no polygon.
+- **us-counties** join by FIPS code or by the name with its state, in the forms a table writes: `Mohave County, AZ`, `Orleans Parish, LA`, `Anchorage Municipality, AK`, `Alexandria city, VA`. The state may be the postal code or the full name. A name without a state is never matched, because most county names exist in several states, and a name two areas share (a Virginia county and the independent city of the same name) is reported as ambiguous.
 - **us-states** and **us-counties** use Albers with Alaska, Hawaii and Puerto Rico moved below the lower 48. Alaska is drawn at 35 percent of the scale of the lower 48, so areas are comparable inside each piece and not between Alaska and the rest. American Samoa, Guam, the Northern Mariana Islands and the US Virgin Islands are not drawn. Population is the Census Bureau estimate for 2023 (July 1).
 - **tw-counties** and **tw-towns** use a Lambert azimuthal equal-area projection centred on Taiwan. Kinmen and Lienchiang (Matsu) are shown as insets, each with its own projection. Wuqiu, a part of Kinmen County far from Kinmen, is not drawn. Township names exist in English and Traditional Chinese only, so other label languages fall back to those.
 - **jp-prefectures** shows Okinawa as an inset. Islands south of 30 degrees north other than Okinawa (Amami, Ogasawara) are not drawn.

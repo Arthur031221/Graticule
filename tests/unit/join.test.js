@@ -2,7 +2,7 @@ import assert from "node:assert/strict";
 import { test } from "node:test";
 import { loadAreas } from "../../src/geo.js";
 import { buildIndex, detectKind, joinKeys, loadAliases, rankKeyColumns } from "../../src/join.js";
-import { damagedNamePattern, normalizeName, suggest } from "../../src/names.js";
+import { damagedNamePattern, editDistance, normalizeName, suggest } from "../../src/names.js";
 import { assets } from "./helpers.js";
 
 async function indexFor(region) {
@@ -277,4 +277,73 @@ test("every regional alias points at an area of its region and no alias is claim
       seen.set(key, id);
     }
   }
+});
+
+test("US counties join by the name with the state, the way tables write them", async () => {
+  const us = await indexFor("us-counties");
+  const expected = {
+    "Los Angeles County, CA": "06037",
+    "Los Angeles County, California": "06037",
+    "Los Angeles, CA": "06037",
+    "Orleans Parish, LA": "22071",
+    "Anchorage Municipality, AK": "02020",
+    "Alexandria city, VA": "51510",
+    "Richmond city, VA": "51760",
+    "Richmond County, VA": "51159",
+    "Saint Louis County, Missouri": "29189",
+    "St. Louis city, MO": "29510",
+    "Doña Ana County, NM": "35013",
+    "Dona Ana County, NM": "35013",
+    "Baltimore city, MD": "24510",
+    "Baltimore County, MD": "24005",
+    "Carson City, NV": "32510",
+    "Charles City County, VA": "51036",
+    "District of Columbia, DC": "11001",
+  };
+  for (const [name, fips] of Object.entries(expected))
+    assert.deepEqual(idsOf(joinKeys([name], us.index, "name")), [fips], name);
+});
+
+test("a county name that two counties share is ambiguous and a bare name is not matched", async () => {
+  const us = await indexFor("us-counties");
+  const richmond = joinKeys(["Richmond, VA"], us.index, "name");
+  assert.equal(richmond.rowsByArea.size, 0);
+  assert.equal(richmond.ambiguous.length, 1);
+  assert.equal(joinKeys(["Mohave", "Washington County"], us.index, "name").rowsByArea.size, 0);
+  assert.deepEqual(us.order, ["fips", "name"]);
+});
+
+test("the state table of the county names agrees with the bundled states", async () => {
+  const { US_STATES } = await import("../../src/us-names.js");
+  const { areas } = await loadAreas("us-states", assets);
+  for (const area of areas) assert.deepEqual(US_STATES[area.id], [area.keys.postal[0], area.names[0]], area.id);
+  assert.equal(Object.keys(US_STATES).length, areas.length);
+});
+
+test("a limited edit distance is the full one when within the limit and above the limit when not", () => {
+  const letters = "abcde";
+  let seed = 7;
+  const next = () => (seed = (seed * 1103515245 + 12345) % 2147483648);
+  const word = () => Array.from({ length: 3 + (next() % 8) }, () => letters[next() % letters.length]).join("");
+  for (let i = 0; i < 400; i++) {
+    const a = word();
+    const b = word();
+    for (const limit of [0, 1, 2, 3]) {
+      assert.equal(
+        Math.min(editDistance(a, b, limit), limit + 1),
+        Math.min(editDistance(a, b), limit + 1),
+        `${a} ${b} ${limit}`,
+      );
+    }
+  }
+});
+
+test("hundreds of unmatched county names are reported in a moment", async () => {
+  const us = await indexFor("us-counties");
+  const wrong = Array.from({ length: 300 }, (_, i) => `Nonexistent${i} County, TX`);
+  const started = performance.now();
+  const result = joinKeys(wrong, us.index, "name");
+  assert.equal(result.unmatched.length, 300);
+  assert.ok(performance.now() - started < 5000, `${Math.round(performance.now() - started)} ms`);
+  assert.equal(result.unmatched[299].suggestions.length, 0);
 });

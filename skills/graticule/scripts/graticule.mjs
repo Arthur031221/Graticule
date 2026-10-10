@@ -153482,7 +153482,7 @@ var REGIONS = {
     level: "county",
     projection: "albers-usa",
     hide: ["60", "66", "69", "78"],
-    keys: ["fips"],
+    keys: ["fips", "name"],
     title: "United States, counties (US Census cartographic boundaries)",
     strokeMesh: "states",
     population: true
@@ -153612,18 +153612,23 @@ function nameVariants(name) {
   }
   return [...out].filter(Boolean);
 }
-function editDistance(a, b) {
+function editDistance(a, b, limit = Infinity) {
   const x2 = [...a];
   const y = [...b];
   const d = Array.from({ length: x2.length + 1 }, (_, i2) => [i2, ...Array(y.length).fill(0)]);
   for (let j = 0; j <= y.length; j++) d[0][j] = j;
+  let previousMin = 0;
   for (let i2 = 1; i2 <= x2.length; i2++) {
+    let rowMin = d[i2][0];
     for (let j = 1; j <= y.length; j++) {
       const cost = x2[i2 - 1] === y[j - 1] ? 0 : 1;
       d[i2][j] = Math.min(d[i2 - 1][j] + 1, d[i2][j - 1] + 1, d[i2 - 1][j - 1] + cost);
       if (i2 > 1 && j > 1 && x2[i2 - 1] === y[j - 2] && x2[i2 - 2] === y[j - 1])
         d[i2][j] = Math.min(d[i2][j], d[i2 - 2][j - 2] + 1);
+      if (d[i2][j] < rowMin) rowMin = d[i2][j];
     }
+    if (rowMin > limit && previousMin > limit) return limit + 1;
+    previousMin = rowMin;
   }
   return d[x2.length][y.length];
 }
@@ -153631,12 +153636,12 @@ function suggest(value, candidates, limit = 2) {
   const key = normalizeName(value);
   if (key.length < 3) return [];
   const best = /* @__PURE__ */ new Map();
+  const allowed = Math.max(2, Math.floor(key.length * 0.25));
   for (const [norm, label] of candidates) {
     const prefix = key.length >= 4 && norm.length > key.length && norm.startsWith(key) && norm.length - key.length <= 12;
-    if (!prefix && Math.abs(norm.length - key.length) > 4) continue;
-    const distance2 = prefix ? 1 : editDistance(key, norm);
-    if (distance2 <= Math.max(2, Math.floor(key.length * 0.25)) && distance2 < (best.get(label) ?? Infinity))
-      best.set(label, distance2);
+    if (!prefix && Math.abs(norm.length - key.length) > Math.min(4, allowed)) continue;
+    const distance2 = prefix ? 1 : editDistance(key, norm, allowed);
+    if (distance2 <= allowed && distance2 < (best.get(label) ?? Infinity)) best.set(label, distance2);
   }
   return [...best].sort((p, q) => p[1] - q[1]).slice(0, limit).map(([label]) => label);
 }
@@ -153649,6 +153654,71 @@ var FORMAL_PREFIX = /^(?:the\s+)?(?:(?:people's\s+democratic|democratic\s+social
 function formalVariants(value) {
   const stripped = String(value).trim().replace(FORMAL_PREFIX, "");
   return stripped && stripped !== String(value).trim() ? [stripped] : [];
+}
+
+// src/us-names.js
+var US_STATES = {
+  "01": ["AL", "Alabama"],
+  "02": ["AK", "Alaska"],
+  "04": ["AZ", "Arizona"],
+  "05": ["AR", "Arkansas"],
+  "06": ["CA", "California"],
+  "08": ["CO", "Colorado"],
+  "09": ["CT", "Connecticut"],
+  10: ["DE", "Delaware"],
+  11: ["DC", "District of Columbia"],
+  12: ["FL", "Florida"],
+  13: ["GA", "Georgia"],
+  15: ["HI", "Hawaii"],
+  16: ["ID", "Idaho"],
+  17: ["IL", "Illinois"],
+  18: ["IN", "Indiana"],
+  19: ["IA", "Iowa"],
+  20: ["KS", "Kansas"],
+  21: ["KY", "Kentucky"],
+  22: ["LA", "Louisiana"],
+  23: ["ME", "Maine"],
+  24: ["MD", "Maryland"],
+  25: ["MA", "Massachusetts"],
+  26: ["MI", "Michigan"],
+  27: ["MN", "Minnesota"],
+  28: ["MS", "Mississippi"],
+  29: ["MO", "Missouri"],
+  30: ["MT", "Montana"],
+  31: ["NE", "Nebraska"],
+  32: ["NV", "Nevada"],
+  33: ["NH", "New Hampshire"],
+  34: ["NJ", "New Jersey"],
+  35: ["NM", "New Mexico"],
+  36: ["NY", "New York"],
+  37: ["NC", "North Carolina"],
+  38: ["ND", "North Dakota"],
+  39: ["OH", "Ohio"],
+  40: ["OK", "Oklahoma"],
+  41: ["OR", "Oregon"],
+  42: ["PA", "Pennsylvania"],
+  44: ["RI", "Rhode Island"],
+  45: ["SC", "South Carolina"],
+  46: ["SD", "South Dakota"],
+  47: ["TN", "Tennessee"],
+  48: ["TX", "Texas"],
+  49: ["UT", "Utah"],
+  50: ["VT", "Vermont"],
+  51: ["VA", "Virginia"],
+  53: ["WA", "Washington"],
+  54: ["WV", "West Virginia"],
+  55: ["WI", "Wisconsin"],
+  56: ["WY", "Wyoming"],
+  72: ["PR", "Puerto Rico"]
+};
+var INDEPENDENT_CITIES = /* @__PURE__ */ new Set(["24", "29", "32", "51"]);
+function countyNames(fips, name) {
+  const state = US_STATES[fips.slice(0, 2)];
+  if (!state) return [];
+  const independent = INDEPENDENT_CITIES.has(fips.slice(0, 2)) && Number(fips.slice(2)) >= 500;
+  const types = independent ? ["city", ""] : fips.startsWith("22") ? ["Parish", ""] : fips.startsWith("02") ? ["Borough", "Census Area", "Municipality", "City and Borough", ""] : fips.startsWith("72") ? ["Municipio", "Municipality", ""] : ["County", ""];
+  const spellings = types.flatMap((type) => state.map((place) => [name, type, place].filter(Boolean).join(" ")));
+  return [...new Set(spellings.flatMap(nameVariants))];
 }
 
 // src/geo.js
@@ -153686,7 +153756,7 @@ function keysFor(level, p, names) {
     case "state":
       return { fips: [p.id], postal: p.postal ? [p.postal] : [], name: spellings };
     case "county":
-      return p.iso ? { code: [p.id], name: spellings } : { fips: [p.id], name: [] };
+      return p.iso ? { code: [p.id], name: spellings } : { fips: [p.id], name: countyNames(p.id, names[0] ?? "") };
     case "town":
       return {
         code: [p.id],
@@ -153813,6 +153883,7 @@ function parseColumn(cells) {
 }
 
 // src/join.js
+var MAX_SUGGESTED = 25;
 var PAD = { fips: 0, isonum: 3, jis: 2 };
 function normalizeCode(kind, value) {
   const text2 = String(value).trim().toUpperCase();
@@ -153947,9 +154018,9 @@ function joinKeys(values, index, kind) {
     const count = values.filter((v) => v === raw).length;
     via[result.padded ? "padded" : result.via] += count;
   }
-  const missing = [...unmatched.values()].map((u) => ({
+  const missing = [...unmatched.values()].map((u, i2) => ({
     ...u,
-    suggestions: kind === "name" ? suggest(u.value, index.labels) : []
+    suggestions: kind === "name" && i2 < MAX_SUGGESTED ? suggest(u.value, index.labels) : []
   }));
   return { kind, rowsByArea, unmatched: missing, ambiguous: [...ambiguous.values()], via, blank };
 }
@@ -158351,7 +158422,7 @@ function nodeAssets(root = findAssetRoot()) {
 }
 
 // src/version.js
-var VERSION = "0.3.0";
+var VERSION = "0.3.1";
 
 // src/report.js
 var MAX_LISTED = 12;

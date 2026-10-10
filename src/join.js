@@ -7,6 +7,8 @@ import { damagedNamePattern, formalVariants, normalizeName, suggest } from "./na
  * @typedef {{ kinds: Record<string, Map<string, Entry[]>>, labels: [string, string][], byId: Map<string, Area> }} Index
  */
 
+/** How many unmatched names get suggestions of the closest spelling. */
+const MAX_SUGGESTED = 25;
 const PAD = { fips: 0, isonum: 3, jis: 2 };
 
 function normalizeCode(kind, value) {
@@ -211,9 +213,10 @@ export function joinKeys(values, index, kind) {
     const count = values.filter((v) => v === raw).length;
     via[result.padded ? "padded" : result.via] += count;
   }
-  const missing = [...unmatched.values()].map((u) => ({
+  // Suggestions take a scan of every known name, and a report lists a dozen: the first ones are enough.
+  const missing = [...unmatched.values()].map((u, i) => ({
     ...u,
-    suggestions: kind === "name" ? suggest(u.value, index.labels) : [],
+    suggestions: kind === "name" && i < MAX_SUGGESTED ? suggest(u.value, index.labels) : [],
   }));
   return { kind, rowsByArea, unmatched: missing, ambiguous: [...ambiguous.values()], via, blank };
 }

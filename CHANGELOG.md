@@ -1,5 +1,12 @@
 # Changelog
 
+## 0.3.1 (2026-10-11)
+
+- US counties join by name with the state: `Mohave County, AZ`, `Orleans Parish, LA`, `Anchorage Municipality, AK`, `Alexandria city, VA`. The state may be the postal code or the full name. A name two areas share is reported as ambiguous and a name without a state is never matched.
+- Playground: the buttons of a blocked card work when a map was drawn before, because the greyed map no longer takes their clicks. Small multiples start with the numeric columns ticked, and spec errors such as a missing highlight get a Go to field button.
+- A table with hundreds of unmatched names is reported in under a second instead of several.
+- `render` lists the check log among the files it wrote, and the install page names the program for each install route.
+
 ## 0.3.0 (2026-10-10)
 
 - `--fix` divides raw counts by population in Taiwan, Japan and South Korea too. Counties and townships carry the Ministry of the Interior household registration at the end of 2023, prefectures the 2020 census and provinces the 2020 census. `scripts/add-population.mjs` fetches the sources and stops unless each total matches the official figure.

@@ -49,19 +49,29 @@ export function nameVariants(name) {
   return [...out].filter(Boolean);
 }
 
-/** Edit distance (insertions, deletions, substitutions, adjacent swaps). */
-export function editDistance(a, b) {
+/**
+ * Edit distance (insertions, deletions, substitutions, adjacent swaps). With a limit it gives up
+ * once the distance is certain to be above it, and then returns a number above the limit. That
+ * is much faster for names that are far apart.
+ */
+export function editDistance(a, b, limit = Infinity) {
   const x = [...a];
   const y = [...b];
   const d = Array.from({ length: x.length + 1 }, (_, i) => [i, ...Array(y.length).fill(0)]);
   for (let j = 0; j <= y.length; j++) d[0][j] = j;
+  let previousMin = 0;
   for (let i = 1; i <= x.length; i++) {
+    let rowMin = d[i][0];
     for (let j = 1; j <= y.length; j++) {
       const cost = x[i - 1] === y[j - 1] ? 0 : 1;
       d[i][j] = Math.min(d[i - 1][j] + 1, d[i][j - 1] + 1, d[i - 1][j - 1] + cost);
       if (i > 1 && j > 1 && x[i - 1] === y[j - 2] && x[i - 2] === y[j - 1])
         d[i][j] = Math.min(d[i][j], d[i - 2][j - 2] + 1);
+      if (d[i][j] < rowMin) rowMin = d[i][j];
     }
+    // A distance never falls below the smaller of the last two rows, so once both are over the limit it cannot return.
+    if (rowMin > limit && previousMin > limit) return limit + 1;
+    previousMin = rowMin;
   }
   return d[x.length][y.length];
 }
@@ -77,14 +87,14 @@ export function suggest(value, candidates, limit = 2) {
   const key = normalizeName(value);
   if (key.length < 3) return [];
   const best = new Map();
+  const allowed = Math.max(2, Math.floor(key.length * 0.25));
   for (const [norm, label] of candidates) {
     // Names are normalised without spaces, so "Chiayi" starts both "chiayicity" and "chiayicounty".
     const prefix =
       key.length >= 4 && norm.length > key.length && norm.startsWith(key) && norm.length - key.length <= 12;
-    if (!prefix && Math.abs(norm.length - key.length) > 4) continue;
-    const distance = prefix ? 1 : editDistance(key, norm);
-    if (distance <= Math.max(2, Math.floor(key.length * 0.25)) && distance < (best.get(label) ?? Infinity))
-      best.set(label, distance);
+    if (!prefix && Math.abs(norm.length - key.length) > Math.min(4, allowed)) continue;
+    const distance = prefix ? 1 : editDistance(key, norm, allowed);
+    if (distance <= allowed && distance < (best.get(label) ?? Infinity)) best.set(label, distance);
   }
   return [...best]
     .sort((p, q) => p[1] - q[1])

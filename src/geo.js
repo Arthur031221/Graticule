@@ -3,6 +3,7 @@ import { geoArea } from "d3-geo";
 import { getRegion } from "./regions.js";
 import { langIndex, LANGS } from "./lang.js";
 import { nameVariants } from "./names.js";
+import { countyNames } from "./us-names.js";
 
 const EARTH_RADIUS_KM = 6371.0088;
 
@@ -57,7 +58,7 @@ function keysFor(level, p, names) {
     case "state":
       return { fips: [p.id], postal: p.postal ? [p.postal] : [], name: spellings };
     case "county":
-      return p.iso ? { code: [p.id], name: spellings } : { fips: [p.id], name: [] };
+      return p.iso ? { code: [p.id], name: spellings } : { fips: [p.id], name: countyNames(p.id, names[0] ?? "") };
     case "town":
       return {
         code: [p.id],

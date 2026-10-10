@@ -479,3 +479,20 @@ test("the buttons of a blocked card stay clickable over the greyed map left behi
   await expect(page.locator("#stage-note")).not.toHaveClass(/show/);
   await expect(svg(page)).toBeVisible();
 });
+
+test("a table of county names with their state joins US counties", async ({ page }) => {
+  await page.goto("/");
+  const csv = [
+    "county,rate",
+    "Los Angeles County CA,4.1",
+    "Cook County IL,3.8",
+    "Harris County TX,3.2",
+    "Orleans Parish LA,5.0",
+    "Anchorage Municipality AK,4.4",
+    "Alexandria city VA,2.7",
+  ].join("\n");
+  await page.locator("#file").setInputFiles({ name: "counties.csv", mimeType: "text/csv", buffer: Buffer.from(csv) });
+  await expect(page.locator("#region")).toHaveValue("us-counties");
+  await expect(page.locator("#join-summary")).toContainText("6 of 6 rows matched 6 areas");
+  await expect(page.locator("#value")).toHaveValue("rate");
+});

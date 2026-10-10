@@ -133,7 +133,7 @@ export const REGIONS = {
     level: "county",
     projection: "albers-usa",
     hide: ["60", "66", "69", "78"],
-    keys: ["fips"],
+    keys: ["fips", "name"],
     title: "United States, counties (US Census cartographic boundaries)",
     strokeMesh: "states",
     population: true,
