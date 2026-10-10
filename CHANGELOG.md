@@ -1,5 +1,14 @@
 # Changelog
 
+## 0.3.0 (2026-10-10)
+
+- `--fix` divides raw counts by population in Taiwan, Japan and South Korea too. Counties and townships carry the Ministry of the Interior household registration at the end of 2023, prefectures the 2020 census and provinces the 2020 census. `scripts/add-population.mjs` fetches the sources and stops unless each total matches the official figure.
+- Playground: on a phone the map opens full screen at a size where labels can be read, and pans by touch. The page no longer jumps while it loads, because the stage and the example chips keep their space.
+- Custom boundaries are sturdier. Rings are turned the way d3 wants by their own winding, so holes, polygons wider than a hemisphere and the antimeridian all draw correctly. A feature id works as a key, every spelling of WGS84 is accepted and a property called `constructor` is only a property.
+- Gallery: Brazil's states from a TopoJSON file, with the 2022 census from IBGE divided by the area measured from the boundary file.
+- Playground races closed: an older file, example or region lookup can no longer replace a newer one.
+- Issue forms, a pull request checklist and a security policy.
+
 ## 0.2.0 (2026-10-10)
 
 - Your own boundaries. `region: "custom"` with a `boundaries` block draws any GeoJSON or TopoJSON file of polygons. Every property that differs per feature becomes a key type, so a table joins on whichever column matches. The projection is an equal-area one chosen from the extent. Files in metres are refused with the command that reprojects them. `graticule join` and `graticule init` take `--boundaries`, and the playground takes the file next to the table.
