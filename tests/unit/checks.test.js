@@ -526,3 +526,19 @@ test("a blank key cell does not stop the key column from being found", async () 
   assert.equal(result.analysis.join.column, "c");
   assert.ok(ids(result).includes("join-blank"));
 });
+
+test("a long list of unmatched names is cut after twenty and says how many are left out", async () => {
+  const { loadAreas } = await import("../../src/geo.js");
+  const { assets } = await import("./helpers.js");
+  const { areas } = await loadAreas("world", assets);
+  const rows = [
+    ...areas.slice(0, 120).map((a, i) => ({ iso3: a.id, v: i + 1 })),
+    ...Array.from({ length: 60 }, (_, i) => ({ iso3: `ZZ${i}`, v: 1 })),
+  ];
+  const result = await build(base({ data: { rows, key: "iso3", value: "v", kind: "rate", label: "Units" } }));
+  const finding = result.findings.find((f) => f.id === "join-unmatched");
+  assert.match(finding.message, /^60 rows matched no area/);
+  assert.match(finding.message, /; \.\.\. \(\+40\)\.$/);
+  assert.equal(finding.message.split("; ").length, 21);
+  assert.equal(result.analysis.join.unmatched.length, 60);
+});

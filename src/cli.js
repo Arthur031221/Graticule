@@ -136,7 +136,19 @@ async function readTable(path, encoding) {
     console.error(
       `${path} is not valid UTF-8, so it was read as ${used}. If names look wrong, pass --encoding (big5, shift_jis, euc-kr, gbk) or save the file as UTF-8.`,
     );
-  return parseTable(text);
+  const table = parseTable(text);
+  const { duplicateColumns, unterminatedQuote, raggedRows } = table.problems;
+  if (unterminatedQuote)
+    console.error(`${path}: a quoted field never closes, which swallows the rows after it. Check the quotes.`);
+  if (duplicateColumns.length)
+    console.error(
+      `${path}: the column name ${duplicateColumns.join(", ")} appears more than once, so it is not clear which one is meant.`,
+    );
+  if (raggedRows)
+    console.error(
+      `${path}: ${raggedRows} ${raggedRows === 1 ? "row has" : "rows have"} a different number of cells than the header.`,
+    );
+  return table;
 }
 
 /** Builds the map for the render and check commands. */

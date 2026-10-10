@@ -155956,6 +155956,8 @@ function checkAnalysis(a) {
   }
   return findings;
 }
+var MAX_NAMES = 20;
+var namesOf = (items, render) => items.slice(0, MAX_NAMES).map(render).join("; ") + (items.length > MAX_NAMES ? `; ... (+${items.length - MAX_NAMES})` : "");
 function checkJoin(a, add2) {
   const { join: join3 } = a;
   const keyed = join3.tableRows.filter((r) => (r[join3.column] ?? "").trim() !== "").length;
@@ -155973,13 +155975,16 @@ function checkJoin(a, add2) {
     const rows = join3.unmatched.reduce((n, u) => n + u.rows.length, 0);
     add2("join-unmatched", "warn", {
       count: rows,
-      list: join3.unmatched.map((u) => u.suggestions.length ? `${u.value} (${u.suggestions.join(" or ")}?)` : u.value).join("; ")
+      list: namesOf(
+        join3.unmatched,
+        (u) => u.suggestions.length ? `${u.value} (${u.suggestions.join(" or ")}?)` : u.value
+      )
     });
   }
   if (join3.blank) add2("join-blank", "warn", { count: join3.blank });
   if (join3.ambiguous.length)
     add2("join-ambiguous", "warn", {
-      list: join3.ambiguous.map((u) => `${u.value} (${u.candidates.join(" or ")})`).join("; ")
+      list: namesOf(join3.ambiguous, (u) => `${u.value} (${u.candidates.join(" or ")})`)
     });
 }
 function checkRawCounts(a, add2) {
@@ -158608,7 +158613,19 @@ async function readTable(path, encoding) {
     console.error(
       `${path} is not valid UTF-8, so it was read as ${used}. If names look wrong, pass --encoding (big5, shift_jis, euc-kr, gbk) or save the file as UTF-8.`
     );
-  return parseTable(text2);
+  const table = parseTable(text2);
+  const { duplicateColumns, unterminatedQuote, raggedRows } = table.problems;
+  if (unterminatedQuote)
+    console.error(`${path}: a quoted field never closes, which swallows the rows after it. Check the quotes.`);
+  if (duplicateColumns.length)
+    console.error(
+      `${path}: the column name ${duplicateColumns.join(", ")} appears more than once, so it is not clear which one is meant.`
+    );
+  if (raggedRows)
+    console.error(
+      `${path}: ${raggedRows} ${raggedRows === 1 ? "row has" : "rows have"} a different number of cells than the header.`
+    );
+  return table;
 }
 async function build(specPath, flags, assets) {
   const spec = await readSpec(specPath);

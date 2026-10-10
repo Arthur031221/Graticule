@@ -180,6 +180,12 @@ export function checkAnalysis(a) {
   return findings;
 }
 
+/** The first names of a long list, with how many are left out. The full list is in the JSON report. */
+const MAX_NAMES = 20;
+const namesOf = (items, render) =>
+  items.slice(0, MAX_NAMES).map(render).join("; ") +
+  (items.length > MAX_NAMES ? `; ... (+${items.length - MAX_NAMES})` : "");
+
 function checkJoin(a, add) {
   const { join } = a;
   const keyed = join.tableRows.filter((r) => (r[join.column] ?? "").trim() !== "").length;
@@ -197,15 +203,15 @@ function checkJoin(a, add) {
     const rows = join.unmatched.reduce((n, u) => n + u.rows.length, 0);
     add("join-unmatched", "warn", {
       count: rows,
-      list: join.unmatched
-        .map((u) => (u.suggestions.length ? `${u.value} (${u.suggestions.join(" or ")}?)` : u.value))
-        .join("; "),
+      list: namesOf(join.unmatched, (u) =>
+        u.suggestions.length ? `${u.value} (${u.suggestions.join(" or ")}?)` : u.value,
+      ),
     });
   }
   if (join.blank) add("join-blank", "warn", { count: join.blank });
   if (join.ambiguous.length)
     add("join-ambiguous", "warn", {
-      list: join.ambiguous.map((u) => `${u.value} (${u.candidates.join(" or ")})`).join("; "),
+      list: namesOf(join.ambiguous, (u) => `${u.value} (${u.candidates.join(" or ")})`),
     });
 }
 

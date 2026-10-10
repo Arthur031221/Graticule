@@ -214,6 +214,21 @@ test("a spec may not read boundaries from outside its folder", async () => {
   assert.match(result.stdout, /outside the folder of the spec/);
 });
 
+test("join and init warn about a table with a quote that never closes, repeated columns or short rows", async () => {
+  const out = await mkdtemp(join(tmpdir(), "graticule-"));
+  await writeFile(join(out, "quote.csv"), 'country,value\n"France,1\nJapan,3\nBrazil,5\n');
+  await writeFile(join(out, "dup.csv"), "country,value,value\nFrance,1,2\nJapan,3,4\nBrazil,5,6\n");
+  await writeFile(join(out, "short.csv"), "country,value\nFrance,1\nJapan\nBrazil,5\nKenya,2\n");
+  const quote = await graticule("join", join(out, "quote.csv"), "--region", "world");
+  assert.match(quote.stderr, /quote\.csv: a quoted field never closes/);
+  const dup = await graticule("join", join(out, "dup.csv"), "--region", "world");
+  assert.match(dup.stderr, /the column name value appears more than once/);
+  const short = await graticule("init", join(out, "short.csv"), "--region", "world");
+  assert.match(short.stderr, /1 row has a different number of cells than the header/);
+  const clean = await graticule("join", "life-expectancy/data.csv", "--region", "world");
+  assert.equal(clean.stderr, "");
+});
+
 test("init writes the table's path relative to where the spec will be saved", async () => {
   const out = await mkdtemp(join(tmpdir(), "graticule-"));
   await writeFile(join(out, "data.csv"), await readFile(join(gallery, "life-expectancy/data.csv"), "utf8"));
